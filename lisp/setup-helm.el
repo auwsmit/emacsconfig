@@ -14,25 +14,22 @@
   (custom-set-variables
    '(helm-recentf-fuzzy-match t)
    '(helm-buffers-fuzzy-matching t)
-   ;; '(helm-locate-fuzzy-match t)
    '(helm-M-x-fuzzy-match t)
-   ;; '(helm-semantic-fuzzy-match t)
-   ;; '(helm-imenu-fuzzy-match t)
-   ;; '(helm-apropos-fuzzy-match t)
-   ;; '(helm-lisp-fuzzy-completion t)
-   '(helm-completion-in-region-fuzzy-match t)
-   )
+   '(helm-apropos-fuzzy-match t)
+   '(helm-completion-in-region-fuzzy-match t))
 
-  ;; More Evil friendly bindings
+  ;; Evil-friendly bindings
   (define-key helm-map (kbd "C-j") 'helm-next-line)
   (define-key helm-map (kbd "C-k") 'helm-previous-line)
   (define-key helm-map (kbd "C-n") 'helm-next-source)
   (define-key helm-map (kbd "C-p") 'helm-previous-source)
 
-  ;; Helm execute-command
-  (global-set-key (kbd "M-x") 'helm-M-x)
+  ;; ;; Helm for default M-x
+  ;; (global-set-key (kbd "M-x") 'helm-M-x)
+  ;; ;; old M-x
+  ;; (global-set-key (kbd "C-x x") 'execute-extended-command)
 
-  ;; Possible fuzzy search improvements
+  ;; ;; Possible fuzzy search improvements
   ;; (use-package helm-flx
   ;;   :config
   ;;   (helm-flx-mode +1))

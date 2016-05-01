@@ -18,8 +18,14 @@
 ;; Allow recursive minibuffers
 (setq enable-recursive-minibuffers t)
 
-;; Don't be so stingy on the memory, we have lots now. It's the distant future.
-(setq gc-cons-threshold 20000000)
+(defun my-minibuffer-setup-hook ()
+  (setq gc-cons-threshold most-positive-fixnum))
+
+(defun my-minibuffer-exit-hook ()
+  (setq gc-cons-threshold 800000))
+
+(add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
+(add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
 
 ;; Enable HideShow
 (add-hook 'prog-mode-hook (lambda () (hs-minor-mode t)))

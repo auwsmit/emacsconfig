@@ -25,7 +25,7 @@
 (set-fringe-bitmap-face 'tilde 'font-lock-comment-face)
 (setq-default indicate-empty-lines t)
 
-;; TODO: personally modify monokai
+;; Theme
 (use-package monokai-theme
   :config
   (load-theme 'monokai t))
@@ -42,14 +42,14 @@
   (setq sml/theme 'dark)
   (sml/setup))
 
-;; memes
-(use-package nyan-mode
-  :config
-  (setq nyan-bar-length 8)
-  ;; (nyan-toggle-wavy-trail)
-  ;; (nyan-start-animation)
-  (nyan-mode t)
-  )
+;; ;; memes
+;; (use-package nyan-mode
+;;   :config
+;;   (setq nyan-bar-length 8)
+;;   ;; (nyan-toggle-wavy-trail)
+;;   ;; (nyan-start-animation)
+;;   (nyan-mode t)
+;;   )
 
 ;; Unclutter modeline
 (use-package diminish)
@@ -57,7 +57,7 @@
 (eval-after-load "HideShow" '(diminish 'hs-minor-mode))
 (eval-after-load "undo-tree" '(diminish 'undo-tree-mode))
 
-;; Pretty powerline
+;; ;; Pretty powerline
 ;; (use-package powerline-evil
 ;;   :config
 ;;   (powerline-evil-vim-color-theme)

@@ -1,9 +1,3 @@
-(defun preconfig-evil ()
-  "Configure Evil mode variables BEFORE activation."
-  (setq evil-want-fine-undo "No")
-  (setq evil-want-C-u-scroll t)
-  (setq evil-ex-substitute-global t))
-
 (defun config-evil-custom-bindings ()
   "Define custom key bindings for Evil mode."
 
@@ -39,28 +33,48 @@
   (define-key evil-insert-state-map "\C-a" 'move-beginning-of-line)
   (define-key evil-insert-state-map "\C-e" 'move-end-of-line)
 
+  ;; Window navigation
+  (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
+  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
+  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
+  (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+
   ;; select pasted text
   (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
+
+  ;; vim-sayonara
+  (define-key evil-normal-state-map (kbd "g s") 'evil-delete-buffer)
+  (define-key evil-normal-state-map (kbd "g S") 'my/evil-delete-buffer-keep-windows)
 
   ;; unimpaired (work in progress)
   (defun my/evil-blank-above (count)
     "Add [count] blank lines above the point."
     (interactive "p")
+    (setq col (current-column))
     (while (> count 0)
       (evil-insert-newline-above)
       (forward-line 1)
       (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
-      (setq count (1- count))))
+      (setq count (1- count)))
+    (move-to-column col))
   (defun my/evil-blank-below (count)
     "Add [count] blank lines below the point."
     (interactive "p")
+    (setq col (current-column))
     (while (> count 0)
       (evil-insert-newline-below)
       (forward-line -1)
       (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
-      (setq count (1- count))))
+      (setq count (1- count)))
+    (move-to-column col))
   (define-key evil-normal-state-map (kbd "[ SPC") 'my/evil-blank-above)
-  (define-key evil-normal-state-map (kbd "] SPC") 'my/evil-blank-below))
+  (define-key evil-normal-state-map (kbd "] SPC") 'my/evil-blank-below)
+
+  ;; "get option" is the mnemonic
+  ;; Also GoT is pretty good
+  (define-key evil-normal-state-map (kbd "g o t") 'toggle-truncate-lines)
+  (define-key evil-normal-state-map (kbd "g o n") 'linum-mode)
+  (define-key evil-normal-state-map (kbd "g o s") 'flyspell-mode))
 
 (defun config-evil-other-modes ()
   "Define custom key bindings for other modes to be more consistent
@@ -119,12 +133,17 @@
 
   ;; Start these modes in Normal state
   (evil-set-initial-state 'debugger-mode 'normal)
-  (evil-set-initial-state 'Custom-mode 'normal)
 
   ;; Use Evil search over Emacs search
   ;; (C-s is still i-search)
   (custom-set-variables
    '(evil-search-module (quote evil-search)))
+
+  ;; Center evil search
+  (defadvice evil-ex-start-search (after advice-for-evil-ex-start-search activate)
+    (evil-scroll-line-to-center (line-number-at-pos)))
+  (defadvice evil-ex-search (after advice-for-evil-ex-search activate)
+    (evil-scroll-line-to-center (line-number-at-pos)))
 
   ;; Dehighlight Evil search on cursor move
   ;; TODO: Somehow make this only active during evil search.
@@ -168,54 +187,57 @@
     (interactive)
     (find-file "~/.emacs.d/init.el"))
 
+  (define-key evil-normal-state-map (kbd "SPC TAB") 'other-window)
+
   (evil-leader/set-key
     "S"  'shell
     "i"  'my/open-init-el
     "w"  'evil-write
-    "x"  'evil-delete-buffer
-    "X"  'my/evil-delete-buffer-keep-windows
     "b"  'ido-switch-buffer
     "f"  'ido-find-file
+    "hh"  'help-for-help
     "hr"  'helm-recentf
     "hb"  'helm-buffers-list
     "hf"  'helm-find-files
-    "<SPC>" 'other-window))
+    "ha"  'helm-apropos
+    "<SPC>" 'helm-M-x))
 
 (use-package evil
   :init
-  (preconfig-evil)
+  (setq evil-want-fine-undo "No")
+  (setq evil-want-C-u-scroll t)
+  (setq evil-ex-substitute-global t)
   :config
   (add-hook 'evil-mode-hook 'config-evil)
 
+  ;; Leader key
   (use-package evil-leader
     :config
     (config-evil-leader)
     (global-evil-leader-mode))
 
+  ;; Manipulate surroundings
   (use-package evil-surround
     :config
     (global-evil-surround-mode))
 
+  ;; Exchange operator
   (use-package evil-exchange
     :config
+    ;; "[g]o e[x]change"
     (evil-exchange-install))
 
+  ;; Comment operator
+  (use-package evil-nerd-commenter
+    :config
+    (define-key evil-normal-state-map (kbd "g c") 'evilnc-comment-operator))
+
+  ;; Search visual selections
   (use-package evil-visualstar
     :config
     (global-evil-visualstar-mode))
 
-  ;; (use-package linum-relative
-  ;;   :init
-  ;;   ;; Show current line number
-  ;;   (setq linum-relative-current-symbol "")
-  ;;   :config
-  ;;   ;; Relative line numbers for visual selections
-  ;;   (add-hook 'evil-visual-state-entry-hook (lambda() (interactive) (linum-mode 1)))
-  ;;   (add-hook 'evil-visual-state-exit-hook (lambda() (interactive) (linum-mode 0)))
-
-  ;;   (linum-relative-on)
-  ;;   (add-hook 'dired-mode-hook 'linum-on))
-
+  ;; Deal with parenthesis better
   (use-package evil-smartparens
     :diminish evil-smartparens-mode
     :config
@@ -225,6 +247,19 @@
       (evil-define-key 'normal evil-smartparens-mode-map
   	"S" 'my/SplitLine))
     (add-hook 'emacs-lisp-mode-hook 'enable-evil-smartparens))
+
+  ;; ;; Relative line numbers
+  ;; (use-package linum-relative
+  ;;   :init
+  ;;   ;; Show current line number
+  ;;   (setq linum-relative-current-symbol "")
+  ;;   :config
+  ;;   ;; Enabled for visual selections
+  ;;   (add-hook 'evil-visual-state-entry-hook (lambda() (interactive) (linum-mode 1)))
+  ;;   (add-hook 'evil-visual-state-exit-hook (lambda() (interactive) (linum-mode 0)))
+  ;;   ;; Enable for Dired
+  ;;   (add-hook 'dired-mode-hook 'linum-on))
+  ;;   (linum-relative-on)
 
   (evil-mode 1))
 

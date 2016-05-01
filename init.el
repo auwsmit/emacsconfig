@@ -9,11 +9,12 @@
 ;; General settings
 (require 'setup-general)
 
-;; Custom key bindings
+;; Custom key bindings + guide-key
+;; (Most custom bindings are under their own setup)
 (require 'setup-keybindings)
 
 ;; Setup various packages
-(require 'setup-evil)
 (require 'setup-ido)
 (require 'setup-dired)
 (require 'setup-helm)
+(require 'setup-evil)
