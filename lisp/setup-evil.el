@@ -33,12 +33,6 @@
   (define-key evil-insert-state-map "\C-a" 'move-beginning-of-line)
   (define-key evil-insert-state-map "\C-e" 'move-end-of-line)
 
-  ;; Window navigation
-  (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-  (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
-
   ;; select pasted text
   (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
 
@@ -71,7 +65,6 @@
   (define-key evil-normal-state-map (kbd "] SPC") 'my/evil-blank-below)
 
   ;; "get option" is the mnemonic
-  ;; Also GoT is pretty good
   (define-key evil-normal-state-map (kbd "g o t") 'toggle-truncate-lines)
   (define-key evil-normal-state-map (kbd "g o n") 'linum-mode)
   (define-key evil-normal-state-map (kbd "g o s") 'flyspell-mode))
@@ -146,15 +139,20 @@
     (evil-scroll-line-to-center (line-number-at-pos)))
 
   ;; Dehighlight Evil search on cursor move
-  ;; TODO: Somehow make this only active during evil search.
-  ;;       It's probably inefficient having this hook active all the time.
   (defun my/evil-search-nohighlight-on-move ()
     (interactive)
     (if (not (or (equal (this-command-keys) "n")
 		 (equal (this-command-keys) "N")))
-	(evil-ex-nohighlight)))
-  (add-hook 'pre-command-hook 'my/evil-search-nohighlight-on-move)
-
+	(progn (evil-ex-nohighlight)
+	       (remove-hook 'pre-command-hook
+			    'my/evil-search-nohighlight-on-move))))
+  (defun my/add-hook-evil-search ()
+    (add-hook 'pre-command-hook 'my/evil-search-nohighlight-on-move))
+  (defadvice evil-ex-start-search (after advice-for-evil-ex-search activate)
+    (my/add-hook-evil-search))
+  (defadvice evil-ex-search (after advice-for-evil-ex-search activate)
+    (my/add-hook-evil-search))
+  
   ;; Dehighlight on insert mode or visual mode
   (add-hook 'evil-insert-state-entry-hook 'evil-ex-nohighlight)
   (add-hook 'evil-visual-state-entry-hook 'evil-ex-nohighlight)
@@ -187,26 +185,27 @@
     (interactive)
     (find-file "~/.emacs.d/init.el"))
 
-  (define-key evil-normal-state-map (kbd "SPC TAB") 'other-window)
-
   (evil-leader/set-key
     "S"  'shell
     "i"  'my/open-init-el
     "w"  'evil-write
     "b"  'ido-switch-buffer
     "f"  'ido-find-file
-    "hh"  'help-for-help
     "hr"  'helm-recentf
     "hb"  'helm-buffers-list
     "hf"  'helm-find-files
     "ha"  'helm-apropos
-    "<SPC>" 'helm-M-x))
+    "<SPC>" 'helm-M-x)
+  
+  ;; SPC+TAB isn't compatible with Evil leader,
+  ;; so this is a work-around until that's fixed.
+  (define-key evil-normal-state-map (kbd "SPC TAB") 'other-window))
 
 (use-package evil
   :init
-  (setq evil-want-fine-undo "No")
-  (setq evil-want-C-u-scroll t)
-  (setq evil-ex-substitute-global t)
+  (setq evil-ex-substitute-global t
+	evil-want-fine-undo "No"
+	evil-want-C-u-scroll t)
   :config
   (add-hook 'evil-mode-hook 'config-evil)
 
@@ -226,7 +225,7 @@
     :config
     ;; "[g]o e[x]change"
     (evil-exchange-install))
-
+  
   ;; Comment operator
   (use-package evil-nerd-commenter
     :config
@@ -237,18 +236,8 @@
     :config
     (global-evil-visualstar-mode))
 
-  ;; Deal with parenthesis better
-  (use-package evil-smartparens
-    :diminish evil-smartparens-mode
-    :config
-    (defun enable-evil-smartparens ()
-      ;; (turn-on-smartparens-strict-mode)
-      (evil-smartparens-mode t)
-      (evil-define-key 'normal evil-smartparens-mode-map
-  	"S" 'my/SplitLine))
-    (add-hook 'emacs-lisp-mode-hook 'enable-evil-smartparens))
-
   ;; ;; Relative line numbers
+  ;; ;; TODO: look into enabling only in active window
   ;; (use-package linum-relative
   ;;   :init
   ;;   ;; Show current line number
@@ -258,8 +247,8 @@
   ;;   (add-hook 'evil-visual-state-entry-hook (lambda() (interactive) (linum-mode 1)))
   ;;   (add-hook 'evil-visual-state-exit-hook (lambda() (interactive) (linum-mode 0)))
   ;;   ;; Enable for Dired
-  ;;   (add-hook 'dired-mode-hook 'linum-on))
-  ;;   (linum-relative-on)
+  ;;   (add-hook 'dired-mode-hook 'linum-on)
+  ;;   (linum-relative-on))
 
   (evil-mode 1))
 

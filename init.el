@@ -1,20 +1,25 @@
-;; Setup load path
-(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-(require 'setup-package)
+;; Disable garbage collection to speed start-up time
+;; see: http://tiny.cc/7wd7ay
+(let ((gc-cons-threshold most-positive-fixnum))
 
-;; Setup appearance early so that if something goes
-;; wrong with the init, Emacs is still lookin' good.
-(require 'setup-appearance)
+  ;; Setup load path
+  (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+  (require 'setup-package)
 
-;; General settings
-(require 'setup-general)
+  ;; Setup appearance early so that if something goes
+  ;; wrong with the init, Emacs is still lookin' good.
+  (require 'setup-appearance)
 
-;; Custom key bindings + guide-key
-;; (Most custom bindings are under their own setup)
-(require 'setup-keybindings)
+  ;; General settings
+  (require 'setup-general)
 
-;; Setup various packages
-(require 'setup-ido)
-(require 'setup-dired)
-(require 'setup-helm)
-(require 'setup-evil)
+  ;; Custom key bindings + guide-key
+  ;; (Most custom bindings are under their own setup)
+  (require 'setup-keybindings)
+
+  ;; Setup various packages
+  (require 'setup-ido)
+  (require 'setup-dired)
+  (require 'setup-helm)
+  (require 'setup-evil))
+

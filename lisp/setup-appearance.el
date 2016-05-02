@@ -3,6 +3,9 @@
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
+;; Splash screen is not needed
+(setq inhibit-splash-screen t)
+
 ;; STOP THE BEEPING AND FLASHING
 (setq ring-bell-function 'ignore)
 
@@ -11,6 +14,12 @@
 
 ;; Show column number in modeline
 (column-number-mode t)
+
+;; Highlight trailing white space
+(custom-set-variables
+ '(whitespace-trailing t))
+(custom-set-faces
+ '(trailing-whitespace ((t (:background "dim gray")))))
 
 ;; Default Font
 (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-9" ))
