@@ -17,7 +17,7 @@
 
 ;; Highlight trailing white space
 (custom-set-variables
- '(whitespace-trailing t))
+ '(show-trailing-whitespace t))
 (custom-set-faces
  '(trailing-whitespace ((t (:background "dim gray")))))
 

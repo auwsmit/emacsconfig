@@ -1,9 +1,9 @@
-(defun config-evil-custom-bindings ()
+(defun setup-evil-custom-bindings ()
   "Define custom key bindings for Evil mode."
 
   ;; C-g like Vim to see total line numbers
   (define-key evil-normal-state-map "\C-g" 'count-words)
-  
+
   ;; C-g cancel consistency.. it's like the new escape
   (define-key evil-insert-state-map "\C-g" 'evil-normal-state)
   (define-key evil-visual-state-map "\C-g" 'evil-normal-state)
@@ -33,10 +33,18 @@
   (define-key evil-insert-state-map "\C-a" 'move-beginning-of-line)
   (define-key evil-insert-state-map "\C-e" 'move-end-of-line)
 
+  ;; Jump list (previous, next)
+  (define-key evil-normal-state-map "\C-n" 'evil-jump-forward)
+  (define-key evil-normal-state-map "\C-p" 'evil-jump-backward)
+
+  ;; easier scroll adjustment
+  (define-key evil-normal-state-map "\C-j" 'evil-scroll-line-down)
+  (define-key evil-normal-state-map "\C-k" 'evil-scroll-line-up)
+
   ;; select pasted text
   (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
 
-  ;; vim-sayonara
+  ;; [g]o [s]ayonara
   (define-key evil-normal-state-map (kbd "g s") 'evil-delete-buffer)
   (define-key evil-normal-state-map (kbd "g S") 'my/evil-delete-buffer-keep-windows)
 
@@ -49,7 +57,7 @@
       (evil-insert-newline-above)
       (forward-line 1)
       (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
-      (setq count (1- count)))
+      (setq count (- 1 count)))
     (move-to-column col))
   (defun my/evil-blank-below (count)
     "Add [count] blank lines below the point."
@@ -59,7 +67,7 @@
       (evil-insert-newline-below)
       (forward-line -1)
       (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
-      (setq count (1- count)))
+      (setq count (- 1 count)))
     (move-to-column col))
   (define-key evil-normal-state-map (kbd "[ SPC") 'my/evil-blank-above)
   (define-key evil-normal-state-map (kbd "] SPC") 'my/evil-blank-below)
@@ -67,11 +75,18 @@
   ;; "get option" is the mnemonic
   (define-key evil-normal-state-map (kbd "g o t") 'toggle-truncate-lines)
   (define-key evil-normal-state-map (kbd "g o n") 'linum-mode)
-  (define-key evil-normal-state-map (kbd "g o s") 'flyspell-mode))
+  ;; TODO: look into spell checker that's cross-platform
+  ;; (define-key evil-normal-state-map (kbd "g o s") 'flyspell-mode)
 
-(defun config-evil-other-modes ()
+  ;; clear trailing whitespace
+  (evil-ex-define-cmd "ctw" 'delete-trailing-whitespace))
+
+(defun setup-evil-other-modes ()
   "Define custom key bindings for other modes to be more consistent
   with Evil mode."
+
+  ;; debugger
+  ;; (evil-set-initial-state 'debugger-mode 'normal)
 
   ;; ibuffer
   (evil-set-initial-state 'ibuffer-mode 'normal)
@@ -104,19 +119,21 @@
     "w" 'evil-forward-word-begin
     "b" 'evil-backward-word-begin
     "e" 'evil-forward-word-end
-    "?" 'evil-search-backward
-    "n" 'evil-search-next
-    "N" 'evil-search-previous
+    "f" 'evil-find-char
+    "?" 'evil-ex-search-backward
+    "n" 'evil-ex-search-next
+    "N" 'evil-ex-search-previous
+    "L" 'evil-window-bottom
     "G" 'evil-goto-line
     "gg" 'evil-goto-first-line
     "]]" 'Info-forward-node
     "[[" 'Info-backward-node
-    "]n" 'Info-next
-    "[n" 'Info-prev
     "<" 'Info-top-node
-    ">" 'Info-final-node))
+    ">" 'Info-final-node
+    "\C-n" 'Info-history-forward
+    "\C-p" 'Info-history-back))
 
-(defun config-evil ()
+(defun setup-evil ()
   "Configure Evil mode."
 
   ;; Normal state == Motion state
@@ -124,22 +141,15 @@
   (setq evil-normal-state-modes (append evil-motion-state-modes evil-normal-state-modes))
   (setq evil-motion-state-modes nil)
 
-  ;; Start these modes in Normal state
-  (evil-set-initial-state 'debugger-mode 'normal)
-
   ;; Use Evil search over Emacs search
   ;; (C-s is still i-search)
   (custom-set-variables
    '(evil-search-module (quote evil-search)))
 
-  ;; Center evil search
-  (defadvice evil-ex-start-search (after advice-for-evil-ex-start-search activate)
-    (evil-scroll-line-to-center (line-number-at-pos)))
-  (defadvice evil-ex-search (after advice-for-evil-ex-search activate)
-    (evil-scroll-line-to-center (line-number-at-pos)))
-
-  ;; Dehighlight Evil search on cursor move
+  ;; Center evil search & dehighlight when finished searching
   (defun my/evil-search-nohighlight-on-move ()
+    "Dehighlight Evil ex search when
+any keys other than n or N are pressed."
     (interactive)
     (if (not (or (equal (this-command-keys) "n")
 		 (equal (this-command-keys) "N")))
@@ -148,11 +158,13 @@
 			    'my/evil-search-nohighlight-on-move))))
   (defun my/add-hook-evil-search ()
     (add-hook 'pre-command-hook 'my/evil-search-nohighlight-on-move))
-  (defadvice evil-ex-start-search (after advice-for-evil-ex-search activate)
-    (my/add-hook-evil-search))
+  (defadvice evil-ex-start-search (after advice-for-evil-ex-start-search activate)
+    (progn (evil-scroll-line-to-center (line-number-at-pos))
+	   (my/add-hook-evil-search)))
   (defadvice evil-ex-search (after advice-for-evil-ex-search activate)
-    (my/add-hook-evil-search))
-  
+    (progn (evil-scroll-line-to-center (line-number-at-pos))
+	   (my/add-hook-evil-search)))
+
   ;; Dehighlight on insert mode or visual mode
   (add-hook 'evil-insert-state-entry-hook 'evil-ex-nohighlight)
   (add-hook 'evil-visual-state-entry-hook 'evil-ex-nohighlight)
@@ -173,10 +185,10 @@
 	  (server-edit)
 	(kill-buffer nil))))
 
-  (config-evil-custom-bindings)
-  (config-evil-other-modes))
+  (setup-evil-custom-bindings)
+  (setup-evil-other-modes))
 
-(defun config-evil-leader ()
+(defun setup-evil-leader ()
   "Configure evil leader mode."
   (evil-leader/set-leader "<SPC>")
   (setq evil-leader/in-all-states 1)
@@ -186,7 +198,8 @@
     (find-file "~/.emacs.d/init.el"))
 
   (evil-leader/set-key
-    "S"  'shell
+    "e"  'eval-last-sexp
+    "E"  'eval-print-last-sexp
     "i"  'my/open-init-el
     "w"  'evil-write
     "b"  'ido-switch-buffer
@@ -196,7 +209,7 @@
     "hf"  'helm-find-files
     "ha"  'helm-apropos
     "<SPC>" 'helm-M-x)
-  
+
   ;; SPC+TAB isn't compatible with Evil leader,
   ;; so this is a work-around until that's fixed.
   (define-key evil-normal-state-map (kbd "SPC TAB") 'other-window))
@@ -207,12 +220,12 @@
 	evil-want-fine-undo "No"
 	evil-want-C-u-scroll t)
   :config
-  (add-hook 'evil-mode-hook 'config-evil)
+  (add-hook 'evil-mode-hook 'setup-evil)
 
   ;; Leader key
   (use-package evil-leader
     :config
-    (config-evil-leader)
+    (setup-evil-leader)
     (global-evil-leader-mode))
 
   ;; Manipulate surroundings
@@ -224,8 +237,9 @@
   (use-package evil-exchange
     :config
     ;; "[g]o e[x]change"
+    ;; gX is cancel
     (evil-exchange-install))
-  
+
   ;; Comment operator
   (use-package evil-nerd-commenter
     :config
