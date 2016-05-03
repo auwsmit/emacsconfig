@@ -60,6 +60,9 @@ any keys other than n or N are pressed."
   (define-key evil-visual-state-map "\C-g" 'evil-normal-state)
   (define-key evil-replace-state-map "\C-g" 'evil-normal-state)
 
+  ;; Cancel Emacs state
+  (define-key evil-emacs-state-map "\C-g" 'evil-normal-state)
+
   ;; U instead of C-r
   (define-key evil-normal-state-map "U" 'redo)
 
@@ -67,7 +70,7 @@ any keys other than n or N are pressed."
   (define-key evil-normal-state-map "Q" (kbd "@ q"))
 
   ;; Y to yank until EOL more like D and C
-  (define-key evil-normal-state-map "Y" (kbd "Y $"))
+  (define-key evil-normal-state-map "Y" (kbd "y $"))
 
   ;; Backspace instead of C-6 for alternate-file
   (define-key evil-normal-state-map (kbd "DEL") 'evil-switch-to-windows-last-buffer)
@@ -124,9 +127,9 @@ any keys other than n or N are pressed."
   (define-key evil-normal-state-map (kbd "] SPC") 'my/evil-blank-below)
 
   ;; "get option" is the mnemonic
-  (define-key evil-normal-state-map ;; [t]runcate
+  (define-key evil-normal-state-map ;; [t]runcate lines
     (kbd "g o t") 'toggle-truncate-lines)
-  (define-key evil-normal-state-map ;; [n]umber
+  (define-key evil-normal-state-map ;; li[n]um mode
     (kbd "g o n") 'linum-mode)
   ;; TODO: look into spell checker that's cross-platform
   ;; (define-key evil-normal-state-map (kbd "g o s") 'flyspell-mode)
@@ -190,30 +193,27 @@ any keys other than n or N are pressed."
     "\C-p" 'Info-history-back))
 
 (defun setup-evil-leader ()
-  "Configure evil leader mode."
-  (evil-leader/set-leader "<SPC>")
-  (setq evil-leader/in-all-states 1)
+  "Configure general.el to emulate Vim Leader functionality."
 
   (defun my/open-init-el ()
     (interactive)
     (find-file "~/.emacs.d/init.el"))
 
-  (evil-leader/set-key
-    "<SPC>" 'helm-M-x
-    "e"  'eval-last-sexp
-    "E"  (kbd "C-u C-x C-e")
-    "i"  'my/open-init-el
-    "w"  'evil-write
-    "b"  'ido-switch-buffer
-    "f"  'ido-find-file
-    "hr"  'helm-recentf
-    "hb"  'helm-buffers-list
-    "hf"  'helm-find-files
-    "ha"  'helm-apropos)
-
-  ;; SPC+TAB isn't compatible with Evil leader,
-  ;; so this is a work-around until that's fixed.
-  (define-key evil-normal-state-map (kbd "SPC TAB") 'other-window))
+  (general-define-key
+   :prefix "SPC"
+   :non-normal-prefix "M-SPC"
+   "TAB" 'other-window
+   "SPC" 'helm-M-x
+   "e"  'eval-last-sexp
+   "E"  (kbd "C-u C-x C-e")
+   "i"  'my/open-init-el
+   "w"  'evil-write
+   "b"  'ido-switch-buffer
+   "f"  'ido-find-file
+   "hr"  'helm-recentf
+   "hb"  'helm-buffers-list
+   "hf"  'helm-find-files
+   "ha"  'helm-apropos))
 
 (use-package evil
   :init
@@ -222,11 +222,14 @@ any keys other than n or N are pressed."
   :config
   (add-hook 'evil-mode-hook 'setup-evil)
 
-  ;; Leader key
-  (use-package evil-leader
+  ;; General
+  (use-package general
+    :init
+    ;; bind a key globally in normal state; keymaps must be quoted
+    (setq general-default-keymaps 'evil-normal-state-map)
     :config
     (setup-evil-leader)
-    (global-evil-leader-mode))
+    )
 
   ;; Manipulate surroundings
   (use-package evil-surround

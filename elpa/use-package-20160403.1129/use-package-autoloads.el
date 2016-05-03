@@ -3,8 +3,8 @@
 ;;; Code:
 
 
-;;;### (autoloads (use-package) "use-package" "use-package.el" (22312
-;;;;;;  6017 426103 720000))
+;;;### (autoloads (use-package) "use-package" "use-package.el" (22313
+;;;;;;  2343 979830 991000))
 ;;; Generated autoloads from use-package.el
 
 (autoload 'use-package "use-package" "\
@@ -64,8 +64,8 @@ this file.  Usage:
 
 ;;;***
 
-;;;### (autoloads nil nil ("use-package-pkg.el") (22312 6017 561424
-;;;;;;  346000))
+;;;### (autoloads nil nil ("use-package-pkg.el") (22313 2344 156908
+;;;;;;  910000))
 
 ;;;***
 

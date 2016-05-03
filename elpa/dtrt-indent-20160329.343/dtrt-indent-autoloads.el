@@ -4,7 +4,7 @@
 
 
 ;;;### (autoloads (dtrt-indent-mode dtrt-indent-mode) "dtrt-indent"
-;;;;;;  "dtrt-indent.el" (22312 6025 122103 986000))
+;;;;;;  "dtrt-indent.el" (22313 2351 387831 246000))
 ;;; Generated autoloads from dtrt-indent.el
 
 (defvar dtrt-indent-mode nil "\
@@ -35,7 +35,7 @@ use either \\[customize] or the function `dtrt-indent-mode'.")
 ;;;***
 
 ;;;### (autoloads nil nil ("dtrt-indent-diag.el" "dtrt-indent-pkg.el")
-;;;;;;  (22312 6025 240361 274000))
+;;;;;;  (22313 2351 503100 731000))
 
 ;;;***
 

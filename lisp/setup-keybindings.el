@@ -4,7 +4,8 @@
 ;; guide-key for the newbie
 (use-package guide-key
   :init
-  (setq guide-key/guide-key-sequence '("SPC" "C-x" "C-c")
+  (setq guide-key/guide-key-sequence
+	'("SPC" "C-x" "C-c" "M-g")
 	guide-key/recursive-key-sequence-flag t
 	guide-key/popup-window-position 'bottom
 	guide-key/idle-delay 0.5)

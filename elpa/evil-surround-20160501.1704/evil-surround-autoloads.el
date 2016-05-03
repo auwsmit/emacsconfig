@@ -6,7 +6,7 @@
 ;;;### (autoloads (global-evil-surround-mode turn-off-evil-surround-mode
 ;;;;;;  turn-on-evil-surround-mode evil-surround-mode evil-surround-change
 ;;;;;;  evil-surround-delete) "evil-surround" "evil-surround.el"
-;;;;;;  (22312 6062 634105 280000))
+;;;;;;  (22313 2390 355832 591000))
 ;;; Generated autoloads from evil-surround.el
 
 (autoload 'evil-surround-delete "evil-surround" "\
@@ -63,8 +63,8 @@ See `evil-surround-mode' for more information on Evil-Surround mode.
 
 ;;;***
 
-;;;### (autoloads nil nil ("evil-surround-pkg.el") (22312 6062 743682
-;;;;;;  889000))
+;;;### (autoloads nil nil ("evil-surround-pkg.el") (22313 2390 502604
+;;;;;;  514000))
 
 ;;;***
 

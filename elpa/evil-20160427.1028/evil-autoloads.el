@@ -3,8 +3,8 @@
 ;;; Code:
 
 
-;;;### (autoloads nil "evil-core" "evil-core.el" (22312 6053 474104
-;;;;;;  964000))
+;;;### (autoloads nil "evil-core" "evil-core.el" (22313 2382 519832
+;;;;;;  320000))
 ;;; Generated autoloads from evil-core.el
  (autoload 'evil-mode "evil")
 
@@ -14,7 +14,7 @@
 ;;;;;;  "evil-common.el" "evil-digraphs.el" "evil-ex.el" "evil-integration.el"
 ;;;;;;  "evil-jumps.el" "evil-macros.el" "evil-maps.el" "evil-pkg.el"
 ;;;;;;  "evil-repeat.el" "evil-search.el" "evil-states.el" "evil-types.el"
-;;;;;;  "evil-vars.el" "evil.el") (22312 6053 738598 319000))
+;;;;;;  "evil-vars.el" "evil.el") (22313 2382 761895 981000))
 
 ;;;***
 

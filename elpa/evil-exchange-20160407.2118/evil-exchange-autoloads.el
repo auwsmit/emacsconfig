@@ -5,7 +5,7 @@
 
 ;;;### (autoloads (evil-exchange-cx-install evil-exchange-install
 ;;;;;;  evil-exchange-cancel) "evil-exchange" "evil-exchange.el"
-;;;;;;  (22312 6063 642105 314000))
+;;;;;;  (22313 2391 255832 622000))
 ;;; Generated autoloads from evil-exchange.el
 
 (autoload 'evil-exchange "evil-exchange" "\
@@ -28,8 +28,8 @@ Setting evil-exchange key bindings in a vim-compatible way
 
 ;;;***
 
-;;;### (autoloads nil nil ("evil-exchange-pkg.el") (22312 6063 782434
-;;;;;;  425000))
+;;;### (autoloads nil nil ("evil-exchange-pkg.el") (22313 2391 395186
+;;;;;;  931000))
 
 ;;;***
 

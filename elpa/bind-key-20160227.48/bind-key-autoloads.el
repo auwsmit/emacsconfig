@@ -4,8 +4,8 @@
 
 
 ;;;### (autoloads (describe-personal-keybindings bind-keys* bind-keys
-;;;;;;  bind-key* unbind-key bind-key) "bind-key" "bind-key.el" (22312
-;;;;;;  6016 186103 677000))
+;;;;;;  bind-key* unbind-key bind-key) "bind-key" "bind-key.el" (22313
+;;;;;;  2343 43830 959000))
 ;;; Generated autoloads from bind-key.el
 
 (autoload 'bind-key "bind-key" "\
@@ -65,8 +65,8 @@ Display all the personal keybindings defined by `bind-key'.
 
 ;;;***
 
-;;;### (autoloads nil nil ("bind-key-pkg.el") (22312 6016 302457
-;;;;;;  237000))
+;;;### (autoloads nil nil ("bind-key-pkg.el") (22313 2343 164996
+;;;;;;  103000))
 
 ;;;***
 

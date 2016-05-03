@@ -5,7 +5,7 @@
 
 ;;;### (autoloads (helm-debug-toggle helm-other-buffer helm helm-debug-open-last-log
 ;;;;;;  helm-define-key-with-subkeys helm-multi-key-defun helm-define-multi-key)
-;;;;;;  "helm" "helm.el" (22312 6032 894104 254000))
+;;;;;;  "helm" "helm.el" (22313 2359 431831 524000))
 ;;; Generated autoloads from helm.el
 
 (autoload 'helm-define-multi-key "helm" "\
@@ -192,7 +192,7 @@ Enable/disable helm debugging from outside of helm session.
 ;;;***
 
 ;;;### (autoloads nil nil ("helm-core-pkg.el" "helm-lib.el" "helm-multi-match.el"
-;;;;;;  "helm-source.el") (22312 6033 89048 420000))
+;;;;;;  "helm-source.el") (22313 2359 627956 902000))
 
 ;;;***
 
