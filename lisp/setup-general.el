@@ -1,12 +1,16 @@
+;; Make emacsclient work
+(server-start)
+
 ;; Scroll smoothly
 (setq scroll-margin 0
       scroll-conservatively 10000
       scroll-preserve-screen-position)
 
-;; Remember last position when reopening files
-(if (version< emacs-version "25.0") (progn
-				      (require 'saveplace)
-				      (setq-default save-place t))
+;; Remember last position for reopened files
+(if (version< emacs-version "25.0")
+    (progn
+      (require 'saveplace)
+      (setq-default save-place t))
   (save-place-mode 1))
 
 ;; Backup files in one folder
@@ -23,7 +27,7 @@
 (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
 (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
 
-;; Enable HideShow
+;; Enable HideShow in programming modes
 (add-hook 'prog-mode-hook (lambda () (hs-minor-mode t)))
 
 ;; Auto detect indent settings
