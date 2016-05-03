@@ -94,12 +94,14 @@
 
   ;; shell
   (defun my/evil-shell-insert ()
+    "Go to the very end of the buffer and enter insert state."
     (interactive)
     (evil-goto-line)
     (evil-append-line 0))
   (evil-define-key 'normal shell-mode-map
     "I" 'my/evil-shell-insert
-    "A" 'my/evil-shell-insert)
+    "A" 'my/evil-shell-insert
+    "\C-d" 'evil-scroll-down)
 
   ;; Dired
   ;; TODO: Get shell access vim-style
@@ -164,10 +166,6 @@ any keys other than n or N are pressed."
   (defadvice evil-ex-search (after advice-for-evil-ex-search activate)
     (progn (evil-scroll-line-to-center (line-number-at-pos))
 	   (my/add-hook-evil-search)))
-
-  ;; Dehighlight on insert mode or visual mode
-  (add-hook 'evil-insert-state-entry-hook 'evil-ex-nohighlight)
-  (add-hook 'evil-visual-state-entry-hook 'evil-ex-nohighlight)
 
   (evil-define-command my/evil-delete-buffer-keep-windows
     (buffer &optional bang)
