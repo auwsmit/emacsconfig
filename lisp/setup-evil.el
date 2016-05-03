@@ -198,6 +198,7 @@ any keys other than n or N are pressed."
     (find-file "~/.emacs.d/init.el"))
 
   (evil-leader/set-key
+    "<SPC>" 'helm-M-x
     "e"  'eval-last-sexp
     "E"  'eval-print-last-sexp
     "i"  'my/open-init-el
@@ -207,8 +208,7 @@ any keys other than n or N are pressed."
     "hr"  'helm-recentf
     "hb"  'helm-buffers-list
     "hf"  'helm-find-files
-    "ha"  'helm-apropos
-    "<SPC>" 'helm-M-x)
+    "ha"  'helm-apropos)
 
   ;; SPC+TAB isn't compatible with Evil leader,
   ;; so this is a work-around until that's fixed.

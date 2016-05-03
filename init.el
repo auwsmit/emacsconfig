@@ -21,9 +21,8 @@
   (require 'setup-ido)
   (require 'setup-dired)
   (require 'setup-helm)
-  
+
   ;; Setup Evil mode, along with associated packages
   ;; (This file is big and separated into functions)
   ;; (I recommend HideShow for easier code overview)
   (require 'setup-evil))
-
