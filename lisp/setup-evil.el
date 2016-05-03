@@ -1,140 +1,3 @@
-(defun setup-evil-custom-bindings ()
-  "Define custom key bindings for Evil mode."
-
-  ;; C-g like Vim to see total line numbers
-  (define-key evil-normal-state-map "\C-g" 'count-words)
-
-  ;; C-g cancel consistency.. it's like the new escape
-  (define-key evil-insert-state-map "\C-g" 'evil-normal-state)
-  (define-key evil-visual-state-map "\C-g" 'evil-normal-state)
-  (define-key evil-replace-state-map "\C-g" 'evil-normal-state)
-
-  ;; U instead of C-r
-  (define-key evil-normal-state-map "U" 'redo)
-
-  ;; Q to replay q register
-  (define-key evil-normal-state-map "Q" (kbd "@ q"))
-
-  ;; Y to yank until EOL more like D and C
-  (define-key evil-normal-state-map "Y" (kbd "Y $"))
-
-  ;; Backspace instead of C-6 for alternate-file
-  (define-key evil-normal-state-map (kbd "DEL") 'evil-switch-to-windows-last-buffer)
-
-  ;; [S]plit Line (sister to [J]oin Line)
-  (defun my/SplitLine ()
-    (interactive)
-    (newline-and-indent)
-    (forward-line -1)
-    (move-end-of-line 1))
-  (define-key evil-normal-state-map "S" 'my/SplitLine)
-
-  ;; Insert motion
-  (define-key evil-insert-state-map "\C-a" 'move-beginning-of-line)
-  (define-key evil-insert-state-map "\C-e" 'move-end-of-line)
-
-  ;; Jump list (previous, next)
-  (define-key evil-normal-state-map "\C-n" 'evil-jump-forward)
-  (define-key evil-normal-state-map "\C-p" 'evil-jump-backward)
-
-  ;; easier scroll adjustment
-  (define-key evil-normal-state-map "\C-j" 'evil-scroll-line-down)
-  (define-key evil-normal-state-map "\C-k" 'evil-scroll-line-up)
-
-  ;; select pasted text
-  (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
-
-  ;; [g]o [s]ayonara
-  (define-key evil-normal-state-map (kbd "g s") 'evil-delete-buffer)
-  (define-key evil-normal-state-map (kbd "g S") 'my/evil-delete-buffer-keep-windows)
-
-  ;; unimpaired (work in progress)
-  (defun my/evil-blank-above (count)
-    "Add [count] blank lines above the point."
-    (interactive "p")
-    (setq col (current-column))
-    (while (> count 0)
-      (evil-insert-newline-above)
-      (forward-line 1)
-      (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
-      (setq count (- 1 count)))
-    (move-to-column col))
-  (defun my/evil-blank-below (count)
-    "Add [count] blank lines below the point."
-    (interactive "p")
-    (setq col (current-column))
-    (while (> count 0)
-      (evil-insert-newline-below)
-      (forward-line -1)
-      (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
-      (setq count (- 1 count)))
-    (move-to-column col))
-  (define-key evil-normal-state-map (kbd "[ SPC") 'my/evil-blank-above)
-  (define-key evil-normal-state-map (kbd "] SPC") 'my/evil-blank-below)
-
-  ;; "get option" is the mnemonic
-  (define-key evil-normal-state-map (kbd "g o t") 'toggle-truncate-lines)
-  (define-key evil-normal-state-map (kbd "g o n") 'linum-mode)
-  ;; TODO: look into spell checker that's cross-platform
-  ;; (define-key evil-normal-state-map (kbd "g o s") 'flyspell-mode)
-
-  ;; clear trailing whitespace
-  (evil-ex-define-cmd "ctw" 'delete-trailing-whitespace))
-
-(defun setup-evil-other-modes ()
-  "Define custom key bindings for other modes to be more consistent
-  with Evil mode."
-
-  ;; debugger
-  ;; (evil-set-initial-state 'debugger-mode 'normal)
-
-  ;; ibuffer
-  (evil-set-initial-state 'ibuffer-mode 'normal)
-  (define-key evil-normal-state-map (kbd "g b") 'ibuffer)
-
-  ;; shell
-  (defun my/evil-shell-insert ()
-    "Go to the very end of the buffer and enter insert state."
-    (interactive)
-    (evil-goto-line)
-    (evil-append-line 0))
-  (evil-define-key 'normal shell-mode-map
-    "I" 'my/evil-shell-insert
-    "A" 'my/evil-shell-insert
-    "\C-d" 'evil-scroll-down)
-
-  ;; Dired
-  ;; TODO: Get shell access vim-style
-  ;; tpope vinegar-style
-  (define-key evil-normal-state-map "-" (kbd "\C-x d RET"))
-  (add-hook 'dired-mode-hook
-	    (lambda ()
-	      (define-key dired-mode-map (kbd "-") ;; go up directory
-		(lambda () (interactive) (find-alternate-file "..")))
-	      ))
-  (evil-define-key 'normal dired-mode-map
-    (kbd "RET") 'dired-find-alternate-file
-    "q" 'my/evil-delete-buffer-keep-windows)
-
-  ;; Info
-  (evil-define-key 'normal Info-mode-map
-    "w" 'evil-forward-word-begin
-    "b" 'evil-backward-word-begin
-    "e" 'evil-forward-word-end
-    "f" 'evil-find-char
-    "?" 'evil-ex-search-backward
-    "n" 'evil-ex-search-next
-    "N" 'evil-ex-search-previous
-    "L" 'evil-window-bottom
-    "G" 'evil-goto-line
-    "gg" 'evil-goto-first-line
-    "]]" 'Info-forward-node
-    "[[" 'Info-backward-node
-    "<" 'Info-top-node
-    ">" 'Info-final-node
-    "\C-n" 'Info-history-forward
-    "\C-p" 'Info-history-back))
-
 (defun setup-evil ()
   "Configure Evil mode."
 
@@ -186,6 +49,146 @@ any keys other than n or N are pressed."
   (setup-evil-custom-bindings)
   (setup-evil-other-modes))
 
+(defun setup-evil-custom-bindings ()
+  "Define custom key bindings for Evil mode."
+
+  ;; C-g like Vim to see total line numbers
+  (define-key evil-normal-state-map "\C-g" 'count-words)
+
+  ;; C-g cancel consistency.. it's like the new escape
+  (define-key evil-insert-state-map "\C-g" 'evil-normal-state)
+  (define-key evil-visual-state-map "\C-g" 'evil-normal-state)
+  (define-key evil-replace-state-map "\C-g" 'evil-normal-state)
+
+  ;; U instead of C-r
+  (define-key evil-normal-state-map "U" 'redo)
+
+  ;; Q to replay q register
+  (define-key evil-normal-state-map "Q" (kbd "@ q"))
+
+  ;; Y to yank until EOL more like D and C
+  (define-key evil-normal-state-map "Y" (kbd "Y $"))
+
+  ;; Backspace instead of C-6 for alternate-file
+  (define-key evil-normal-state-map (kbd "DEL") 'evil-switch-to-windows-last-buffer)
+
+  ;; [S]plit Line (sister to [J]oin Line)
+  (defun my/SplitLine ()
+    (interactive)
+    (newline-and-indent)
+    (forward-line -1)
+    (move-end-of-line 1))
+  (define-key evil-normal-state-map "S" 'my/SplitLine)
+
+  ;; this lets me keep C-u unmodified
+  (define-key evil-normal-state-map "\C-j" 'evil-scroll-down)
+  (define-key evil-normal-state-map "\C-k" 'evil-scroll-up)
+
+  ;; Insert motion
+  (define-key evil-insert-state-map "\C-a" 'move-beginning-of-line)
+  (define-key evil-insert-state-map "\C-e" 'move-end-of-line)
+
+  ;; Jump list (previous, next)
+  (define-key evil-normal-state-map "\C-n" 'evil-jump-forward)
+  (define-key evil-normal-state-map "\C-p" 'evil-jump-backward)
+
+  ;; select last pasted text
+  (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
+
+  ;; [g]o [s]ayonara
+  (define-key evil-normal-state-map (kbd "g s") 'evil-delete-buffer)
+  (define-key evil-normal-state-map (kbd "g S") 'my/evil-delete-buffer-keep-windows)
+
+  ;; unimpaired (work in progress)
+  (defun my/evil-blank-above (count)
+    "Add [count] blank lines above the point."
+    (interactive "p")
+    (setq col (current-column))
+    (while (> count 0)
+      (evil-insert-newline-above)
+      (forward-line 1)
+      (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
+      (setq count (- 1 count)))
+    (move-to-column col))
+  (defun my/evil-blank-below (count)
+    "Add [count] blank lines below the point."
+    (interactive "p")
+    (setq col (current-column))
+    (while (> count 0)
+      (evil-insert-newline-below)
+      (forward-line -1)
+      (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
+      (setq count (- 1 count)))
+    (move-to-column col))
+  (define-key evil-normal-state-map (kbd "[ SPC") 'my/evil-blank-above)
+  (define-key evil-normal-state-map (kbd "] SPC") 'my/evil-blank-below)
+
+  ;; "get option" is the mnemonic
+  (define-key evil-normal-state-map ;; [t]runcate
+    (kbd "g o t") 'toggle-truncate-lines)
+  (define-key evil-normal-state-map ;; [n]umber
+    (kbd "g o n") 'linum-mode)
+  ;; TODO: look into spell checker that's cross-platform
+  ;; (define-key evil-normal-state-map (kbd "g o s") 'flyspell-mode)
+
+  ;; clear trailing whitespace
+  (evil-ex-define-cmd "ctw" 'delete-trailing-whitespace))
+
+(defun setup-evil-other-modes ()
+  "Define custom key bindings for other modes to be more consistent
+  with Evil mode."
+
+  ;; debugger
+  ;; (evil-set-initial-state 'debugger-mode 'normal)
+
+  ;; ibuffer
+  (evil-set-initial-state 'ibuffer-mode 'normal)
+  (define-key evil-normal-state-map (kbd "g b") 'ibuffer)
+
+  ;; shell
+  (defun my/evil-shell-insert ()
+    "Go to the very end of the buffer and enter insert state."
+    (interactive)
+    (evil-goto-line)
+    (evil-append-line 0))
+  (evil-define-key 'normal shell-mode-map
+    "I" 'my/evil-shell-insert
+    "A" 'my/evil-shell-insert
+    "\C-d" 'evil-scroll-down)
+
+  ;; Dired
+  ;; TODO: Get shell access vim-style
+  ;; tpope vinegar-style
+  (define-key evil-normal-state-map "-" (kbd "\C-x d RET"))
+  (add-hook 'dired-mode-hook
+	    (lambda ()
+	      (define-key dired-mode-map (kbd "-") ;; go up directory
+		(lambda () (interactive) (find-alternate-file "..")))
+	      ))
+  (evil-define-key 'normal dired-mode-map
+    (kbd "RET") 'dired-find-alternate-file
+    "q" 'my/evil-delete-buffer-keep-windows)
+
+  ;; Info
+  (evil-define-key 'normal Info-mode-map
+    "w" 'evil-forward-word-begin
+    "b" 'evil-backward-word-begin
+    "e" 'evil-forward-word-end
+    "f" 'evil-find-char
+    "?" 'evil-ex-search-backward
+    "n" 'evil-ex-search-next
+    "N" 'evil-ex-search-previous
+    "H" 'evil-window-top
+    "L" 'evil-window-bottom
+    "G" 'evil-goto-line
+    "gg" 'evil-goto-first-line
+    "]]" 'Info-forward-node
+    "[[" 'Info-backward-node
+    "<" 'Info-top-node
+    ">" 'Info-final-node
+    "\C-n" 'Info-history-forward
+    "\C-p" 'Info-history-back))
+
 (defun setup-evil-leader ()
   "Configure evil leader mode."
   (evil-leader/set-leader "<SPC>")
@@ -198,7 +201,7 @@ any keys other than n or N are pressed."
   (evil-leader/set-key
     "<SPC>" 'helm-M-x
     "e"  'eval-last-sexp
-    "E"  'eval-print-last-sexp
+    "E"  (kbd "C-u C-x C-e")
     "i"  'my/open-init-el
     "w"  'evil-write
     "b"  'ido-switch-buffer
@@ -215,8 +218,7 @@ any keys other than n or N are pressed."
 (use-package evil
   :init
   (setq evil-ex-substitute-global t
-	evil-want-fine-undo "No"
-	evil-want-C-u-scroll t)
+	evil-want-fine-undo "No")
   :config
   (add-hook 'evil-mode-hook 'setup-evil)
 
