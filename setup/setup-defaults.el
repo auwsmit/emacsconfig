@@ -13,11 +13,24 @@
       (setq-default save-place t))
   (save-place-mode 1))
 
+;; When saving a file that starts with `#!', make it executable.
+(add-hook 'after-save-hook
+	  'executable-make-buffer-file-executable-if-script-p)
+
+;; Sentences end with a single period.
+(setq sentence-end-double-space nil)
+
 ;; Backup files in one folder
 (setq backup-directory-alist `(("." . "~/.emacs.d/.saves")))
 
 ;; Allow recursive minibuffers
 (setq enable-recursive-minibuffers t)
+
+;; y/n instead of yes/no
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; Auto-update changed files
+(global-auto-revert-mode t)
 
 ;; Disable garbage collection in minibuffer
 (defun my-minibuffer-setup-hook ()
@@ -37,4 +50,4 @@
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 
-(provide 'setup-general)
+(provide 'setup-defaults)

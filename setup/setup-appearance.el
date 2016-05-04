@@ -11,6 +11,8 @@
 
 ;; Highlight matching parenthesis
 (show-paren-mode t)
+(custom-set-variables
+  '(show-paren-delay 0.0))
 
 ;; Show column number in modeline
 (column-number-mode t)

@@ -3,17 +3,18 @@
 (let ((gc-cons-threshold most-positive-fixnum))
 
   ;; Setup load path
-  (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+  (add-to-list 'load-path (expand-file-name "setup" user-emacs-directory))
   (require 'setup-package)
 
   ;; Setup appearance early so that if something goes
   ;; wrong with the init, Emacs is still lookin' good.
   (require 'setup-appearance)
 
-  ;; General settings
-  (require 'setup-general)
+  ;; Setup sensible defaults for Emacs
+  ;; AKA general, non-specific settings
+  (require 'setup-defaults)
 
-  ;; Custom key bindings + guide-key
+  ;; Custom key bindings + which-key
   ;; (Most custom bindings are under their own setup)
   (require 'setup-keybindings)
 
