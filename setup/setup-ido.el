@@ -7,10 +7,12 @@
   :config
   (ido-vertical-mode 1))
 
-;; Evil-friendly bindings
-(define-key ido-common-completion-map "\C-j" 'ido-next-match)
-(define-key ido-common-completion-map "\C-k" 'ido-prev-match)
-(define-key ido-file-completion-map "\C-k" 'ido-prev-match)
-(define-key ido-buffer-completion-map "\C-k" 'ido-prev-match)
+;; No arrow keys
+(general-define-key
+ :keymaps '(ido-common-completion-map
+	    ido-file-completion-map
+	    ido-buffer-completion-map)
+ "C-j" 'ido-next-match
+ "C-k" 'ido-prev-match)
 
 (provide 'setup-ido)

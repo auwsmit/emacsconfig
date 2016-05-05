@@ -6,7 +6,7 @@
 			 ("melpa" . "http://melpa.org/packages/")
 			 ("melpa-stable" . "http://stable.melpa.org/packages/")))
 
-;; Auto-install use-package for package management.
+;; Auto-install use-package for package management
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))

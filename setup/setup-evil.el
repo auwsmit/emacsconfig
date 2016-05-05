@@ -30,6 +30,8 @@ any keys other than n or N are pressed."
     (progn (evil-scroll-line-to-center (line-number-at-pos))
 	   (my/add-hook-evil-search)))
 
+  ;; this is the (evil-delete-buffer) function,
+  ;; but doesn't close any windows
   (evil-define-command my/evil-delete-buffer-keep-windows
     (buffer &optional bang)
     (interactive "<b><!>")
@@ -46,34 +48,30 @@ any keys other than n or N are pressed."
 	  (server-edit)
 	(kill-buffer nil))))
 
+  ;; clear trailing whitespace ex command
+  (evil-ex-define-cmd "ctw" 'delete-trailing-whitespace)
+
   (setup-evil-custom-bindings)
-  (setup-evil-other-modes))
+  (setup-evil-other-modes)
+  (setup-evil-leader))
 
 (defun setup-evil-custom-bindings ()
   "Define custom key bindings for Evil mode."
 
-  ;; C-g like Vim to see total line numbers
-  (define-key evil-normal-state-map "\C-g" 'count-words)
+  ;; general.el: bind to normal-state by default
+  (setq general-default-keymaps 'evil-normal-state-map)
 
-  ;; C-g cancel consistency.. it's like the new escape
-  (define-key evil-insert-state-map "\C-g" 'evil-normal-state)
-  (define-key evil-visual-state-map "\C-g" 'evil-normal-state)
-  (define-key evil-replace-state-map "\C-g" 'evil-normal-state)
-
-  ;; Cancel Emacs state
-  (define-key evil-emacs-state-map "\C-g" 'evil-normal-state)
-
-  ;; U instead of C-r
-  (define-key evil-normal-state-map "U" 'redo)
+  ;; U instead of C-r for redo
+  (general-define-key "U" 'redo)
 
   ;; Q to replay q register
-  (define-key evil-normal-state-map "Q" (kbd "@ q"))
+  (general-define-key "Q" (kbd "@ q"))
 
   ;; Y to yank until EOL more like D and C
-  (define-key evil-normal-state-map "Y" (kbd "y $"))
+  (general-define-key "Y" (kbd "y $"))
 
-  ;; Backspace instead of C-6 for alternate-file
-  (define-key evil-normal-state-map (kbd "DEL") 'evil-switch-to-windows-last-buffer)
+  ;; Back(space) to last buffer
+  (general-define-key (kbd "DEL") 'evil-switch-to-windows-last-buffer)
 
   ;; [S]plit Line (sister to [J]oin Line)
   (defun my/SplitLine ()
@@ -81,28 +79,24 @@ any keys other than n or N are pressed."
     (newline-and-indent)
     (forward-line -1)
     (move-end-of-line 1))
-  (define-key evil-normal-state-map "S" 'my/SplitLine)
+  (general-define-key "S" 'my/SplitLine)
 
-  ;; this lets me keep C-u unmodified
-  (define-key evil-normal-state-map "\C-j" 'evil-scroll-down)
-  (define-key evil-normal-state-map "\C-k" 'evil-scroll-up)
-
-  ;; Insert motion
-  (define-key evil-insert-state-map "\C-a" 'move-beginning-of-line)
-  (define-key evil-insert-state-map "\C-e" 'move-end-of-line)
+  ;; this lets me keep Emacs' C-u (universal-argument)
+  (general-define-key "C-j" 'evil-scroll-down)
+  (general-define-key "C-k" 'evil-scroll-up)
 
   ;; Jump list (previous, next)
-  (define-key evil-normal-state-map "\C-n" 'evil-jump-forward)
-  (define-key evil-normal-state-map "\C-p" 'evil-jump-backward)
+  (general-define-key "C-p" 'evil-jump-backward)
+  (general-define-key "C-n" 'evil-jump-forward)
 
   ;; select last pasted text
-  (define-key evil-normal-state-map (kbd "g p") (kbd "` [ v ` ]"))
+  (general-define-key "g p" (kbd "` [ v ` ]"))
 
-  ;; [g]o [s]ayonara
-  (define-key evil-normal-state-map (kbd "g s") 'evil-delete-buffer)
-  (define-key evil-normal-state-map (kbd "g S") 'my/evil-delete-buffer-keep-windows)
+  ;; [g]o [s]ayonara (à la vim-sayonara)
+  (general-define-key "g s" 'evil-delete-buffer)
+  (general-define-key "g S" 'my/evil-delete-buffer-keep-windows)
 
-  ;; unimpaired (work in progress)
+  ;; inspired by tpope's unimpaired (work in progress)
   (defun my/evil-blank-above (count)
     "Add [count] blank lines above the point."
     (interactive "p")
@@ -111,7 +105,7 @@ any keys other than n or N are pressed."
       (evil-insert-newline-above)
       (forward-line 1)
       (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
-      (setq count (- 1 count)))
+      (setq count (- count 1)))
     (move-to-column col))
   (defun my/evil-blank-below (count)
     "Add [count] blank lines below the point."
@@ -121,59 +115,64 @@ any keys other than n or N are pressed."
       (evil-insert-newline-below)
       (forward-line -1)
       (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
-      (setq count (- 1 count)))
+      (setq count (- count 1)))
     (move-to-column col))
-  (define-key evil-normal-state-map (kbd "[ SPC") 'my/evil-blank-above)
-  (define-key evil-normal-state-map (kbd "] SPC") 'my/evil-blank-below)
+  (general-define-key "[ SPC" 'my/evil-blank-above)
+  (general-define-key "] SPC" 'my/evil-blank-below)
 
   ;; "get option" is the mnemonic
-  (define-key evil-normal-state-map ;; [t]runcate lines
-    (kbd "g o t") 'toggle-truncate-lines)
-  (define-key evil-normal-state-map ;; li[n]um mode
-    (kbd "g o n") 'linum-mode)
-  ;; TODO: look into spell checker that's cross-platform
+  (general-define-key "g o t" 'toggle-truncate-lines)
+  (general-define-key "g o n" 'linum-mode)
+  ;; TODO: look into cross-platform spell checker
   ;; (define-key evil-normal-state-map (kbd "g o s") 'flyspell-mode)
 
-  ;; clear trailing whitespace
-  (evil-ex-define-cmd "ctw" 'delete-trailing-whitespace))
+  ;; C-g like Vim to see total line numbers
+  (general-define-key "C-g" 'count-words)
+
+  ;; general.el: back to global for non-normal-state bindings
+  (setq general-default-keymaps 'global)
+
+  ;; Always cancel to normal state
+  ;; It's like the new escape.
+  (general-define-key :states '(visual insert replace motion emacs)
+		      "C-g" 'evil-normal-state
+		      "C-[" 'evil-normal-state)
+
+  ;; Insert motion
+  (general-define-key :states '(insert)
+		      "C-a" 'move-beginning-of-line
+		      "C-e" 'move-end-of-line)
+)
 
 (defun setup-evil-other-modes ()
   "Define custom key bindings for other modes to be more consistent
   with Evil mode."
 
-  ;; debugger
-  ;; (evil-set-initial-state 'debugger-mode 'normal)
-
   ;; ibuffer
   (evil-set-initial-state 'ibuffer-mode 'normal)
   (define-key evil-normal-state-map (kbd "g b") 'ibuffer)
 
-  ;; shell
+  ;; Shell
   (defun my/evil-shell-insert ()
     "Go to the very end of the buffer and enter insert state."
     (interactive)
     (evil-goto-line)
     (evil-append-line 0))
-  (evil-define-key 'normal shell-mode-map
+  (general-evil-define-key '(normal) 'shell-mode-map
     "I" 'my/evil-shell-insert
-    "A" 'my/evil-shell-insert
-    "\C-d" 'evil-scroll-down)
+    "A" 'my/evil-shell-insert)
 
   ;; Dired
-  ;; TODO: Get shell access vim-style
-  ;; tpope vinegar-style
-  (define-key evil-normal-state-map "-" (kbd "\C-x d RET"))
-  (add-hook 'dired-mode-hook
-	    (lambda ()
-	      (define-key dired-mode-map (kbd "-") ;; go up directory
-		(lambda () (interactive) (find-alternate-file "..")))
-	      ))
-  (evil-define-key 'normal dired-mode-map
-    (kbd "RET") 'dired-find-alternate-file
+  ;; inspired by vinegar by tpope
+  (general-define-key :states '(normal visual) "-" (kbd "C-x d RET"))
+  (general-evil-define-key '(normal visual) 'dired-mode-map
+    ;; Go up directory
+    "-" (lambda () (interactive) (find-alternate-file ".."))
+    "RET" 'dired-find-alternate-file
     "q" 'my/evil-delete-buffer-keep-windows)
 
   ;; Info
-  (evil-define-key 'normal Info-mode-map
+  (general-evil-define-key '(normal) 'Info-mode-map
     "w" 'evil-forward-word-begin
     "b" 'evil-backward-word-begin
     "e" 'evil-forward-word-end
@@ -189,23 +188,23 @@ any keys other than n or N are pressed."
     "[[" 'Info-backward-node
     "<" 'Info-top-node
     ">" 'Info-final-node
-    "\C-n" 'Info-history-forward
-    "\C-p" 'Info-history-back))
+    "C-p" 'Info-history-back
+    "C-n" 'Info-history-forward))
 
 (defun setup-evil-leader ()
-  "Configure general.el to emulate Vim Leader functionality."
+  "Configure bindings to emulate Vim Leader functionality."
 
   (defun my/open-init-el ()
     (interactive)
     (find-file "~/.emacs.d/init.el"))
 
   (general-define-key
+   :states '(normal motion emacs)
    :prefix "SPC"
-   :non-normal-prefix "M-SPC"
+   :global-prefix "C-SPC"
    "TAB" 'other-window
    "SPC" 'helm-M-x
    "e"  'eval-last-sexp
-   "E"  (kbd "C-u C-x C-e")
    "i"  'my/open-init-el
    "w"  'evil-write
    "b"  'ido-switch-buffer
@@ -222,15 +221,6 @@ any keys other than n or N are pressed."
   :config
   (add-hook 'evil-mode-hook 'setup-evil)
 
-  ;; General
-  (use-package general
-    :init
-    ;; bind a key globally in normal state; keymaps must be quoted
-    (setq general-default-keymaps 'evil-normal-state-map)
-    :config
-    (setup-evil-leader)
-    )
-
   ;; Manipulate surroundings
   (use-package evil-surround
     :config
@@ -246,7 +236,7 @@ any keys other than n or N are pressed."
   ;; Comment operator
   (use-package evil-nerd-commenter
     :config
-    (define-key evil-normal-state-map (kbd "g c") 'evilnc-comment-operator))
+    (general-define-key :states '(normal visual) "g c" 'evilnc-comment-operator))
 
   ;; Search visual selections
   (use-package evil-visualstar

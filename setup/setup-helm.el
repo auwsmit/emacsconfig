@@ -18,11 +18,12 @@
    '(helm-apropos-fuzzy-match t)
    '(helm-completion-in-region-fuzzy-match t))
 
-  ;; Evil-friendly bindings
-  (define-key helm-map (kbd "C-j") 'helm-next-line)
-  (define-key helm-map (kbd "C-k") 'helm-previous-line)
-  (define-key helm-map (kbd "C-n") 'helm-next-source)
-  (define-key helm-map (kbd "C-p") 'helm-previous-source)
+  ;; No arrow keys
+  (general-define-key :keymaps 'helm-map
+		      "C-j" 'helm-next-line
+		      "C-k" 'helm-previous-line
+		      "C-n" 'helm-next-source
+		      "C-p" 'helm-previous-source)
 
   ;; ;; Helm for default M-x
   ;; (global-set-key (kbd "M-x") 'helm-M-x)
