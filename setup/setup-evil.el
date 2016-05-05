@@ -143,13 +143,7 @@ any keys other than n or N are pressed."
   ;; general.el: back to global for non-normal-state bindings
   (setq general-default-keymaps 'global)
 
-  ;; Smex support
-  (general-define-key
-   :states '(normal visual insert emacs)
-   "M-x" 'smex)
-
   ;; Always cancel to normal state
-  ;; It's like the new escape.
   (general-define-key :states '(visual insert replace motion emacs)
 		      "C-g" 'evil-normal-state
 		      "C-[" 'evil-normal-state)
