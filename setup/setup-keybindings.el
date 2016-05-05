@@ -18,7 +18,8 @@
   :init
   (setq which-key-idle-delay 0.5)
   :config
-  (which-key-mode))
+  (which-key-mode)
+  (general-define-key "C-h W" 'which-key-show-top-level))
 
 ;; ;; guide-key for the newbie
 ;; (use-package guide-key

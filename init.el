@@ -14,7 +14,7 @@
   ;; AKA general, non-specific settings
   (require 'setup-defaults)
 
-  ;; Custom key bindings + which-key
+  ;; Custom key bindings + related packages
   ;; (Most custom bindings are under their own setup)
   (require 'setup-keybindings)
 
@@ -26,4 +26,5 @@
   ;; Setup Evil mode, along with associated packages
   ;; (This file is big and separated into functions)
   ;; (I recommend HideShow for easier code overview)
+  ;; TODO: split into separate files
   (require 'setup-evil))

@@ -11,6 +11,15 @@
   (custom-set-variables
    '(evil-search-module (quote evil-search)))
 
+  ;; Cursor color to indicate modes
+    (setq evil-normal-state-cursor   '("#0a9dff" box)
+          evil-insert-state-cursor   '("#0a9dff" bar)
+          evil-replace-state-cursor  '("#0a9dff" hbar)
+          evil-operator-state-cursor '("cyan" box)
+          evil-visual-state-cursor   '("yellow" box)
+          evil-motion-state-cursor   '("deep pink" box)
+          evil-emacs-state-cursor    '("red2" box))
+
   ;; Center evil search & dehighlight when finished searching
   (defun my/evil-search-nohighlight-on-move ()
     "Dehighlight Evil ex search when
@@ -96,7 +105,8 @@ any keys other than n or N are pressed."
   (general-define-key "g s" 'evil-delete-buffer)
   (general-define-key "g S" 'my/evil-delete-buffer-keep-windows)
 
-  ;; inspired by tpope's unimpaired (work in progress)
+  ;; Insert blank space above/below cursor
+  ;; inspired by tpope's unimpaired
   (defun my/evil-blank-above (count)
     "Add [count] blank lines above the point."
     (interactive "p")
@@ -121,6 +131,7 @@ any keys other than n or N are pressed."
   (general-define-key "] SPC" 'my/evil-blank-below)
 
   ;; "get option" is the mnemonic
+  ;; also inspired by tpope's unimpaired
   (general-define-key "g o t" 'toggle-truncate-lines)
   (general-define-key "g o n" 'linum-mode)
   ;; TODO: look into cross-platform spell checker
@@ -131,6 +142,11 @@ any keys other than n or N are pressed."
 
   ;; general.el: back to global for non-normal-state bindings
   (setq general-default-keymaps 'global)
+
+  ;; Smex support
+  (general-define-key
+   :states '(normal visual insert emacs)
+   "M-x" 'smex)
 
   ;; Always cancel to normal state
   ;; It's like the new escape.
@@ -150,7 +166,7 @@ any keys other than n or N are pressed."
 
   ;; ibuffer
   (evil-set-initial-state 'ibuffer-mode 'normal)
-  (define-key evil-normal-state-map (kbd "g b") 'ibuffer)
+  (general-define-key :states 'normal "g b" 'ibuffer)
 
   ;; Shell
   (defun my/evil-shell-insert ()
@@ -158,12 +174,12 @@ any keys other than n or N are pressed."
     (interactive)
     (evil-goto-line)
     (evil-append-line 0))
-  (general-evil-define-key '(normal) 'shell-mode-map
+  (general-evil-define-key 'normal 'shell-mode-map
     "I" 'my/evil-shell-insert
     "A" 'my/evil-shell-insert)
 
   ;; Dired
-  ;; inspired by vinegar by tpope
+  ;; inspired by tpope's vinegar
   (general-define-key :states '(normal visual) "-" (kbd "C-x d RET"))
   (general-evil-define-key '(normal visual) 'dired-mode-map
     ;; Go up directory
@@ -172,7 +188,7 @@ any keys other than n or N are pressed."
     "q" 'my/evil-delete-buffer-keep-windows)
 
   ;; Info
-  (general-evil-define-key '(normal) 'Info-mode-map
+  (general-evil-define-key 'normal 'Info-mode-map
     "w" 'evil-forward-word-begin
     "b" 'evil-backward-word-begin
     "e" 'evil-forward-word-end
@@ -199,7 +215,7 @@ any keys other than n or N are pressed."
     (find-file "~/.emacs.d/init.el"))
 
   (general-define-key
-   :states '(normal motion emacs)
+   :states '(normal replace motion emacs)
    :prefix "SPC"
    :global-prefix "C-SPC"
    "TAB" 'other-window
