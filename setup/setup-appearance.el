@@ -30,6 +30,7 @@
 (show-paren-mode t)
 
 ;; Highlight trailing white space
+;; TODO: look into imitating Vim's listchars
 (custom-set-variables '(show-trailing-whitespace t))
 (custom-set-faces '(trailing-whitespace ((t (:background "dim gray")))))
 
@@ -50,11 +51,11 @@
   (sml/setup))
 
 ;; Unclutter modeline
-(use-package diminish)
-(eval-after-load "hideshow" '(diminish 'hs-minor-mode))
-(eval-after-load "undo-tree" '(diminish 'undo-tree-mode))
-(eval-after-load "which-key" '(diminish 'which-key-mode))
-(eval-after-load "simple" '(diminish 'overwrite-mode))
-;; (eval-after-load "smartparens" '(diminish 'smartparens-mode))
+(use-package diminish
+  :config
+  (eval-after-load "hideshow" '(diminish 'hs-minor-mode))
+  (eval-after-load "undo-tree" '(diminish 'undo-tree-mode))
+  (eval-after-load "which-key" '(diminish 'which-key-mode))
+  (eval-after-load "simple" '(diminish 'overwrite-mode)))
 
 (provide 'setup-appearance)

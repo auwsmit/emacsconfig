@@ -2,23 +2,23 @@
   "Configure Evil mode."
 
   ;; Normal state == Motion state
-  ;; This simplifies things for me.
+  ;; This simplifies things greatly.
   (setq evil-normal-state-modes (append evil-motion-state-modes evil-normal-state-modes))
   (setq evil-motion-state-modes nil)
 
+  ;; Cursor color to indicate modes
+  (setq evil-normal-state-cursor   '("dodger blue" box)
+	evil-insert-state-cursor   '("dodger blue" bar)
+	evil-replace-state-cursor  '("dodger blue" hbar)
+	evil-operator-state-cursor '("turquoise" box)
+	evil-visual-state-cursor   '("orange" box)
+	evil-motion-state-cursor   '("deep pink" box)
+	evil-emacs-state-cursor    '("red2" box))
+
   ;; Use Evil search over Emacs search
-  ;; (C-s is still i-search)
+  ;; (C-s/C-r are still i-search)
   (custom-set-variables
    '(evil-search-module (quote evil-search)))
-
-  ;; Cursor color to indicate modes
-    (setq evil-normal-state-cursor   '("#0a9dff" box)
-          evil-insert-state-cursor   '("#0a9dff" bar)
-          evil-replace-state-cursor  '("#0a9dff" hbar)
-          evil-operator-state-cursor '("cyan" box)
-          evil-visual-state-cursor   '("yellow" box)
-          evil-motion-state-cursor   '("deep pink" box)
-          evil-emacs-state-cursor    '("red2" box))
 
   ;; Center evil search & dehighlight when finished searching
   (defun my/evil-search-nohighlight-on-move ()
@@ -91,19 +91,19 @@ any keys other than n or N are pressed."
   (general-define-key "S" 'my/SplitLine)
 
   ;; this lets me keep Emacs' C-u (universal-argument)
-  (general-define-key "C-j" 'evil-scroll-down)
-  (general-define-key "C-k" 'evil-scroll-up)
+  (general-define-key "C-j" 'evil-scroll-down
+		      "C-k" 'evil-scroll-up)
 
   ;; Jump list (previous, next)
-  (general-define-key "C-p" 'evil-jump-backward)
-  (general-define-key "C-n" 'evil-jump-forward)
+  (general-define-key "C-p" 'evil-jump-backward
+		      "C-n" 'evil-jump-forward)
 
   ;; select last pasted text
   (general-define-key "g p" (kbd "` [ v ` ]"))
 
   ;; [g]o [s]ayonara (à la vim-sayonara)
-  (general-define-key "g s" 'evil-delete-buffer)
-  (general-define-key "g S" 'my/evil-delete-buffer-keep-windows)
+  (general-define-key "g s" 'evil-delete-buffer
+		      "g S" 'my/evil-delete-buffer-keep-windows)
 
   ;; Insert blank space above/below cursor
   ;; inspired by tpope's unimpaired
@@ -132,10 +132,16 @@ any keys other than n or N are pressed."
 
   ;; "get option" is the mnemonic
   ;; also inspired by tpope's unimpaired
-  (general-define-key "g o t" 'toggle-truncate-lines)
-  (general-define-key "g o n" 'linum-mode)
-  ;; TODO: look into cross-platform spell checker
-  ;; (define-key evil-normal-state-map (kbd "g o s") 'flyspell-mode)
+  (general-define-key "g o t" 'toggle-truncate-lines
+		      "g o n" 'linum-mode
+		      ;; TODO: look into cross-platform spell checker
+		      "g o s" 'flyspell-mode)
+
+  ;; Fold-to-scope
+  (general-define-key "z s" 'hs-hide-level)
+
+  ;; Just in case M-x is weirdly undefined
+  (general-define-key "M-x" 'execute-extended-command)
 
   ;; C-g like Vim to see total line numbers
   (general-define-key "C-g" 'count-words)
@@ -143,12 +149,12 @@ any keys other than n or N are pressed."
   ;; general.el: back to global for non-normal-state bindings
   (setq general-default-keymaps 'global)
 
-  ;; Always cancel to normal state
+  ;; Always cancel/escape to normal state
   (general-define-key :states '(visual insert replace motion emacs)
 		      "C-g" 'evil-normal-state
 		      "C-[" 'evil-normal-state)
 
-  ;; Insert motion
+  ;; Insert navigation
   (general-define-key :states '(insert)
 		      "C-a" 'move-beginning-of-line
 		      "C-e" 'move-end-of-line)
@@ -160,46 +166,58 @@ any keys other than n or N are pressed."
 
   ;; ibuffer
   (evil-set-initial-state 'ibuffer-mode 'normal)
-  (general-define-key :states 'normal "g b" 'ibuffer)
 
-  ;; Shell
+  ;; Occur
+  (evil-set-initial-state 'occur-mode 'normal)
+  (evil-make-overriding-map occur-mode-map 'normal)
+  (general-evil-define-key 'normal 'occur-mode-map
+    "q"   'evil-delete-buffer
+    "RET" 'occur-mode-goto-occurrence
+    "gg"  'evil-goto-first-line
+    "n" 'evil-ex-search-next
+    "?" 'evil-ex-search-backward)
+
+  ;; Dired
+  ;; bindings inspired by tpope's vinegar
+  (general-define-key :states '(normal visual) "-" (kbd "C-x d RET"))
+  (general-evil-define-key 'normal 'dired-mode-map
+    ;; Go up directory
+    "-" (lambda ()(interactive)
+	  (find-alternate-file ".."))
+    "RET" 'dired-find-alternate-file
+    "q" 'my/evil-delete-buffer-keep-windows
+    "n" 'evil-ex-search-next
+    "N" 'evil-ex-search-previous
+    "?" 'evil-ex-search-backward)
+
+  ;; Info
+  (general-evil-define-key 'normal 'Info-mode-map
+    "TAB" 'Info-next-reference
+    "S-TAB" 'Info-prev-reference
+    "RET" 'Info-follow-nearest-node
+    "u" 'Info-up
+    "q" 'Info-exit
+    "d" 'Info-directory
+    "C-p" 'Info-history-back
+    "C-n" 'Info-history-forward
+    "C-l" 'Info-history
+    "]" 'Info-forward-node
+    "[" 'Info-backward-node
+    "<" 'Info-top-node
+    ">" 'Info-final-node
+    "_" 'Info-prev
+    "+" 'Info-next)
+
+  ;; Shell(s)
   (defun my/evil-shell-insert ()
     "Go to the very end of the buffer and enter insert state."
     (interactive)
     (evil-goto-line)
     (evil-append-line 0))
-  (general-evil-define-key 'normal 'shell-mode-map
+  (general-evil-define-key 'normal
+    :keymaps '(shell-mode-map eshell-mode-map term-mode-map)
     "I" 'my/evil-shell-insert
-    "A" 'my/evil-shell-insert)
-
-  ;; Dired
-  ;; inspired by tpope's vinegar
-  (general-define-key :states '(normal visual) "-" (kbd "C-x d RET"))
-  (general-evil-define-key '(normal visual) 'dired-mode-map
-    ;; Go up directory
-    "-" (lambda () (interactive) (find-alternate-file ".."))
-    "RET" 'dired-find-alternate-file
-    "q" 'my/evil-delete-buffer-keep-windows)
-
-  ;; Info
-  (general-evil-define-key 'normal 'Info-mode-map
-    "w" 'evil-forward-word-begin
-    "b" 'evil-backward-word-begin
-    "e" 'evil-forward-word-end
-    "f" 'evil-find-char
-    "?" 'evil-ex-search-backward
-    "n" 'evil-ex-search-next
-    "N" 'evil-ex-search-previous
-    "H" 'evil-window-top
-    "L" 'evil-window-bottom
-    "G" 'evil-goto-line
-    "gg" 'evil-goto-first-line
-    "]]" 'Info-forward-node
-    "[[" 'Info-backward-node
-    "<" 'Info-top-node
-    ">" 'Info-final-node
-    "C-p" 'Info-history-back
-    "C-n" 'Info-history-forward))
+    "A" 'my/evil-shell-insert))
 
 (defun setup-evil-leader ()
   "Configure bindings to emulate Vim Leader functionality."
@@ -209,25 +227,37 @@ any keys other than n or N are pressed."
     (find-file "~/.emacs.d/init.el"))
 
   (general-define-key
-   :states '(normal replace motion emacs)
+   :states '(normal motion emacs)
    :prefix "SPC"
-   :global-prefix "C-SPC"
-   "TAB" 'other-window
-   "SPC" 'helm-M-x
+
+   ;; Less CTRL more SPC
+   "x" ctl-x-map
+   "h" help-map
+   "w" 'evil-window-map
+
+   ;; Often used shortcuts
+   "TAB" 'evil-window-next
+   "s"  'evil-write
    "e"  'eval-last-sexp
-   "i"  'my/open-init-el
-   "w"  'evil-write
-   "b"  'ido-switch-buffer
    "f"  'ido-find-file
-   "hr"  'helm-recentf
-   "hb"  'helm-buffers-list
-   "hf"  'helm-find-files
-   "ha"  'helm-apropos))
+   "b"  'ido-switch-buffer
+   "B"  'ibuffer
+   "i"  'my/open-init-el
+   "o"  'occur
+   "O"  'multi-occur
+
+   ;; Helm shortcuts "take ctrl"
+   "SPC" 'helm-M-x
+   "C-r"  'helm-recentf
+   "C-b"  'helm-buffers-list
+   "C-f"  'helm-find-files
+   "C-h"  'helm-apropos))
 
 (use-package evil
   :init
   (setq evil-ex-substitute-global t
-	evil-want-fine-undo "No")
+	evil-want-fine-undo "No"
+	evil-overriding-maps nil)
   :config
   (add-hook 'evil-mode-hook 'setup-evil)
 

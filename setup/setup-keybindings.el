@@ -5,21 +5,20 @@
 (general-define-key "C-x C-b" 'ibuffer)
 
 ;; resize text easier
-(general-define-key "C-0"
-  (lambda() (interactive) (text-scale-set 0)))
-(general-define-key "C-+" 'text-scale-increase)
-(general-define-key "C-=" 'text-scale-increase)
-(general-define-key "C-_" 'text-scale-decrease)
-(general-define-key "C--" 'text-scale-decrease)
+(general-define-key
+ "C-0" (lambda() (interactive) (text-scale-set 0))
+ "C-=" 'text-scale-increase
+ "C--" 'text-scale-decrease)
 
+;; Show available key bindings
 ;; TODO: Check minimum version
-;; which-key to help my stupid monkey brain
 (use-package which-key
   :init
   (setq which-key-idle-delay 0.5)
   :config
   (which-key-mode)
-  (general-define-key "C-h W" 'which-key-show-top-level))
+  ;; show top-level bindings
+  (general-define-key "C-h T" 'which-key-show-top-level))
 
 ;; ;; guide-key for the newbie
 ;; (use-package guide-key

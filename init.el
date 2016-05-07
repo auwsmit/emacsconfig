@@ -26,5 +26,5 @@
   ;; Setup Evil mode, along with associated packages
   ;; (This file is big and separated into functions)
   ;; (I recommend HideShow for easier code overview)
-  ;; TODO: split into separate files
-  (require 'setup-evil))
+  (require 'setup-evil)
+  )
