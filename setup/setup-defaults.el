@@ -1,4 +1,4 @@
-; Make emacsclient work
+;; Make emacsclient work
 (server-start)
 
 ;; Scroll smoothly
@@ -8,7 +8,7 @@
 
 ;; When saving a file that starts with `#!', make it executable.
 (add-hook 'after-save-hook
-	  'executable-make-buffer-file-executable-if-script-p)
+          'executable-make-buffer-file-executable-if-script-p)
 
 ;; Sentences end with a single period.
 (setq sentence-end-double-space nil)
@@ -24,6 +24,13 @@
 
 ;; Enable HideShow in programming modes
 (add-hook 'prog-mode-hook (lambda () (hs-minor-mode t)))
+
+;; Default tab/indent settings
+(setq-default tab-width 4
+              indent-tabs-mode nil
+              c-basic-offset 4
+              c-default-style "linux")
+(c-set-offset 'case-label '+)
 
 ;; Auto detect indent settings
 (use-package dtrt-indent)

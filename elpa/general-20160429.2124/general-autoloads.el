@@ -5,7 +5,7 @@
 
 ;;;### (autoloads (general-evil-setup general-evil-define-key general-emacs-define-key
 ;;;;;;  general-create-definer general-define-key) "general" "general.el"
-;;;;;;  (22313 2389 447832 559000))
+;;;;;;  (22318 12625 0 0))
 ;;; Generated autoloads from general.el
 
 (autoload 'general-define-key "general" "\
@@ -75,7 +75,8 @@ aliases such as `nmap' for `general-nmap'.
 
 ;;;***
 
-;;;### (autoloads nil nil ("general-pkg.el") (22313 2389 574605 457000))
+;;;### (autoloads nil nil ("general-pkg.el") (22318 12625 405000
+;;;;;;  0))
 
 ;;;***
 

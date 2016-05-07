@@ -8,12 +8,12 @@
 
   ;; Cursor color to indicate modes
   (setq evil-normal-state-cursor   '("dodger blue" box)
-	evil-insert-state-cursor   '("dodger blue" bar)
-	evil-replace-state-cursor  '("dodger blue" hbar)
-	evil-operator-state-cursor '("turquoise" box)
-	evil-visual-state-cursor   '("orange" box)
-	evil-motion-state-cursor   '("deep pink" box)
-	evil-emacs-state-cursor    '("red2" box))
+        evil-insert-state-cursor   '("dodger blue" bar)
+        evil-replace-state-cursor  '("dodger blue" hbar)
+        evil-operator-state-cursor '("turquoise" box)
+        evil-visual-state-cursor   '("orange" box)
+        evil-motion-state-cursor   '("deep pink" box)
+        evil-emacs-state-cursor    '("red2" box))
 
   ;; Use Evil search over Emacs search
   ;; (C-s/C-r are still i-search)
@@ -26,18 +26,18 @@
 any keys other than n or N are pressed."
     (interactive)
     (if (not (or (equal (this-command-keys) "n")
-		 (equal (this-command-keys) "N")))
-	(progn (evil-ex-nohighlight)
-	       (remove-hook 'pre-command-hook
-			    'my/evil-search-nohighlight-on-move))))
+                 (equal (this-command-keys) "N")))
+        (progn (evil-ex-nohighlight)
+               (remove-hook 'pre-command-hook
+                            'my/evil-search-nohighlight-on-move))))
   (defun my/add-hook-evil-search ()
     (add-hook 'pre-command-hook 'my/evil-search-nohighlight-on-move))
   (defadvice evil-ex-start-search (after advice-for-evil-ex-start-search activate)
     (progn (evil-scroll-line-to-center (line-number-at-pos))
-	   (my/add-hook-evil-search)))
+           (my/add-hook-evil-search)))
   (defadvice evil-ex-search (after advice-for-evil-ex-search activate)
     (progn (evil-scroll-line-to-center (line-number-at-pos))
-	   (my/add-hook-evil-search)))
+           (my/add-hook-evil-search)))
 
   ;; this is the (evil-delete-buffer) function,
   ;; but doesn't close any windows
@@ -46,16 +46,16 @@ any keys other than n or N are pressed."
     (interactive "<b><!>")
     (with-current-buffer (or buffer (current-buffer))
       (when bang
-	(set-buffer-modified-p nil)
-	(dolist (process (process-list))
-	  (when (eq (process-buffer process)
-		    (current-buffer))
-	    (set-process-query-on-exit-flag process nil))))
+        (set-buffer-modified-p nil)
+        (dolist (process (process-list))
+          (when (eq (process-buffer process)
+                    (current-buffer))
+            (set-process-query-on-exit-flag process nil))))
       (if (and (fboundp 'server-edit)
-	       (boundp 'server-buffer-clients)
-	       server-buffer-clients)
-	  (server-edit)
-	(kill-buffer nil))))
+               (boundp 'server-buffer-clients)
+               server-buffer-clients)
+          (server-edit)
+        (kill-buffer nil))))
 
   ;; clear trailing whitespace ex command
   (evil-ex-define-cmd "ctw" 'delete-trailing-whitespace)
@@ -92,18 +92,18 @@ any keys other than n or N are pressed."
 
   ;; this lets me keep Emacs' C-u (universal-argument)
   (general-define-key "C-j" 'evil-scroll-down
-		      "C-k" 'evil-scroll-up)
+                      "C-k" 'evil-scroll-up)
 
   ;; Jump list (previous, next)
   (general-define-key "C-p" 'evil-jump-backward
-		      "C-n" 'evil-jump-forward)
+                      "C-n" 'evil-jump-forward)
 
   ;; select last pasted text
   (general-define-key "g p" (kbd "` [ v ` ]"))
 
   ;; [g]o [s]ayonara (à la vim-sayonara)
   (general-define-key "g s" 'evil-delete-buffer
-		      "g S" 'my/evil-delete-buffer-keep-windows)
+                      "g S" 'my/evil-delete-buffer-keep-windows)
 
   ;; Insert blank space above/below cursor
   ;; inspired by tpope's unimpaired
@@ -133,9 +133,9 @@ any keys other than n or N are pressed."
   ;; "get option" is the mnemonic
   ;; also inspired by tpope's unimpaired
   (general-define-key "g o t" 'toggle-truncate-lines
-		      "g o n" 'linum-mode
-		      ;; TODO: look into cross-platform spell checker
-		      "g o s" 'flyspell-mode)
+                      "g o n" 'linum-mode
+                      ;; TODO: look into cross-platform spell checker
+                      "g o s" 'flyspell-mode)
 
   ;; Fold-to-scope
   (general-define-key "z s" 'hs-hide-level)
@@ -151,14 +151,14 @@ any keys other than n or N are pressed."
 
   ;; Always cancel/escape to normal state
   (general-define-key :states '(visual insert replace motion emacs)
-		      "C-g" 'evil-normal-state
-		      "C-[" 'evil-normal-state)
+                      "C-g" 'evil-normal-state
+                      "C-[" 'evil-normal-state)
 
   ;; Insert navigation
   (general-define-key :states '(insert)
-		      "C-a" 'move-beginning-of-line
-		      "C-e" 'move-end-of-line)
-)
+                      "C-a" 'move-beginning-of-line
+                      "C-e" 'move-end-of-line)
+  )
 
 (defun setup-evil-other-modes ()
   "Define custom key bindings for other modes to be more consistent
@@ -170,7 +170,8 @@ any keys other than n or N are pressed."
   ;; Occur
   (evil-set-initial-state 'occur-mode 'normal)
   (evil-make-overriding-map occur-mode-map 'normal)
-  (general-evil-define-key 'normal 'occur-mode-map
+  (general-evil-define-key 'normal
+    :keymaps '(occur-mode-map occur-edit-mode-map)
     "q"   'evil-delete-buffer
     "RET" 'occur-mode-goto-occurrence
     "gg"  'evil-goto-first-line
@@ -183,7 +184,7 @@ any keys other than n or N are pressed."
   (general-evil-define-key 'normal 'dired-mode-map
     ;; Go up directory
     "-" (lambda ()(interactive)
-	  (find-alternate-file ".."))
+          (find-alternate-file ".."))
     "RET" 'dired-find-alternate-file
     "q" 'my/evil-delete-buffer-keep-windows
     "n" 'evil-ex-search-next
@@ -236,7 +237,7 @@ any keys other than n or N are pressed."
    "w" 'evil-window-map
 
    ;; Often used shortcuts
-   "TAB" 'evil-window-next
+   "TAB" 'other-window
    "s"  'evil-write
    "e"  'eval-last-sexp
    "f"  'ido-find-file
@@ -256,8 +257,8 @@ any keys other than n or N are pressed."
 (use-package evil
   :init
   (setq evil-ex-substitute-global t
-	evil-want-fine-undo "No"
-	evil-overriding-maps nil)
+        evil-want-fine-undo "No"
+        evil-overriding-maps nil)
   :config
   (add-hook 'evil-mode-hook 'setup-evil)
 

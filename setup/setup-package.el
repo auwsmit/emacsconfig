@@ -3,8 +3,8 @@
 
 ;; Package repositories in use
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-			 ("melpa" . "http://melpa.org/packages/")
-			 ("melpa-stable" . "http://stable.melpa.org/packages/")))
+                         ("melpa" . "http://melpa.org/packages/")
+                         ("melpa-stable" . "http://stable.melpa.org/packages/")))
 
 ;; Auto-install use-package for package management
 (unless (package-installed-p 'use-package)

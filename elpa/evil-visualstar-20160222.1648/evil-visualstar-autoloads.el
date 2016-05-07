@@ -5,7 +5,7 @@
 
 ;;;### (autoloads (turn-off-evil-visualstar-mode turn-on-evil-visualstar-mode
 ;;;;;;  global-evil-visualstar-mode evil-visualstar-mode) "evil-visualstar"
-;;;;;;  "evil-visualstar.el" (22313 2393 191832 689000))
+;;;;;;  "evil-visualstar.el" (22318 12661 0 0))
 ;;; Generated autoloads from evil-visualstar.el
 
 (autoload 'evil-visualstar-mode "evil-visualstar" "\
@@ -46,8 +46,8 @@ Turns off visual star selection.
 
 ;;;***
 
-;;;### (autoloads nil nil ("evil-visualstar-pkg.el") (22313 2393
-;;;;;;  375443 926000))
+;;;### (autoloads nil nil ("evil-visualstar-pkg.el") (22318 12661
+;;;;;;  333000 0))
 
 ;;;***
 

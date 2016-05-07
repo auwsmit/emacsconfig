@@ -10,8 +10,8 @@
 ;; No arrow keys
 (general-define-key
  :keymaps '(ido-common-completion-map
-	    ido-file-completion-map
-	    ido-buffer-completion-map)
+            ido-file-completion-map
+            ido-buffer-completion-map)
  "C-j" 'ido-next-match
  "C-k" 'ido-prev-match)
 

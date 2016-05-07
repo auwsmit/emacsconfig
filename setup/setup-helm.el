@@ -2,11 +2,11 @@
   :diminish helm-mode
   :init
   (require 'helm-config)
-  (setq helm-split-window-in-side-p         t ; open helm buffer inside current window, not occupy whole other window
-      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-      helm-ff-file-name-history-use-recentf t)
+  (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+        helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+        helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+        helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+        helm-ff-file-name-history-use-recentf t)
 
   :config
   (helm-mode 1)
@@ -20,10 +20,10 @@
 
   ;; No arrow keys
   (general-define-key :keymaps 'helm-map
-		      "C-j" 'helm-next-line
-		      "C-k" 'helm-previous-line
-		      "C-n" 'helm-next-source
-		      "C-p" 'helm-previous-source)
+                      "C-j" 'helm-next-line
+                      "C-k" 'helm-previous-line
+                      "C-n" 'helm-next-source
+                      "C-p" 'helm-previous-source)
 
   ;; ;; Helm for default M-x
   ;; (global-set-key (kbd "M-x") 'helm-M-x)

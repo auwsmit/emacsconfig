@@ -1,5 +1,12 @@
 ;; Maximize Emacs frame on startup
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(defun w32-maximize-frame ()
+  "Maximize the current frame (windows only)"
+  (interactive)
+  (w32-send-sys-command 61488))
+(if (eq system-type 'windows-nt)
+    (progn
+      (add-hook 'window-setup-hook 'w32-maximize-frame t))
+  (set-frame-parameter nil 'fullscreen 'maximized))
 
 ;; Minimal GUI, remove unnecessary gui elements
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))

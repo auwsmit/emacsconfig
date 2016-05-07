@@ -8,7 +8,7 @@
 ;;;;;;  evilnc-toggle-comment-empty-lines evilnc-toggle-invert-comment-line-by-line
 ;;;;;;  evilnc-quick-comment-or-uncomment-to-the-line evilnc-comment-or-uncomment-to-the-line
 ;;;;;;  evilnc-comment-or-uncomment-paragraphs) "evil-nerd-commenter"
-;;;;;;  "evil-nerd-commenter.el" (22313 2392 251832 656000))
+;;;;;;  "evil-nerd-commenter.el" (22318 12659 0 0))
 ;;; Generated autoloads from evil-nerd-commenter.el
 
 (autoload 'evilnc-comment-or-uncomment-paragraphs "evil-nerd-commenter" "\
@@ -89,7 +89,7 @@ Set the hotkeys of evil-nerd-comment.
 ;;;***
 
 ;;;### (autoloads nil nil ("evil-nerd-commenter-operator.el" "evil-nerd-commenter-pkg.el")
-;;;;;;  (22313 2392 366569 725000))
+;;;;;;  (22318 12660 20000 0))
 
 ;;;***
 

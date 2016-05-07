@@ -3,8 +3,8 @@
 ;;; Code:
 
 
-;;;### (autoloads (guide-key-mode) "guide-key" "guide-key.el" (22313
-;;;;;;  2356 255831 414000))
+;;;### (autoloads (guide-key-mode) "guide-key" "guide-key.el" (22318
+;;;;;;  12631 0 0))
 ;;; Generated autoloads from guide-key.el
 
 (defvar guide-key-mode nil "\
@@ -28,8 +28,8 @@ positive, otherwise disable.
 
 ;;;***
 
-;;;### (autoloads nil nil ("guide-key-pkg.el") (22313 2356 397948
-;;;;;;  502000))
+;;;### (autoloads nil nil ("guide-key-pkg.el") (22318 12631 203000
+;;;;;;  0))
 
 ;;;***
 
