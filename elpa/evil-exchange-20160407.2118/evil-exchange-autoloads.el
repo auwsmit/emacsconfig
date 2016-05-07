@@ -1,11 +1,10 @@
 ;;; evil-exchange-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-
+(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads (evil-exchange-cx-install evil-exchange-install
-;;;;;;  evil-exchange-cancel) "evil-exchange" "evil-exchange.el"
-;;;;;;  (22318 12658 0 0))
+;;;### (autoloads nil "evil-exchange" "evil-exchange.el" (22318 29513
+;;;;;;  0 0))
 ;;; Generated autoloads from evil-exchange.el
 
 (autoload 'evil-exchange "evil-exchange" "\
@@ -28,16 +27,9 @@ Setting evil-exchange key bindings in a vim-compatible way
 
 ;;;***
 
-;;;### (autoloads nil nil ("evil-exchange-pkg.el") (22318 12658 832000
-;;;;;;  0))
-
-;;;***
-
-(provide 'evil-exchange-autoloads)
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
-;; coding: utf-8
 ;; End:
 ;;; evil-exchange-autoloads.el ends here

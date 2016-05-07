@@ -1,10 +1,10 @@
 ;;; ido-vertical-mode-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-
+(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads (ido-vertical-mode) "ido-vertical-mode" "ido-vertical-mode.el"
-;;;;;;  (22318 12633 0 0))
+;;;### (autoloads nil "ido-vertical-mode" "ido-vertical-mode.el"
+;;;;;;  (22318 29482 0 0))
 ;;; Generated autoloads from ido-vertical-mode.el
 
 (defvar ido-vertical-mode nil "\
@@ -23,16 +23,9 @@ Makes ido-mode display vertically.
 
 ;;;***
 
-;;;### (autoloads nil nil ("ido-vertical-mode-pkg.el") (22318 12633
-;;;;;;  984000 0))
-
-;;;***
-
-(provide 'ido-vertical-mode-autoloads)
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
-;; coding: utf-8
 ;; End:
 ;;; ido-vertical-mode-autoloads.el ends here

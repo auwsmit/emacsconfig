@@ -1,18 +1,9 @@
 ;;; which-key-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-
+(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads (which-key-C-h-dispatch which-key-undo-key which-key-show-top-level
-;;;;;;  which-key-show-previous-page-cycle which-key-show-next-page-cycle
-;;;;;;  which-key-show-previous-page-no-cycle which-key-show-next-page-no-cycle
-;;;;;;  which-key-show-standard-help which-key-reload-key-sequence
-;;;;;;  which-key-declare-prefixes-for-mode which-key-declare-prefixes
-;;;;;;  which-key-add-prefix-title which-key-add-major-mode-key-based-replacements
-;;;;;;  which-key-add-key-based-replacements which-key-setup-minibuffer
-;;;;;;  which-key-setup-side-window-bottom which-key-setup-side-window-right-bottom
-;;;;;;  which-key-setup-side-window-right which-key-mode) "which-key"
-;;;;;;  "which-key.el" (22318 12632 0 0))
+;;;### (autoloads nil "which-key" "which-key.el" (22318 29481 0 0))
 ;;; Generated autoloads from which-key.el
 
 (defvar which-key-mode nil "\
@@ -165,16 +156,9 @@ prefix) if `which-key-use-C-h-commands' is non nil.
 
 ;;;***
 
-;;;### (autoloads nil nil ("which-key-pkg.el") (22318 12632 750000
-;;;;;;  0))
-
-;;;***
-
-(provide 'which-key-autoloads)
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
-;; coding: utf-8
 ;; End:
 ;;; which-key-autoloads.el ends here

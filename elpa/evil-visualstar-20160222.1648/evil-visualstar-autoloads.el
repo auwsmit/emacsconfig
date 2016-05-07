@@ -1,11 +1,10 @@
 ;;; evil-visualstar-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-
+(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads (turn-off-evil-visualstar-mode turn-on-evil-visualstar-mode
-;;;;;;  global-evil-visualstar-mode evil-visualstar-mode) "evil-visualstar"
-;;;;;;  "evil-visualstar.el" (22318 12661 0 0))
+;;;### (autoloads nil "evil-visualstar" "evil-visualstar.el" (22318
+;;;;;;  29517 0 0))
 ;;; Generated autoloads from evil-visualstar.el
 
 (autoload 'evil-visualstar-mode "evil-visualstar" "\
@@ -46,16 +45,9 @@ Turns off visual star selection.
 
 ;;;***
 
-;;;### (autoloads nil nil ("evil-visualstar-pkg.el") (22318 12661
-;;;;;;  333000 0))
-
-;;;***
-
-(provide 'evil-visualstar-autoloads)
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
-;; coding: utf-8
 ;; End:
 ;;; evil-visualstar-autoloads.el ends here

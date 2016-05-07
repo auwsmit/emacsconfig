@@ -1,10 +1,10 @@
 ;;; use-package-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-
+(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads (use-package) "use-package" "use-package.el" (22313
-;;;;;;  2343 979830 991000))
+;;;### (autoloads nil "use-package" "use-package.el" (22318 29472
+;;;;;;  0 0))
 ;;; Generated autoloads from use-package.el
 
 (autoload 'use-package "use-package" "\
@@ -64,16 +64,9 @@ this file.  Usage:
 
 ;;;***
 
-;;;### (autoloads nil nil ("use-package-pkg.el") (22313 2344 156908
-;;;;;;  910000))
-
-;;;***
-
-(provide 'use-package-autoloads)
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
-;; coding: utf-8
 ;; End:
 ;;; use-package-autoloads.el ends here

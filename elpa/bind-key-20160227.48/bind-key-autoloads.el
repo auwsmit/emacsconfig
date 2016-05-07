@@ -1,11 +1,9 @@
 ;;; bind-key-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-
+(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads (describe-personal-keybindings bind-keys* bind-keys
-;;;;;;  bind-key* unbind-key bind-key) "bind-key" "bind-key.el" (22313
-;;;;;;  2343 43830 959000))
+;;;### (autoloads nil "bind-key" "bind-key.el" (22318 29471 0 0))
 ;;; Generated autoloads from bind-key.el
 
 (autoload 'bind-key "bind-key" "\
@@ -65,16 +63,9 @@ Display all the personal keybindings defined by `bind-key'.
 
 ;;;***
 
-;;;### (autoloads nil nil ("bind-key-pkg.el") (22313 2343 164996
-;;;;;;  103000))
-
-;;;***
-
-(provide 'bind-key-autoloads)
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
-;; coding: utf-8
 ;; End:
 ;;; bind-key-autoloads.el ends here

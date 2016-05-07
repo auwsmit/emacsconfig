@@ -1,11 +1,9 @@
 ;;; general-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-
+(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads (general-evil-setup general-evil-define-key general-emacs-define-key
-;;;;;;  general-create-definer general-define-key) "general" "general.el"
-;;;;;;  (22318 12625 0 0))
+;;;### (autoloads nil "general" "general.el" (22318 29480 0 0))
 ;;; Generated autoloads from general.el
 
 (autoload 'general-define-key "general" "\
@@ -75,16 +73,9 @@ aliases such as `nmap' for `general-nmap'.
 
 ;;;***
 
-;;;### (autoloads nil nil ("general-pkg.el") (22318 12625 405000
-;;;;;;  0))
-
-;;;***
-
-(provide 'general-autoloads)
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
-;; coding: utf-8
 ;; End:
 ;;; general-autoloads.el ends here

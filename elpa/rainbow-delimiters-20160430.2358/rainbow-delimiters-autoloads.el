@@ -1,11 +1,10 @@
 ;;; rainbow-delimiters-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-
+(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads (rainbow-delimiters-mode-disable rainbow-delimiters-mode-enable
-;;;;;;  rainbow-delimiters-mode) "rainbow-delimiters" "rainbow-delimiters.el"
-;;;;;;  (22313 2347 551831 114000))
+;;;### (autoloads nil "rainbow-delimiters" "rainbow-delimiters.el"
+;;;;;;  (22318 29475 0 0))
 ;;; Generated autoloads from rainbow-delimiters.el
 
 (autoload 'rainbow-delimiters-mode "rainbow-delimiters" "\
@@ -25,16 +24,9 @@ Disable `rainbow-delimiters-mode'.
 
 ;;;***
 
-;;;### (autoloads nil nil ("rainbow-delimiters-pkg.el") (22313 2347
-;;;;;;  687956 547000))
-
-;;;***
-
-(provide 'rainbow-delimiters-autoloads)
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
-;; coding: utf-8
 ;; End:
 ;;; rainbow-delimiters-autoloads.el ends here

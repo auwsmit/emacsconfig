@@ -1,10 +1,10 @@
 ;;; dtrt-indent-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-
+(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads (dtrt-indent-mode dtrt-indent-mode) "dtrt-indent"
-;;;;;;  "dtrt-indent.el" (22318 12623 0 0))
+;;;### (autoloads nil "dtrt-indent" "dtrt-indent.el" (22318 29478
+;;;;;;  0 0))
 ;;; Generated autoloads from dtrt-indent.el
 
 (defvar dtrt-indent-mode nil "\
@@ -35,15 +35,13 @@ use either \\[customize] or the function `dtrt-indent-mode'.")
 ;;;***
 
 ;;;### (autoloads nil nil ("dtrt-indent-diag.el" "dtrt-indent-pkg.el")
-;;;;;;  (22318 12624 92000 0))
+;;;;;;  (22318 29479 151406 900000))
 
 ;;;***
 
-(provide 'dtrt-indent-autoloads)
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
-;; coding: utf-8
 ;; End:
 ;;; dtrt-indent-autoloads.el ends here

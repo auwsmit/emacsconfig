@@ -1,13 +1,0 @@
-;;; rich-minority-autoloads.el --- automatically extracted autoloads
-;;
-;;; Code:
-
-
-(provide 'rich-minority-autoloads)
-;; Local Variables:
-;; version-control: never
-;; no-byte-compile: t
-;; no-update-autoloads: t
-;; coding: utf-8
-;; End:
-;;; rich-minority-autoloads.el ends here
