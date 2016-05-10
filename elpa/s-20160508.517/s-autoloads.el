@@ -1,11 +1,15 @@
-;;; monokai-theme-autoloads.el --- automatically extracted autoloads
+;;; s-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
 (add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+
+;;;### (autoloads nil nil ("s.el") (22319 42490 306016 900000))
+
+;;;***
 
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
 ;; End:
-;;; monokai-theme-autoloads.el ends here
+;;; s-autoloads.el ends here

@@ -11,11 +11,11 @@
   (require 'setup-appearance)
 
   ;; Setup sensible defaults for Emacs
-  ;; AKA general, non-specific settings
+  ;; AKA general settings
   (require 'setup-defaults)
 
   ;; Custom key bindings + related packages
-  ;; (Most custom bindings are under their own setup)
+  ;; (Most mode-associated bindings are under their own setup)
   (require 'setup-keybindings)
 
   ;; Setup various packages
@@ -26,5 +26,4 @@
   ;; Setup Evil mode, along with associated packages
   ;; (This file is big and separated into functions)
   ;; (I recommend HideShow for easier code overview)
-  (require 'setup-evil)
-  )
+  (require 'setup-evil))

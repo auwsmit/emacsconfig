@@ -1,16 +1,18 @@
-(defun setup-evil ()
-  "Configure Evil mode."
+(defun setup-evil-settings ()
+  "Primary function to configure Evil mode. All other 'setup-evil-'
+functions are called from within this one."
 
   ;; Normal state == Motion state
   ;; This simplifies things greatly.
   (setq evil-normal-state-modes (append evil-motion-state-modes evil-normal-state-modes))
   (setq evil-motion-state-modes nil)
 
-  ;; Cursor color to indicate modes
+  ;; Cursor color/shape to indicate modes/states
+  ;; (matches GVim cursor shapes)
   (setq evil-normal-state-cursor   '("dodger blue" box)
         evil-insert-state-cursor   '("dodger blue" bar)
         evil-replace-state-cursor  '("dodger blue" hbar)
-        evil-operator-state-cursor '("turquoise" box)
+        evil-operator-state-cursor '("dodger blue" (hbar . 7))
         evil-visual-state-cursor   '("orange" box)
         evil-motion-state-cursor   '("deep pink" box)
         evil-emacs-state-cursor    '("red2" box))
@@ -63,9 +65,9 @@ any keys other than n or N are pressed."
   (setup-evil-custom-bindings)
   (setup-evil-other-modes)
   (setup-evil-leader))
-
 (defun setup-evil-custom-bindings ()
-  "Define custom key bindings for Evil mode."
+  "Define custom key bindings for Evil mode. This is a
+  sub-function of 'setup-evil-settings'"
 
   ;; general.el: bind to normal-state by default
   (setq general-default-keymaps 'evil-normal-state-map)
@@ -130,6 +132,21 @@ any keys other than n or N are pressed."
   (general-define-key "[ SPC" 'my/evil-blank-above)
   (general-define-key "] SPC" 'my/evil-blank-below)
 
+  ;; =p/=P from unimpaired (super WIP)
+  ;; TODO: figure out how to map to = p
+  (defun my/evil-formatted-paste-below (count)
+    "Paste after linewise, reindenting."
+    (interactive "p")
+    (end-of-line) (newline)
+    (evil-paste-after)
+    (evil-goto-mark 91)
+    (evil-visual-line)
+    (evil-goto-mark 93)
+    ;; (evil-indent 91 93)
+    ;; (evil-normal-state)
+    )
+  (general-define-key "] p" 'my/evil-formatted-paste-below)
+
   ;; "get option" is the mnemonic
   ;; also inspired by tpope's unimpaired
   (general-define-key "g o t" 'toggle-truncate-lines
@@ -137,11 +154,14 @@ any keys other than n or N are pressed."
                       ;; TODO: look into cross-platform spell checker
                       "g o s" 'flyspell-mode)
 
+
   ;; Fold-to-scope
   (general-define-key "z s" 'hs-hide-level)
 
   ;; Just in case M-x is weirdly undefined
   (general-define-key "M-x" 'execute-extended-command)
+
+  (general-define-key "SPC c" mode-specific-map)
 
   ;; C-g like Vim to see total line numbers
   (general-define-key "C-g" 'count-words)
@@ -159,10 +179,10 @@ any keys other than n or N are pressed."
                       "C-a" 'move-beginning-of-line
                       "C-e" 'move-end-of-line)
   )
-
 (defun setup-evil-other-modes ()
   "Define custom key bindings for other modes to be more consistent
-  with Evil mode."
+  with Evil mode. This is a sub-function of
+  'setup-evil-settings'"
 
   ;; ibuffer
   (evil-set-initial-state 'ibuffer-mode 'normal)
@@ -218,23 +238,36 @@ any keys other than n or N are pressed."
   (general-evil-define-key 'normal
     :keymaps '(shell-mode-map eshell-mode-map term-mode-map)
     "I" 'my/evil-shell-insert
-    "A" 'my/evil-shell-insert))
+    "A" 'my/evil-shell-insert)
 
+  ;; Help
+  (general-evil-define-key 'normal 'help-mode-map
+    "q" 'evil-delete-buffer))
 (defun setup-evil-leader ()
-  "Configure bindings to emulate Vim Leader functionality."
+  "Configure bindings to emulate Vim Leader functionality. This is a
+sub-function of 'setup-evil-settings'"
 
   (defun my/open-init-el ()
     (interactive)
     (find-file "~/.emacs.d/init.el"))
 
+  (defun my/simulate-key-press (key)
+    "Pretend that KEY was pressed.
+KEY must be given in `kbd' notation."
+    `(lambda () (interactive)
+       (setq prefix-arg current-prefix-arg)
+       (setq unread-command-events (listify-key-sequence (read-kbd-macro,key)))))
+
   (general-define-key
-   :states '(normal motion emacs)
+   :states '(normal motion insert emacs)
    :prefix "SPC"
+   :non-normal-prefix "C-SPC"
 
    ;; Less CTRL more SPC
-   "x" ctl-x-map
-   "h" help-map
    "w" 'evil-window-map
+   "x" (my/simulate-key-press "C-x")
+   "c" (my/simulate-key-press "C-c")
+   "h" (my/simulate-key-press "C-h")
 
    ;; Often used shortcuts
    "TAB" 'other-window
@@ -247,20 +280,19 @@ any keys other than n or N are pressed."
    "o"  'occur
    "O"  'multi-occur
 
-   ;; Helm shortcuts "take ctrl"
+   ;; Helm shortcuts
    "SPC" 'helm-M-x
    "C-r"  'helm-recentf
    "C-b"  'helm-buffers-list
    "C-f"  'helm-find-files
    "C-h"  'helm-apropos))
-
 (use-package evil
   :init
   (setq evil-ex-substitute-global t
         evil-want-fine-undo "No"
         evil-overriding-maps nil)
   :config
-  (add-hook 'evil-mode-hook 'setup-evil)
+  (add-hook 'evil-mode-hook 'setup-evil-settings)
 
   ;; Manipulate surroundings
   (use-package evil-surround
@@ -299,5 +331,4 @@ any keys other than n or N are pressed."
   ;;   (linum-relative-on))
 
   (evil-mode 1))
-
 (provide 'setup-evil)

@@ -1,29 +1,28 @@
 ;; Make emacsclient work
-(server-start)
 
-;; Scroll smoothly
-(setq scroll-margin 0
-      scroll-conservatively 10000
-      scroll-preserve-screen-position)
+(require 'server)
+(if (not (server-running-p)) (server-start))
 
-;; When saving a file that starts with `#!', make it executable.
-(add-hook 'after-save-hook
-          'executable-make-buffer-file-executable-if-script-p)
+(setq
+ ;; Backup files in one folder
+ backup-directory-alist `(("." . "~/.emacs.d/.saves"))
 
-;; Sentences end with a single period.
-(setq sentence-end-double-space nil)
+ ;; Switch to help window when activated
+ help-window-select t
 
-;; Backup files in one folder
-(setq backup-directory-alist `(("." . "~/.emacs.d/.saves")))
+ ;; Scroll smoothly
+ scroll-margin 0
+ scroll-conservatively 10000
+ scroll-preserve-screen-position t
 
-;; Auto-update changed files
-(global-auto-revert-mode t)
+ ;; Sentences end with a single period.
+ sentence-end-double-space nil
+
+ ;; Allow recursive minibuffers
+ enable-recursive-minibuffers t)
 
 ;; y/n instead of yes/no
 (fset 'yes-or-no-p 'y-or-n-p)
-
-;; Enable HideShow in programming modes
-(add-hook 'prog-mode-hook (lambda () (hs-minor-mode t)))
 
 ;; Default tab/indent settings
 (setq-default tab-width 4
@@ -35,6 +34,16 @@
 ;; Auto detect indent settings
 (use-package dtrt-indent)
 
+;; Auto-update changed files
+(global-auto-revert-mode t)
+
+;; When saving a file that starts with `#!', make it executable in *nix
+(add-hook 'after-save-hook
+          'executable-make-buffer-file-executable-if-script-p)
+
+;; Enable HideShow in programming modes
+(add-hook 'prog-mode-hook (lambda () (hs-minor-mode t)))
+
 ;; Better same-name buffer distinction
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
@@ -45,9 +54,6 @@
       (require 'saveplace)
       (setq-default save-place t))
   (save-place-mode 1))
-
-;; Allow recursive minibuffers
-(setq enable-recursive-minibuffers t)
 
 ;; Disable garbage collection in minibuffer
 (defun my-minibuffer-setup-hook ()

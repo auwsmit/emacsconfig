@@ -4,7 +4,7 @@
 
 ;; Author: Magnar Sveen <magnars@gmail.com>
 ;; Version: 2.12.1
-;; Package-Version: 20160501.1123
+;; Package-Version: 20160507.1405
 ;; Keywords: lists
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -556,11 +556,8 @@ Alias: `-any'"
 
 (defun -butlast (list)
   "Return a list of all items in list except for the last."
-  (let (result)
-    (while (cdr list)
-      (!cons (car list) result)
-      (!cdr list))
-    (nreverse result)))
+  ;; no alias as we don't want magic optional argument
+  (butlast list))
 
 (defmacro --count (pred list)
   "Anaphoric form of `-count'."
@@ -677,7 +674,9 @@ section is returned.  Defaults to 1."
     (nreverse new-list)))
 
 (defun -take (n list)
-  "Return a new list of the first N items in LIST, or all items if there are fewer than N."
+  "Return a new list of the first N items in LIST, or all items if there are fewer than N.
+
+See also: `-take-last'"
   (let (result)
     (--dotimes n
       (when list
@@ -685,7 +684,23 @@ section is returned.  Defaults to 1."
         (!cdr list)))
     (nreverse result)))
 
-(defalias '-drop 'nthcdr "Return the tail of LIST without the first N items.")
+(defun -take-last (n list)
+  "Return the last N items of LIST in order.
+
+See also: `-take'"
+  (copy-sequence (last list n)))
+
+(defalias '-drop 'nthcdr
+  "Return the tail of LIST without the first N items.
+
+See also: `-drop-last'")
+
+(defun -drop-last (n list)
+  "Remove the last N items of LIST and return a copy.
+
+See also: `-drop'"
+  ;; No alias because we don't want magic optional argument
+  (butlast list n))
 
 (defmacro --take-while (form list)
   "Anaphoric form of `-take-while'."

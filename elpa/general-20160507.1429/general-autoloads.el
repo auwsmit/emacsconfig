@@ -3,7 +3,7 @@
 ;;; Code:
 (add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads nil "general" "general.el" (22318 29480 0 0))
+;;;### (autoloads nil "general" "general.el" (22322 8787 0 0))
 ;;; Generated autoloads from general.el
 
 (autoload 'general-define-key "general" "\
@@ -47,9 +47,11 @@ are intended to be the defaults.
 A wrapper for `general-define-key' that is similar to `define-key'.
 It has a positional argument for KEYMAPS. It acts the same as
 `general-define-key', and ARGS can contain keyword arguments in addition to
-keybindings.
+keybindings. This can basically act as a drop-in replacement for `define-key',
+and unlike with `general-define-key', if KEYMAPS is a single keymap, it does
+not need to be quoted.
 
-\(fn KEYMAPS &rest ARGS)" nil nil)
+\(fn KEYMAPS &rest ARGS)" nil t)
 
 (put 'general-emacs-define-key 'lisp-indent-function '1)
 
@@ -57,11 +59,13 @@ keybindings.
 A wrapper for `general-define-key' that is similar to `evil-define-key'.
 It has positional arguments for STATES and KEYMAPS. It acts the same as
 `general-define-key', and ARGS can contain keyword arguments in addition to
-keybindings.
+keybindings. This can basically act as a drop-in replacement for
+`evil-define-key', and unlike with `general-define-key', if KEYMAPS is a single
+keymap, it does not need to be quoted.
 
-\(fn STATES KEYMAPS &rest ARGS)" nil nil)
+\(fn STATES KEYMAPS &rest ARGS)" nil t)
 
-(put 'general-evil-define-key 'lisp-indent-function 'defun)
+(put 'general-evil-define-key 'lisp-indent-function '2)
 
 (autoload 'general-evil-setup "general" "\
 Set up some basic equivalents for vim mapping functions.
@@ -70,6 +74,11 @@ Specifying SHORT-NAMES as non-nil will create non-prefixed function
 aliases such as `nmap' for `general-nmap'.
 
 \(fn &optional SHORT-NAMES)" nil nil)
+
+;;;***
+
+;;;### (autoloads nil nil ("elpa.el" "general-pkg.el") (22322 8788
+;;;;;;  65333 100000))
 
 ;;;***
 

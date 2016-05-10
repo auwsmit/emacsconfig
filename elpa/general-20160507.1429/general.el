@@ -2,7 +2,6 @@
 
 ;; Author: Fox Kiester <noct@openmailbox.org>
 ;; URL: https://github.com/noctuid/general.el
-;; Package-Version: 20160429.2124
 ;; Created: February 17, 2016
 ;; Keywords: vim, evil, leader, keybindings, keys
 ;; Package-Requires: ((cl-lib "0.5"))
@@ -292,8 +291,8 @@ list of keymaps)."
                             ',global-prefix-maps)))
                (cond ((and (or ',non-normal-prefix-maps
                                ',global-prefix-maps)
-                           (member 'keymap (list 'evil-insert-state-map
-                                                 'evil-emacs-state-map)))
+                           (member ',keymap '(evil-insert-state-map
+                                              evil-emacs-state-map)))
                       (when ',non-normal-prefix-maps
                         (apply #'general--emacs-define-key keymap
                                ',non-normal-prefix-maps)))
@@ -317,23 +316,33 @@ are intended to be the defaults."
      (apply #'general-define-key (append args (list ,@args)))))
 
 ;;;###autoload
-(defun general-emacs-define-key (keymaps &rest args)
+(defmacro general-emacs-define-key (keymaps &rest args)
   "A wrapper for `general-define-key' that is similar to `define-key'.
 It has a positional argument for KEYMAPS. It acts the same as
 `general-define-key', and ARGS can contain keyword arguments in addition to
-keybindings."
+keybindings. This can basically act as a drop-in replacement for `define-key',
+and unlike with `general-define-key', if KEYMAPS is a single keymap, it does
+not need to be quoted."
   (declare (indent 1))
-  (apply #'general-define-key (append args (list :keymaps keymaps)) ))
+  `(general-define-key ,@args
+                       :keymaps (if (symbolp ',keymaps)
+                                    ',keymaps
+                                  ,keymaps)))
 
 ;;;###autoload
-(defun general-evil-define-key (states keymaps &rest args)
+(defmacro general-evil-define-key (states keymaps &rest args)
   "A wrapper for `general-define-key' that is similar to `evil-define-key'.
 It has positional arguments for STATES and KEYMAPS. It acts the same as
 `general-define-key', and ARGS can contain keyword arguments in addition to
-keybindings."
-  (declare (indent defun))
-  (apply #'general-define-key
-         (append args (list :states states :keymaps keymaps))))
+keybindings. This can basically act as a drop-in replacement for
+`evil-define-key', and unlike with `general-define-key', if KEYMAPS is a single
+keymap, it does not need to be quoted."
+  (declare (indent 2))
+  `(general-define-key ,@args
+                       :states ,states
+                       :keymaps (if (symbolp ',keymaps)
+                                    ',keymaps
+                                  ,keymaps)))
 
 ;;; Optional Setup
 ;;;###autoload
