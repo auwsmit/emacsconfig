@@ -1,0 +1,1201 @@
+#+ TITLE: An Emacs Config
+#+ AUTHOR: Austin Smith
+#+ EMAIL: AssailantLF@gmail.com
+
+* Evil compatibility preface
+
+Create a list of functions to be ran when Evil-mode is activated. Each function
+corresponds to a mode, and configures that mode to "be more evil."
+
+The benefit of this is that I can enable or disable all of Evil-mode with a
+single variable, and keep it untangled from all other packages/modes. I don't
+know why I would ever want to disable Evil-mode, but I can if I want.
+
+#+BEGIN_SRC emacs-lisp
+(setq my/evil-active t)
+(setq my/evil-other-mode-funs ())
+#+END_SRC
+
+* Package management
+
+** package.el
+
+Initialize package.el, the built-in package manager
+
+#+BEGIN_SRC emacs-lisp
+(package-initialize)
+#+END_SRC
+
+These are the package repositories I use:
+
+#+BEGIN_SRC emacs-lisp
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "http://melpa.org/packages/")
+                         ("melpa-stable" . "http://stable.melpa.org/packages/")))
+#+END_SRC
+
+** use-package
+
+Use [[https://github.com/jwiegley/use-package][use-package]] to install and configure packages. The following snippet
+automatically installs use-package if it isn't already installed.
+
+#+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t)
+#+END_SRC
+
+* Appearance settings
+
+Setup appearance early so that if something goes wrong with the init, Emacs is
+still lookin' good. These settings shouldn't affect functionality.
+
+** Maximize Emacs on startup
+
+This snippet works in *nix and all (relevant) versions of Windows.
+
+#+BEGIN_SRC emacs-lisp
+(defun w32-maximize-frame ()
+  "Maximize the current frame (windows only)"
+  (interactive)
+  (w32-send-sys-command 61488))
+(if (eq system-type 'windows-nt)
+    (progn
+      (add-hook 'window-setup-hook 'w32-maximize-frame t))
+  (set-frame-parameter nil 'fullscreen 'maximized))
+#+END_SRC
+
+** Minimal GUI
+
+Remove unnecessary GUI elements: menu-bar, tool-bar, and scroll bar.
+
+#+BEGIN_SRC emacs-lisp
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+#+END_SRC
+
+** No splash screen
+
+Emacs will open to the scratch buffer instead. Interesting trivia: Emacs
+originally opened to scratch by default.
+
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-splash-screen t)
+#+END_SRC
+
+** Default Font
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-9" ))
+(set-face-attribute 'default t :font "DejaVu Sans Mono-9")
+#+END_SRC
+
+** STOP THE BEEPING AND FLASHING
+
+#+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+#+END_SRC
+
+** Theme
+
+Monokai is warm and colorful. I set some variables so that text stays monospaced
+and all the same size.
+
+#+BEGIN_SRC emacs-lisp
+(use-package monokai-theme
+  :init
+  (setq monokai-use-variable-pitch nil
+        monokai-height-minus-1 1.0
+        monokai-height-plus-1 1.0
+        monokai-height-plus-2 1.0
+        monokai-height-plus-3 1.0
+        monokai-height-plus-4 1.0)
+  :config
+  (load-theme 'monokai t))
+#+END_SRC
+
+** RainbowDelimiters
+
+Highlight matching delimiters with unique colors. This is pretty indespensible
+for lisp with all its mad parenthesis.
+
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-delimiters
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+#+END_SRC
+
+** Highlight matching parenthesis
+
+#+BEGIN_SRC emacs-lisp
+(custom-set-variables '(show-paren-delay 0.0))
+(show-paren-mode t)
+#+END_SRC
+
+** Prettify symbols
+
+Convert certain words into symbols. Prime example: =lambda= becomes =λ=.
+
+#+BEGIN_SRC emacs-lisp
+(global-prettify-symbols-mode)
+#+END_SRC
+
+** Indicate lines after EOF
+
+Use tildes like Vim :>
+
+#+BEGIN_SRC emacs-lisp
+(define-fringe-bitmap 'tilde [0 0 0 113 219 142 0 0] nil nil 'center)
+(setcdr (assq 'empty-line fringe-indicator-alist) 'tilde)
+(set-fringe-bitmap-face 'tilde 'font-lock-comment-face)
+(setq-default indicate-empty-lines t)
+#+END_SRC
+
+** Show column number in modeline
+
+#+BEGIN_SRC emacs-lisp
+(column-number-mode t)
+#+END_SRC
+
+** SmartModeLine
+
+This mostly makes the mode line easier to read.
+
+#+BEGIN_SRC emacs-lisp
+(use-package smart-mode-line
+  :config
+  (setq sml/no-confirm-load-theme t)
+  (setq sml/theme 'dark)
+  (sml/setup))
+#+END_SRC
+
+** Diminish
+
+Use diminish to clean up the mode line. The mode line is cluttered as heck
+without this.
+
+#+BEGIN_SRC emacs-lisp
+(use-package diminish
+  :config
+  (eval-after-load "hideshow" '(diminish 'hs-minor-mode))
+  (eval-after-load "undo-tree" '(diminish 'undo-tree-mode))
+  (eval-after-load "simple" '(diminish 'overwrite-mode))
+  (eval-after-load "autorevert" '(diminish 'auto-revert-mode)))
+#+END_SRC
+
+* General settings
+
+These settings don't belong to any specific mode or package.
+
+** Start server if it isn't started
+
+Turn the first Emacs process into a server, which allows reuse of a that process
+through the shell command =emacsclient=.
+
+#+BEGIN_SRC emacs-lisp
+(require 'server)
+(if (not (server-running-p)) (server-start))
+#+END_SRC
+
+** Backup & auto-save files in one place
+
+These files are useful if something goes wrong, but they're also annoying in how
+they clutter directories. Put them in =~/.emacs.d/tmp= to remedy this.
+
+#+BEGIN_SRC emacs-lisp
+(setq backup-directory-alist `((".*" . "~/.emacs.d/tmp"))
+      auto-save-file-name-transforms `((".*" , "~/.emacs.d/tmp" t)))
+#+END_SRC
+
+** Scroll smoothly
+
+#+BEGIN_SRC emacs-lisp
+(setq scroll-margin 0)
+(setq scroll-conservatively 10000)
+(setq scroll-preserve-screen-position t)
+#+END_SRC
+
+** Sentences end with a single period
+
+#+BEGIN_SRC emacs-lisp
+(setq sentence-end-double-space nil)
+#+END_SRC
+
+** y/n instead of yes/no
+
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+** Wrap text at 80 characters
+
+Part tradition, part totally sensible.
+
+#+BEGIN_SRC emacs-lisp
+(setq-default fill-column 80)
+#+END_SRC
+
+** Indent with spaces by default
+
+#+BEGIN_SRC emacs-lisp
+(setq-default indent-tabs-mode nil)
+#+END_SRC
+
+** Auto detect indent settings
+
+I would prefer to follow a file's indenting style instead of enforcing my
+own, if possible. =dtrt'indent= works for most mainstream languages.
+
+#+BEGIN_SRC emacs-lisp
+(use-package dtrt-indent)
+#+END_SRC
+
+** Auto-update changed files
+
+If a file is changed outside of Emacs, automatically load those changes.
+
+#+BEGIN_SRC emacs-lisp
+(global-auto-revert-mode t)
+#+END_SRC
+
+** Auto-executable scripts in *nix
+
+When saving a file that starts with `#!', make it executable.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'after-save-hook
+          'executable-make-buffer-file-executable-if-script-p)
+#+END_SRC
+
+** Enable HideShow in programming modes
+
+This is useful for getting an overview of the code. It works better in some
+languages and layouts than others.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook (lambda () (hs-minor-mode t)))
+#+END_SRC
+
+** Better same-name buffer distinction
+
+When two buffers are open with the same name, this makes it easier to tell them
+apart.
+
+#+BEGIN_SRC emacs-lisp
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+#+END_SRC
+
+** Remember last position for reopened files
+
+#+BEGIN_SRC emacs-lisp
+(if (version< emacs-version "25.0")
+    (progn (require 'saveplace)
+           (setq-default save-place t))
+  (save-place-mode 1))
+#+END_SRC
+
+** Disable garbage collection in minibuffer
+
+See [[http://tiny.cc/7wd7ay][this article]] for more info.
+
+#+BEGIN_SRC emacs-lisp
+(defun my-minibuffer-setup-hook ()
+  (setq gc-cons-threshold most-positive-fixnum))
+(defun my-minibuffer-exit-hook ()
+  (setq gc-cons-threshold 800000))
+(add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
+(add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
+#+END_SRC
+
+* Key binding settings
+
+These are global bindings or packages that enhance/effect binding keys.
+
+** [[https://github.com/noctuid/general.el][general.el]] - Enhanced key binding
+
+This is one of my favorite packages, and makes it much nicer and easier to bind
+keys. Particularly useful for Evil mode and its various states.
+
+#+BEGIN_SRC emacs-lisp
+(use-package general)
+#+END_SRC
+
+** Resize text easier
+
+=C-+= and =C--= to resize text like every other program does.
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key
+ "C-0" (lambda() (interactive) (text-scale-set 0))
+ "C-=" 'text-scale-increase
+ "C--" 'text-scale-decrease)
+#+END_SRC
+
+** Show available key bindings
+
+Use =which-key= or =guide-key= to display key bindings. =which-key= is a
+superior package, but isn't compatible with older versions of Emacs.
+
+#+BEGIN_SRC emacs-lisp
+(if (version< emacs-version "24.4")
+    (use-package guide-key
+      :init
+      (setq guide-key/guide-key-sequence t
+            guide-key/recursive-key-sequence-flag t
+            guide-key/popup-window-position 'bottom
+            guide-key/idle-delay 0.5)
+      :config
+      (guide-key-mode 1))
+  (use-package which-key
+    :diminish which-key-mode
+    :init
+    (setq which-key-idle-delay 0.5
+          which-key-side-window-max-height 0.50))
+    :config
+    (which-key-mode)
+    ;; show top-level bindings, I don't need the Emacs tutorial
+    (general-define-key "C-h t" 'which-key-show-top-level))
+#+END_SRC
+
+* Language-specific modes
+
+** c-mode
+
+My style preferences:
+
+#+BEGIN_SRC emacs-lisp
+(setq-default c-basic-offset 4
+              c-default-style "linux")
+(c-set-offset 'case-label '+)
+#+END_SRC
+
+* Various packages & modes
+
+** Org-mode
+
+*** Prettier bullets
+
+This package automatically hides preceding asterisks, and makes the leading one
+pretty.
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-bullets
+  :init
+  (setq org-bullets-bullet-list '("●"))
+  :config
+  (add-hook 'org-mode-hook 'org-bullets-mode))
+#+END_SRC
+
+*** Noticeable ellipsis
+
+When headers are collapsed, =org-mode= uses ellipses to represent the hidden
+text, but I think that's too subtle, so this makes them stand out more.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-ellipsis "•••")
+#+END_SRC
+
+*** Default location for notes
+
+Just put them in the default org directory. I'll probably think of a better
+place soon.
+
+#+BEGIN_SRC emacs-lisp
+(setq-default org-default-notes-file (concat org-directory "/notes.org"))
+#+END_SRC
+
+*** Don't adapt indentation
+
+The hierarchy of headers already does the job that indenting would do.
+
+#+BEGIN_SRC emacs-lisp
+(setq-default org-adapt-indentation nil)
+#+END_SRC
+
+*** utf-8 encoding plz
+
+#+BEGIN_SRC emacs-lisp
+(setq utf-translate-cjk-mode nil)
+(set-locale-environment "pl_PL.UTF-8")
+(set-language-environment 'utf-8)
+(setq locale-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(unless (eq system-type 'windows-nt)
+  (progn
+    (set-selection-coding-system 'utf-8)
+    (set-keyboard-coding-system 'utf-8-mac)))
+(prefer-coding-system 'utf-8)
+#+END_SRC
+
+*** Global org bindings
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
+#+END_SRC
+
+*** Evil-mode compatibility
+
+Setup vim-like key bindings.
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-org-mode ()
+  (general-evil-define-key 'normal 'org-mode-map
+    ">" 'outline-demote
+    "<" 'outline-promote
+    "}" 'org-forward-paragraph
+    "{" 'org-backward-paragraph
+    "z j" 'outline-next-visible-heading
+    "z k" 'outline-previous-visible-heading
+    "z u" 'outline-up-heading
+    "z g" 'org-goto
+    "m c" 'org-ctrl-c-ctrl-c
+    "m t" 'org-todo)
+  (general-evil-define-key 'insert 'org-mode-map
+    "C-t" 'outline-demote
+    "C-d" 'outline-promote)
+  (general-evil-define-key '(normal visual insert) 'org-mode-map
+    "M-h" 'org-metaleft
+    "M-j" 'org-metadown
+    "M-k" 'org-metaup
+    "M-l" 'org-metaright
+    "M-S-h" 'org-shiftmetaleft
+    "M-S-j" 'org-shiftmetadown
+    "M-S-k" 'org-shiftmetaup
+    "M-S-l" 'org-shiftmetaright
+    "C-S-h" 'org-shiftcontrolleft
+    "C-S-j" 'org-shiftcontroldown
+    "C-S-k" 'org-shiftcontrolup
+    "C-S-l" 'org-shiftcontrolright))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-org-mode)
+#+END_SRC
+
+** Ido
+
+*** Interactively do things by default
+
+#+BEGIN_SRC emacs-lisp
+(ido-mode 1)
+#+END_SRC
+
+*** Always open a new buffer when there's no match
+
+#+BEGIN_SRC emacs-lisp
+(setq ido-create-new-buffer 'always)
+#+END_SRC
+
+*** Allow flexible matching
+
+#+BEGIN_SRC emacs-lisp
+(setq ido-enable-flex-matching t)
+#+END_SRC
+
+*** Show results vertically
+
+It might show less results, but it makes more sense to my brain.
+
+#+BEGIN_SRC emacs-lisp
+(use-package ido-vertical-mode
+  :config
+  (ido-vertical-mode 1))
+#+END_SRC
+
+*** Evil-mode compatibility
+
+Setup vim-like key bindings.
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-ido-mode ()
+  (general-define-key
+   :keymaps '(ido-common-completion-map
+              ido-file-completion-map
+              ido-buffer-completion-map)
+   "C-j" 'ido-next-match
+   "C-k" 'ido-prev-match))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-ido-mode)
+#+END_SRC
+
+** Dired
+
+*** Enable find-alternate-file
+
+=find-alternate-file= opens a file in the current dired window. This prevents
+dired from creating a bunch of annoying extra buffers.
+
+#+BEGIN_SRC emacs-lisp
+(put 'dired-find-alternate-file 'disabled nil)
+#+END_SRC
+
+*** Human readable filesize
+
+#+BEGIN_SRC emacs-lisp
+(setq-default dired-listing-switches "-alh")
+#+END_SRC
+
+*** Evil-mode compatibility
+
+Setup vim-like key bindings. Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's vinegar]].
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-dired-mode ()
+  (evil-make-overriding-map dired-mode-map 'normal)
+  (general-define-key :states 'normal "-" (kbd "C-x d RET"))
+  (general-evil-define-key 'normal 'dired-mode-map
+    "-" (lambda ()(interactive) (find-alternate-file ".."))
+    "j" 'dired-next-line
+    "k" 'dired-previous-line))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-dired-mode)
+#+END_SRC
+
+** Helm
+
+*** General options
+
+#+BEGIN_SRC emacs-lisp
+(use-package helm
+  :diminish helm-mode
+  :init
+  (require 'helm-config)
+  (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+        helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+        helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+        helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+        helm-ff-file-name-history-use-recentf t)
+#+END_SRC
+
+*** Enable fuzzy searching
+
+We'll see how this affects performance...
+
+#+BEGIN_SRC emacs-lisp
+  :config
+  (helm-mode 1)
+  (custom-set-variables
+   '(helm-recentf-fuzzy-match t)
+   '(helm-buffers-fuzzy-matching t)
+   '(helm-M-x-fuzzy-match t)
+   '(helm-apropos-fuzzy-match t)
+   '(helm-completion-in-region-fuzzy-match t)))
+#+END_SRC
+
+*** Projectile compatibility
+
+#+BEGIN_SRC emacs-lisp
+(use-package helm-projectile
+  :config
+  (projectile-global-mode)
+  (setq projectile-completion-system 'helm)
+  (helm-projectile-on))
+#+END_SRC
+
+*** Evil-mode compatibility
+
+Setup vim-like key bindings.
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-helm-mode ()
+  (general-define-key :keymaps 'helm-map
+                      "C-j" 'helm-next-line
+                      "C-k" 'helm-previous-line
+                      "C-n" 'helm-next-source
+                      "C-p" 'helm-previous-source))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-helm-mode)
+#+END_SRC
+
+** Magit
+
+Magit is so good that it doesn't require any configuration.
+
+#+BEGIN_SRC emacs-lisp
+(use-package magit)
+#+END_SRC
+
+** Yasnippet
+
+Snippets are located under the typical =~/.emacs.d/snippets=
+
+#+BEGIN_SRC emacs-lisp
+(use-package yasnippet
+  :diminish yas-minor-mode
+  :config
+  (yas-global-mode 1))
+#+END_SRC
+
+* EVIL-MODE
+
+Evil is so big and important that it gets its own top-level header. In all caps.
+
+** Custom/helper functions
+
+*** vim-sayonara inspired
+
+I need to implement smarter logic for this. It kinda works alright, I guess.
+
+#+BEGIN_SRC emacs-lisp
+(defun my/evil-sayonara ()
+  "If there's one window, switch to next buffer. Otherwise, close the current
+window."
+  (interactive)
+  (if (eq (next-window) (selected-window))
+      (my/evil-sayonara-bang)
+    (evil-window-delete)))
+
+(defun my/evil-sayonara-bang ()
+  "Switch to next buffer."
+  (interactive)
+  (next-buffer))
+#+END_SRC
+
+*** open init.el
+
+Actually open *this* file you're reading, since it's functionally my =init.el=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/open-init-el ()
+    (interactive)
+    (find-file "~/.emacs.d/config.org"))
+#+END_SRC
+
+** START evil-setup function
+
+This function is ran after Evil-mode is activated, and contains mostly all of my
+configuration for Evil.
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-settings ()
+#+END_SRC
+
+** General settings
+
+*** Normal state == Motion state
+
+Basically avoid Motion state and use Normal state instead.
+
+#+BEGIN_SRC emacs-lisp
+(setq evil-normal-state-modes (append evil-motion-state-modes evil-normal-state-modes))
+(setq evil-motion-state-modes nil)
+#+END_SRC
+
+*** Cursor color/shape to indicate modes/states
+
+This matches GVim's cursor shapes.
+
+#+BEGIN_SRC emacs-lisp
+(setq evil-normal-state-cursor   '("dodger blue" box)
+    evil-insert-state-cursor   '("dodger blue" bar)
+    evil-replace-state-cursor  '("dodger blue" hbar)
+    evil-operator-state-cursor '("dodger blue" (hbar . 7))
+    evil-visual-state-cursor   '("orange" box)
+    evil-motion-state-cursor   '("deep pink" box)
+    evil-emacs-state-cursor    '("red2" box))
+#+END_SRC
+
+*** Auto-switch to help window like Vim
+
+#+BEGIN_SRC emacs-lisp
+(setq help-window-select t)
+#+END_SRC
+
+*** Use Evil search over Emacs search
+
+(C-s/C-r are still i-search)
+
+#+BEGIN_SRC emacs-lisp
+(custom-set-variables
+'(evil-search-module (quote evil-search)))
+#+END_SRC
+
+*** Center evil search & dehighlight when finished searching
+
+#+BEGIN_SRC emacs-lisp
+(defun my/evil-search-nohighlight-on-move ()
+"Dehighlight Evil ex search when any keys other than n or N are pressed."
+(interactive)
+(if (not (or (equal (this-command-keys) "n")
+                (equal (this-command-keys) "N")))
+    (progn (evil-ex-nohighlight)
+            (remove-hook 'pre-command-hook
+                        'my/evil-search-nohighlight-on-move))))
+(defun my/add-hook-evil-search ()
+(add-hook 'pre-command-hook 'my/evil-search-nohighlight-on-move))
+(defadvice evil-ex-start-search (after advice-for-evil-ex-start-search activate)
+(progn (evil-scroll-line-to-center (line-number-at-pos))
+        (my/add-hook-evil-search)))
+(defadvice evil-ex-search (after advice-for-evil-ex-search activate)
+(progn (evil-scroll-line-to-center (line-number-at-pos))
+        (my/add-hook-evil-search)))
+#+END_SRC
+
+*** clear trailing whitespace ex command
+
+#+BEGIN_SRC emacs-lisp
+(evil-ex-define-cmd "ctw" 'delete-trailing-whitespace)
+#+END_SRC
+
+*** Re-enable evil-make-overriding/intercept-map
+
+They were disabled before so that I can have complete control over key bindings.
+They're being enabled again so that I can make use of them.
+
+#+BEGIN_SRC emacs-lisp
+(advice-remove 'evil-make-overriding-map #'my-kill-overriding-maps)
+(advice-remove 'evil-make-intercept-map #'my-kill-intercept-maps)
+#+END_SRC
+
+** Global bindings
+
+These are mostly remaps and convenience shortcuts that I want everywhere.
+
+*** "line" and "entire" text objects
+
+#+BEGIN_SRC emacs-lisp
+  (defmacro define-and-bind-text-object (key start-regex end-regex)
+    "Creates 'inside' and 'around' Evil text objects with regex."
+    (let ((inner-name (make-symbol "inner-name"))
+          (outer-name (make-symbol "outer-name")))
+      `(progn
+         (evil-define-text-object ,inner-name (count &optional beg end type)
+           (evil-select-paren ,start-regex ,end-regex beg end type count nil))
+         (evil-define-text-object ,outer-name (count &optional beg end type)
+           (evil-select-paren ,start-regex ,end-regex beg end type count t))
+         (define-key evil-inner-text-objects-map ,key (quote ,inner-name))
+         (define-key evil-outer-text-objects-map ,key (quote ,outer-name)))))
+  ;; create "il"/"al" (inside/around) line text objects:
+  (define-and-bind-text-object "l" "^\\s-*" "\\s-*$")
+  ;; create "ie"/"ae" (inside/around) entire buffer text objects:
+  (define-and-bind-text-object "e" "\\`\\s-*" "\\s-*\\'")
+#+END_SRC
+
+*** Just in case M-x is weirdly undefined
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal "M-x" 'execute-extended-command)
+#+END_SRC
+
+*** Back to last buffer
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal "DEL"
+                    'evil-switch-to-windows-last-buffer)
+#+END_SRC
+
+*** U instead of C-r for redo
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal "U" 'redo)
+#+END_SRC
+
+*** Q to replay q register
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal "Q" (kbd "@ q"))
+#+END_SRC
+
+*** Y to yank until EOL more like D and C
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal "Y" (kbd "y $"))
+#+END_SRC
+
+*** K (join line above) as inverse of J (join line below)
+
+#+BEGIN_SRC emacs-lisp
+(defun my/evil-join-above ()
+(interactive)
+(transpose-lines 1) (previous-line 2)
+(evil-join (+ (line-number-at-pos) 1) (line-number-at-pos)))
+(general-define-key :states 'normal "K" 'my/evil-join-above)
+#+END_SRC
+
+*** [S]plit Line (sister to [J]oin Line)
+
+#+BEGIN_SRC emacs-lisp
+(defun my/split-line ()
+(interactive)
+(newline-and-indent) (forward-line -1) (move-end-of-line 1))
+(general-define-key :states 'normal "S" 'my/split-line )
+#+END_SRC
+
+*** _ and | to intuitively split windows
+
+also focus on the new split window like Vim
+
+#+BEGIN_SRC emacs-lisp
+(defun evil-window-vsplit ()
+"Split current window vertically and focus on the new window."
+(interactive)
+(split-window-vertically)
+(other-window 1))
+(defun evil-window-split ()
+"Split current window horizontally and focus on the new window."
+(interactive)
+(split-window-horizontally)
+(other-window 1))
+(general-define-key :states 'normal
+                    "|" 'evil-window-split
+                    "_" 'evil-window-vsplit)
+#+END_SRC
+
+*** Convenient scrolling
+
+Aside from being more comfortable, this keeps standard =C-u=
+(universal-argument) available.
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal
+                    "C-j" 'evil-scroll-down
+                    "C-k" 'evil-scroll-up)
+#+END_SRC
+
+*** Jump list (previous, next)
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal
+                    "C-p" 'evil-jump-backward
+                    "C-n" 'evil-jump-forward)
+#+END_SRC
+
+*** gm for alternative mark
+
+Because I use =m= as a mode-specific prefix key in some modes.
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal "gm" 'evil-set-marker)
+#+END_SRC
+
+*** select last pasted/changed text
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal "gp" (kbd "` [ v ` ]"))
+#+END_SRC
+
+*** format last pasted/changed text
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal "g=" (kbd "` [ v ` ] ="))
+#+END_SRC
+
+*** [g]o [s]ayonara (vim-sayonara inspired)
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal
+                    "gs" 'my/evil-sayonara
+                    "gS" 'my/evil-sayonara-bang)
+#+END_SRC
+
+*** evil-unimpaired (inspired by tpope's unimpaired)
+
+#+BEGIN_SRC emacs-lisp
+(defun my/evil-blank-above (count)
+"Add [count] blank lines above the point."
+(interactive "p")
+(setq col (current-column))
+(while (> count 0)
+    (evil-insert-newline-above)
+    (forward-line 1)
+    (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
+    (setq count (- count 1)))
+(move-to-column col))
+(defun my/evil-blank-below (count)
+"Add [count] blank lines below the point."
+(interactive "p")
+(setq col (current-column))
+(while (> count 0)
+    (evil-insert-newline-below)
+    (forward-line -1)
+    (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
+    (setq count (- count 1)))
+(move-to-column col))
+(general-define-key
+:states 'normal
+"[ SPC" 'my/evil-blank-above
+"] SPC" 'my/evil-blank-below
+"[ b" 'previous-buffer
+"] b" 'next-buffer)
+#+END_SRC
+
+*** "change option" is the mnemonic
+
+#+BEGIN_SRC emacs-lisp
+;; (also inspired by tpope's unimpaired)
+(general-define-key :states 'normal
+                    "c" (general-key-dispatch 'evil-change
+                        "ot" 'toggle-truncate-lines
+                        "on" 'linum-mode
+                        "ow" 'toggle-word-wrap
+                        "oW" 'whitespace-mode
+                        ;; TODO: look into cross-platform spell checker
+                        "os" 'flyspell-mode
+                        "c" 'evil-change-whole-line
+                        "s" 'evil-surround-change))
+;; need this for c to work in visual mode
+(general-define-key :states 'visual "c" 'evil-change)
+#+END_SRC
+
+*** C-g to see total line numbers like Vim
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'normal "C-g" 'count-words)
+#+END_SRC
+
+*** Always cancel/escape to normal state
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states '(visual insert replace motion emacs)
+                    "C-g" 'evil-normal-state
+                    "C-[" 'evil-normal-state)
+#+END_SRC
+
+*** Insert movement
+
+#+BEGIN_SRC emacs-lisp
+(general-define-key :states 'insert
+                    "C-a" 'move-beginning-of-line
+                    "C-e" 'move-end-of-line)
+#+END_SRC
+
+** Leader bindings
+
+A "leader" key is a concept from Vim, and it's just a global prefix key like
+=C-x= or =C-c=, but for personal use. I use the spacebar as my leader key, and
+[[https://github.com/noctuid/general.el][general.el]] to make it easy.
+
+*** START general-define-key
+
+#+BEGIN_SRC emacs-lisp
+  (general-define-key
+   :states '(normal motion emacs)
+   :prefix "SPC"
+#+END_SRC
+
+*** Avoiding CTRL
+
+#+BEGIN_SRC emacs-lisp
+   "w" 'evil-window-map
+   "u" (general-simulate-keys "C-u")
+   "x" (general-simulate-keys "C-x")
+   "c" (general-simulate-keys "C-c")
+   "h" (general-simulate-keys "C-h")
+#+END_SRC
+
+*** Often used shortcuts
+
+#+BEGIN_SRC emacs-lisp
+   "TAB" 'other-window
+   "DEL" 'evil-window-delete
+   "s"  'evil-write
+   "e"  'eval-last-sexp
+   "f"  'ido-find-file
+   "b"  'ido-switch-buffer
+   "B"  'ibuffer
+   "i"  'my/open-init-el
+   "o"  'occur
+   "O"  'multi-occur
+#+END_SRC
+
+*** Helm shortcuts
+
+#+BEGIN_SRC emacs-lisp
+   "SPC" 'helm-M-x
+   "C-r"  'helm-recentf
+   "C-b"  'helm-buffers-list
+   "C-f"  'helm-find-files
+   "C-h"  'helm-apropos
+#+END_SRC
+
+*** END general-define-key
+
+#+BEGIN_SRC emacs-lisp
+)
+#+END_SRC
+
+** Evil compatibility with other modes
+
+This runs a list of functions to make other modes "more evil," and helps keep
+Evil-mode separate from other packages/modes.
+
+#+BEGIN_SRC emacs-lisp
+(dolist (fun my/evil-other-mode-funs) (funcall fun))
+#+END_SRC
+
+** END evil-setup function
+
+#+BEGIN_SRC emacs-lisp
+)
+#+END_SRC
+
+** "Small mode" bindings
+
+Setup key bindings for various modes to "be more evil."
+*** ibuffer
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-ibuffer-mode ()
+  (evil-set-initial-state 'ibuffer-mode 'normal)
+  (evil-make-overriding-map ibuffer-mode-map 'normal))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-ibuffer-mode)
+#+END_SRC
+
+*** bookmark
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-bookmark-mode ()
+  (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+  (evil-make-overriding-map bookmark-bmenu-mode-map 'normal)
+  (general-evil-define-key 'normal 'bookmark-bmenu-mode-map
+    "RET" 'bookmark-bmenu-this-window
+    "j" 'evil-next-line
+    "k" 'evil-previous-line))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-bookmark-mode)
+#+END_SRC
+
+*** occur
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-occur-mode ()
+  (evil-set-initial-state 'occur-mode 'normal)
+  (evil-make-overriding-map occur-mode-map 'normal)
+  (general-evil-define-key 'normal '(occur-mode-map occur-edit-mode-map)
+    "e" 'evil-forward-word-end
+    "m e" 'occur-edit-mode))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-occur-mode)
+#+END_SRC
+
+*** help
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-help-mode ()
+  (general-evil-define-key 'normal 'help-mode-map
+    "q" 'quit-window
+    "[" 'help-go-back
+    "]" 'help-go-forward))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-help-mode)
+#+END_SRC
+
+*** info
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-info-mode ()
+  (general-evil-define-key 'normal 'Info-mode-map
+    "TAB" 'Info-next-reference
+    "S-TAB" 'Info-prev-reference
+    "RET" 'Info-follow-nearest-node
+    "C-p" 'Info-history-back
+    "C-n" 'Info-history-forward
+    "q" 'Info-exit
+    "]" 'Info-forward-node
+    "[" 'Info-backward-node
+    "m j" 'Info-forward-node
+    "m k" 'Info-backward-node
+    "m p" 'Info-prev
+    "m n" 'Info-next
+    "m <" 'Info-top-node
+    "m >" 'Info-final-node
+    "m u" 'Info-up
+    "m d" 'Info-directory
+    "m h" 'Info-history))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-info-mode)
+#+END_SRC
+
+*** shell(s)
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-shell-mode ()
+  (defun my/evil-shell-insert ()
+    "Go to the very end of the buffer and enter insert state."
+    (interactive)
+    (evil-goto-line)
+    (evil-append-line 0))
+  (general-evil-define-key 'normal
+      '(shell-mode-map eshell-mode-map term-mode-map)
+    "I" 'my/evil-shell-insert
+    "A" 'my/evil-shell-insert))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-shell-mode)
+#+END_SRC
+
+** START use-package
+
+#+BEGIN_SRC emacs-lisp
+(if (eq my/evil-active t)
+    (use-package evil
+#+END_SRC
+
+** Basic options
+
+These need to be set before Evil-mode is activated.
+
+#+BEGIN_SRC emacs-lisp
+      :init
+      ;; Pre-defined Evil options
+      (setq evil-ex-substitute-global t
+            evil-want-fine-undo "No"
+            evil-overriding-maps nil)
+#+END_SRC
+
+*** Let me handle key bindings myself plz
+
+#+BEGIN_SRC emacs-lisp
+;; Disable evil-make-overriding/intercept-map (at start-up)
+(advice-add 'evil-make-intercept-map
+            :around (defun my-kill-intercept-maps (_ &rest _)))
+(advice-add 'evil-make-overriding-map
+            :around (defun my-kill-overriding-maps (_ &rest _)))
+#+END_SRC
+
+** Hook to configure Evil after activation
+
+#+BEGIN_SRC emacs-lisp
+:config
+(add-hook 'evil-mode-hook 'setup-evil-settings)
+#+END_SRC
+
+** Evil-specific packages
+
+*** Manipulate surroundings
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode))
+#+END_SRC
+
+*** Exchange operator
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil-exchange
+  :config
+  ;; "[g]o e[x]change"
+  ;; gX is cancel
+  (evil-exchange-install))
+#+END_SRC
+
+*** Comment operator
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil-nerd-commenter
+  :config
+  (general-define-key :states '(normal visual) "gc"
+  'evilnc-comment-operator))
+#+END_SRC
+
+*** Search visual selections
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil-visualstar
+  :config
+  (global-evil-visualstar-mode))
+#+END_SRC
+
+** END use-package
+
+#+BEGIN_SRC emacs-lisp
+      (evil-mode 1)))
+#+END_SRC
+
