@@ -467,35 +467,36 @@ The hierarchy of headers already does the job that indenting would do.
 Setup vim-like key bindings.
 
 #+BEGIN_SRC emacs-lisp
-(defun setup-evil-org-mode ()
-  (general-evil-define-key 'normal 'org-mode-map
-    ">" 'outline-demote
-    "<" 'outline-promote
-    "}" 'org-forward-paragraph
-    "{" 'org-backward-paragraph
-    "z j" 'outline-next-visible-heading
-    "z k" 'outline-previous-visible-heading
-    "z u" 'outline-up-heading
-    "z g" 'org-goto
-    "m c" 'org-ctrl-c-ctrl-c
-    "m t" 'org-todo)
-  (general-evil-define-key 'insert 'org-mode-map
-    "C-t" 'outline-demote
-    "C-d" 'outline-promote)
-  (general-evil-define-key '(normal visual insert) 'org-mode-map
-    "M-h" 'org-metaleft
-    "M-j" 'org-metadown
-    "M-k" 'org-metaup
-    "M-l" 'org-metaright
-    "M-S-h" 'org-shiftmetaleft
-    "M-S-j" 'org-shiftmetadown
-    "M-S-k" 'org-shiftmetaup
-    "M-S-l" 'org-shiftmetaright
-    "C-S-h" 'org-shiftcontrolleft
-    "C-S-j" 'org-shiftcontroldown
-    "C-S-k" 'org-shiftcontrolup
-    "C-S-l" 'org-shiftcontrolright))
-(add-to-list 'my/evil-other-mode-funs 'setup-evil-org-mode)
+  (defun setup-evil-org-mode ()
+    (general-evil-define-key 'normal 'org-mode-map
+      ">" 'outline-demote
+      "<" 'outline-promote
+      "}" 'org-forward-paragraph
+      "{" 'org-backward-paragraph
+      "z j" 'outline-next-visible-heading
+      "z k" 'outline-previous-visible-heading
+      "z u" 'outline-up-heading
+      "z g" 'org-goto
+      "m c" 'org-ctrl-c-ctrl-c
+      "m t" 'org-todo
+      "m '" 'org-edit-special)
+    (general-evil-define-key 'insert 'org-mode-map
+      "C-t" 'outline-demote
+      "C-d" 'outline-promote)
+    (general-evil-define-key '(normal visual insert) 'org-mode-map
+      "M-h" 'org-metaleft
+      "M-j" 'org-metadown
+      "M-k" 'org-metaup
+      "M-l" 'org-metaright
+      "M-S-h" 'org-shiftmetaleft
+      "M-S-j" 'org-shiftmetadown
+      "M-S-k" 'org-shiftmetaup
+      "M-S-l" 'org-shiftmetaright
+      "C-S-h" 'org-shiftcontrolleft
+      "C-S-j" 'org-shiftcontroldown
+      "C-S-k" 'org-shiftcontrolup
+      "C-S-l" 'org-shiftcontrolright))
+  (add-to-list 'my/evil-other-mode-funs 'setup-evil-org-mode)
 #+END_SRC
 
 ** Ido
@@ -645,12 +646,16 @@ Setup vim-like key bindings.
 #+BEGIN_SRC emacs-lisp
   (defun setup-evil-magit-mode ()
     (evil-set-initial-state 'magit-status-mode 'normal)
+    (evil-set-initial-state 'magit-log-mode 'normal)
+    (evil-set-initial-state 'magit-diff-mode 'normal)
     (evil-make-overriding-map magit-mode-map 'normal)
     (general-evil-define-key 'normal 'magit-mode-map
       "j" (kbd "n")
       "k" (kbd "p")
       "m c" 'magit-commit-popup
       ))
+    (general-evil-define-key 'normal 'magit-diff-mode-map
+      "C-j" 'evil-scroll-down)
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-magit-mode)
 #+END_SRC
 
@@ -1029,7 +1034,6 @@ The "leader" key is a concept from Vim, and it's just a global prefix key like
 
 #+BEGIN_SRC emacs-lisp
    "TAB" 'other-window
-   "DEL" 'evil-window-delete
    "s"  'evil-write
    "e"  'eval-last-sexp
    "f"  'ido-find-file
@@ -1048,6 +1052,19 @@ The "leader" key is a concept from Vim, and it's just a global prefix key like
    "C-b"  'helm-buffers-list
    "C-f"  'helm-find-files
    "C-h"  'helm-apropos
+#+END_SRC
+
+*** Git shortcuts
+
+#+BEGIN_SRC emacs-lisp
+   "gs" 'magit-status
+   "gd" 'magit-diff
+   "gc" 'magit-commit
+   "gl" 'magit-log
+   "gp" 'magit-push
+   "gw" 'magit-stage-file   ;; "write"
+   "gr" 'magit-unstage-file ;; "remove"
+   "gg" 'vc-git-grep
 #+END_SRC
 
 *** END general-define-key
