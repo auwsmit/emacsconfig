@@ -1,6 +1,6 @@
-#+ TITLE: An Emacs Config
-#+ AUTHOR: Austin Smith
-#+ EMAIL: AssailantLF@gmail.com
+#+TITLE: An Emacs Config
+#+AUTHOR: Austin Smith
+#+EMAIL: AssailantLF@gmail.com
 
 * Evil compatibility preface
 
@@ -47,10 +47,10 @@ automatically installs use-package if it isn't already installed.
 (setq use-package-always-ensure t)
 #+END_SRC
 
-* Appearance settings
+* Appearance related
 
 Setup appearance early so that if something goes wrong with the init, Emacs is
-still lookin' good. These settings shouldn't affect functionality.
+still lookin' good. These settings shouldn't affect any functionality.
 
 ** Maximize Emacs on startup
 
@@ -69,7 +69,7 @@ This snippet works in *nix and all (relevant) versions of Windows.
 
 ** Minimal GUI
 
-Remove unnecessary GUI elements: menu-bar, tool-bar, and scroll bar.
+Remove unnecessary GUI elements: menu-bar, tool-bar, and scroll-bar.
 
 #+BEGIN_SRC emacs-lisp
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
@@ -80,7 +80,7 @@ Remove unnecessary GUI elements: menu-bar, tool-bar, and scroll bar.
 ** No splash screen
 
 Emacs will open to the scratch buffer instead. Interesting trivia: Emacs
-originally opened to scratch by default.
+originally opened to the scratch buffer by default.
 
 #+BEGIN_SRC emacs-lisp
 (setq inhibit-splash-screen t)
@@ -129,10 +129,18 @@ for lisp with all its mad parenthesis.
 #+END_SRC
 
 ** Highlight matching parenthesis
+Specifically the ones under the cursor.
 
 #+BEGIN_SRC emacs-lisp
 (custom-set-variables '(show-paren-delay 0.0))
 (show-paren-mode t)
+#+END_SRC
+
+** Highlight trailing white space
+
+#+BEGIN_SRC emacs-lisp
+(custom-set-variables '(show-trailing-whitespace t))
+(custom-set-faces '(trailing-whitespace ((t (:background "dim gray")))))
 #+END_SRC
 
 ** Prettify symbols
@@ -175,7 +183,7 @@ This mostly makes the mode line easier to read.
 ** Diminish
 
 Use diminish to clean up the mode line. The mode line is cluttered as heck
-without this.
+without this. I use the =:diminish= key word for =use-package= when I can.
 
 #+BEGIN_SRC emacs-lisp
 (use-package diminish
@@ -240,14 +248,16 @@ Part tradition, part totally sensible.
 
 ** Indent with spaces by default
 
+Tabs are weird and can have varying lengths, so I prefer spaces.
+
 #+BEGIN_SRC emacs-lisp
 (setq-default indent-tabs-mode nil)
 #+END_SRC
 
-** Auto detect indent settings
+** Auto-detect indent settings
 
-I would prefer to follow a file's indenting style instead of enforcing my
-own, if possible. =dtrt'indent= works for most mainstream languages.
+I prefer to follow a file's indenting style instead of enforcing my own, if
+possible. =dtrt-indent= does this and works for most mainstream languages.
 
 #+BEGIN_SRC emacs-lisp
 (use-package dtrt-indent)
@@ -263,7 +273,7 @@ If a file is changed outside of Emacs, automatically load those changes.
 
 ** Auto-executable scripts in *nix
 
-When saving a file that starts with `#!', make it executable.
+When saving a file that starts with =#!=, make it executable.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'after-save-hook
@@ -311,9 +321,9 @@ See [[http://tiny.cc/7wd7ay][this article]] for more info.
 (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
 #+END_SRC
 
-* Key binding settings
+* Key binding related
 
-These are global bindings or packages that enhance/effect binding keys.
+These are global bindings, and packages that affect key binding in general.
 
 ** [[https://github.com/noctuid/general.el][general.el]] - Enhanced key binding
 
@@ -326,7 +336,7 @@ keys. Particularly useful for Evil mode and its various states.
 
 ** Resize text easier
 
-=C-+= and =C--= to resize text like every other program does.
+Resize text like every other program does.
 
 #+BEGIN_SRC emacs-lisp
 (general-define-key
@@ -340,6 +350,8 @@ keys. Particularly useful for Evil mode and its various states.
 Use =which-key= or =guide-key= to display key bindings. =which-key= is a
 superior package, but isn't compatible with older versions of Emacs.
 
+*** [[https://github.com/kai2nenobu/guide-key][guide-key]]
+
 #+BEGIN_SRC emacs-lisp
 (if (version< emacs-version "24.4")
     (use-package guide-key
@@ -350,11 +362,20 @@ superior package, but isn't compatible with older versions of Emacs.
             guide-key/idle-delay 0.5)
       :config
       (guide-key-mode 1))
+#+END_SRC
+
+*** [[https://github.com/justbur/emacs-which-key][which-key]]
+
+Show Evil-mode text objects and motions.
+
+#+BEGIN_SRC emacs-lisp
   (use-package which-key
     :diminish which-key-mode
     :init
     (setq which-key-idle-delay 0.5
-          which-key-side-window-max-height 0.50))
+          which-key-side-window-max-height 0.50
+          which-key-allow-evil-operators t
+          which-key-show-operator-state-maps t))
     :config
     (which-key-mode)
     ;; show top-level bindings, I don't need the Emacs tutorial
@@ -379,7 +400,7 @@ My style preferences:
 
 *** Prettier bullets
 
-This package automatically hides preceding asterisks, and makes the leading one
+Automatically hides preceding asterisks, and makes the leading one
 pretty.
 
 #+BEGIN_SRC emacs-lisp
@@ -611,10 +632,26 @@ Setup vim-like key bindings.
 
 ** Magit
 
-Magit is so good that it doesn't require any configuration.
+*** Install/activate
 
 #+BEGIN_SRC emacs-lisp
 (use-package magit)
+#+END_SRC
+
+*** Evil-mode compatibility
+
+Setup vim-like key bindings.
+
+#+BEGIN_SRC emacs-lisp
+  (defun setup-evil-magit-mode ()
+    (evil-set-initial-state 'magit-status-mode 'normal)
+    (evil-make-overriding-map magit-mode-map 'normal)
+    (general-evil-define-key 'normal 'magit-mode-map
+      "j" (kbd "n")
+      "k" (kbd "p")
+      "m c" 'magit-commit-popup
+      ))
+  (add-to-list 'my/evil-other-mode-funs 'setup-evil-magit-mode)
 #+END_SRC
 
 ** Yasnippet
@@ -634,7 +671,7 @@ Evil is so big and important that it gets its own top-level header. In all caps.
 
 ** Custom/helper functions
 
-*** vim-sayonara inspired
+*** [[https://github.com/mhinz/vim-sayonara][vim-sayonara]] inspired
 
 I need to implement smarter logic for this. It kinda works alright, I guess.
 
@@ -882,7 +919,9 @@ Because I use =m= as a mode-specific prefix key in some modes.
 (general-define-key :states 'normal "g=" (kbd "` [ v ` ] ="))
 #+END_SRC
 
-*** [g]o [s]ayonara (vim-sayonara inspired)
+*** [g]o [s]ayonara
+
+Inspired by [[https://github.com/mhinz/vim-sayonara][vim-sayonara]]
 
 #+BEGIN_SRC emacs-lisp
 (general-define-key :states 'normal
@@ -890,7 +929,9 @@ Because I use =m= as a mode-specific prefix key in some modes.
                     "gS" 'my/evil-sayonara-bang)
 #+END_SRC
 
-*** evil-unimpaired (inspired by tpope's unimpaired)
+*** evil-unimpaired
+
+Inspired by [[https://github.com/tpope/vim-unimpaired][unimpaired]]:
 
 #+BEGIN_SRC emacs-lisp
 (defun my/evil-blank-above (count)
@@ -921,10 +962,9 @@ Because I use =m= as a mode-specific prefix key in some modes.
 "] b" 'next-buffer)
 #+END_SRC
 
-*** "change option" is the mnemonic
+"change option" is the mnemonic:
 
 #+BEGIN_SRC emacs-lisp
-;; (also inspired by tpope's unimpaired)
 (general-define-key :states 'normal
                     "c" (general-key-dispatch 'evil-change
                         "ot" 'toggle-truncate-lines
@@ -963,7 +1003,7 @@ Because I use =m= as a mode-specific prefix key in some modes.
 
 ** Leader bindings
 
-A "leader" key is a concept from Vim, and it's just a global prefix key like
+The "leader" key is a concept from Vim, and it's just a global prefix key like
 =C-x= or =C-c=, but for personal use. I use the spacebar as my leader key, and
 [[https://github.com/noctuid/general.el][general.el]] to make it easy.
 
@@ -1033,7 +1073,8 @@ Evil-mode separate from other packages/modes.
 
 ** "Small mode" bindings
 
-Setup key bindings for various modes to "be more evil."
+Setup key bindings for various built-in modes to "be more evil."
+
 *** ibuffer
 
 #+BEGIN_SRC emacs-lisp
@@ -1158,7 +1199,9 @@ These need to be set before Evil-mode is activated.
 
 ** Evil-specific packages
 
-*** Manipulate surroundings
+*** [[https://github.com/timcharper/evil-surround][evil-surround]]
+
+Manipulate surroundings
 
 #+BEGIN_SRC emacs-lisp
 (use-package evil-surround
@@ -1166,7 +1209,9 @@ These need to be set before Evil-mode is activated.
   (global-evil-surround-mode))
 #+END_SRC
 
-*** Exchange operator
+*** [[https://github.com/Dewdrops/evil-exchange][evil-exchange]]
+
+Exchange operator
 
 #+BEGIN_SRC emacs-lisp
 (use-package evil-exchange
@@ -1176,7 +1221,9 @@ These need to be set before Evil-mode is activated.
   (evil-exchange-install))
 #+END_SRC
 
-*** Comment operator
+*** [[https://github.com/redguardtoo/evil-nerd-commenter][evil-nerd-commenter]]
+
+Comment operator
 
 #+BEGIN_SRC emacs-lisp
 (use-package evil-nerd-commenter
@@ -1185,7 +1232,9 @@ These need to be set before Evil-mode is activated.
   'evilnc-comment-operator))
 #+END_SRC
 
-*** Search visual selections
+*** [[https://github.com/bling/evil-visualstar][evil-visualstar]]
+
+Make a visual selection, and search it. Convenient and intuitive.
 
 #+BEGIN_SRC emacs-lisp
 (use-package evil-visualstar
