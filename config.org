@@ -468,7 +468,17 @@ The hierarchy of headers already does the job that indenting would do.
 (prefer-coding-system 'utf-8)
 #+END_SRC
 
+*** More convenient bindings
+
+#+BEGIN_SRC emacs-lisp
+  (general-define-key :keymaps 'org-mode-map
+                      "C-c C-8" 'org-ctrl-c-star
+                      "C-c 8" 'org-ctrl-c-star)
+#+END_SRC
+
 *** Global org bindings
+
+These are available everywhere, even outside of org-mode.
 
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-cl" 'org-store-link)
@@ -571,10 +581,19 @@ We'll see how this affects performance...
 
 ** Magit
 
-Install/activate
+*** Install/activate
 
 #+BEGIN_SRC emacs-lisp
 (use-package magit)
+#+END_SRC
+
+*** Use =ssh-agency= for Windows login prompt
+
+Windows has issues allowing Magit to display prompts (when pushing a repo, for
+example), so this package deals with that and fixes it somehow.
+
+#+BEGIN_SRC emacs-lisp
+(use-package ssh-agency)
 #+END_SRC
 
 ** Yasnippet
@@ -592,7 +611,7 @@ Snippets are located under the typical =~/.emacs.d/snippets=
 
 Evil is so big and important that it gets its own top-level header. In all caps.
 
-** Compatibility with other modes preface
+** Compatibility with other modes
 
 Create a list of functions to be ran when Evil-mode is activated. Each function
 corresponds to a mode, and configures that mode to "be more evil."
@@ -601,9 +620,187 @@ The benefit of this is that I can enable or disable all of Evil-mode with a
 single variable, and keep it untangled from all other packages/modes. I don't
 know why I would ever want to disable Evil-mode, but I can if I want, I guess.
 
+*** Related variables
+
 #+BEGIN_SRC emacs-lisp
 (setq my/evil-active t)
 (setq my/evil-other-mode-funs ())
+#+END_SRC
+
+*** Org
+
+#+BEGIN_SRC emacs-lisp
+  (defun setup-evil-org-mode ()
+    (general-evil-define-key 'normal 'org-mode-map
+      ">" 'outline-demote
+      "<" 'outline-promote
+      "}" 'org-forward-paragraph
+      "{" 'org-backward-paragraph
+      "z j" 'outline-next-visible-heading
+      "z k" 'outline-previous-visible-heading
+      "z u" 'outline-up-heading
+      "z g" 'org-goto)
+    (general-evil-define-key 'insert 'org-mode-map
+      "C-t" 'outline-demote
+      "C-d" 'outline-promote)
+    (general-evil-define-key '(normal visual insert) 'org-mode-map
+      "M-h" 'org-metaleft
+      "M-j" 'org-metadown
+      "M-k" 'org-metaup
+      "M-l" 'org-metaright
+      "M-S-h" 'org-shiftmetaleft
+      "M-S-j" 'org-shiftmetadown
+      "M-S-k" 'org-shiftmetaup
+      "M-S-l" 'org-shiftmetaright
+      "C-S-h" 'org-shiftcontrolleft
+      "C-S-j" 'org-shiftcontroldown
+      "C-S-k" 'org-shiftcontrolup
+      "C-S-l" 'org-shiftcontrolright))
+  (add-to-list 'my/evil-other-mode-funs 'setup-evil-org-mode)
+#+END_SRC
+
+*** Helm
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-helm-mode ()
+  (general-define-key :keymaps 'helm-map
+                      "C-j" 'helm-next-line
+                      "C-k" 'helm-previous-line
+                      "C-n" 'helm-next-source
+                      "C-p" 'helm-previous-source))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-helm-mode)
+#+END_SRC
+
+*** Magit
+
+#+BEGIN_SRC emacs-lisp
+  (defun setup-evil-magit-mode ()
+    (evil-set-initial-state 'magit-status-mode 'normal)
+    (evil-set-initial-state 'magit-log-mode 'normal)
+    (evil-set-initial-state 'magit-diff-mode 'normal)
+    (evil-make-overriding-map magit-mode-map 'normal)
+    (general-evil-define-key 'normal 'magit-mode-map
+      "j" (kbd "n")
+      "k" (kbd "p")
+      "c" 'magit-commit-popup
+      ))
+    (general-evil-define-key 'normal 'magit-diff-mode-map
+      "C-j" 'evil-scroll-down)
+  (add-to-list 'my/evil-other-mode-funs 'setup-evil-magit-mode)
+#+END_SRC
+
+*** Dired
+
+Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's vinegar]].
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-dired-mode ()
+  (evil-make-overriding-map dired-mode-map 'normal)
+  (general-define-key :states 'normal "-" (kbd "C-x d RET"))
+  (general-evil-define-key 'normal 'dired-mode-map
+    "-" (lambda ()(interactive) (find-alternate-file ".."))
+    "j" 'dired-next-line
+    "k" 'dired-previous-line))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-dired-mode)
+#+END_SRC
+
+*** Ido
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-ido-mode ()
+  (general-define-key
+   :keymaps '(ido-common-completion-map
+              ido-file-completion-map
+              ido-buffer-completion-map)
+   "C-j" 'ido-next-match
+   "C-k" 'ido-prev-match))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-ido-mode)
+#+END_SRC
+
+*** Occur
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-occur-mode ()
+  (evil-set-initial-state 'occur-mode 'normal)
+  (evil-make-overriding-map occur-mode-map 'normal)
+  (general-evil-define-key 'normal '(occur-mode-map occur-edit-mode-map)
+    "e" 'evil-forward-word-end
+    "m e" 'occur-edit-mode))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-occur-mode)
+#+END_SRC
+
+*** Bookmark
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-bookmark-mode ()
+  (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+  (evil-make-overriding-map bookmark-bmenu-mode-map 'normal)
+  (general-evil-define-key 'normal 'bookmark-bmenu-mode-map
+    "RET" 'bookmark-bmenu-this-window
+    "j" 'evil-next-line
+    "k" 'evil-previous-line))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-bookmark-mode)
+#+END_SRC
+
+*** Info
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-info-mode ()
+  (general-evil-define-key 'normal 'Info-mode-map
+    "TAB" 'Info-next-reference
+    "S-TAB" 'Info-prev-reference
+    "RET" 'Info-follow-nearest-node
+    "C-p" 'Info-history-back
+    "C-n" 'Info-history-forward
+    "q" 'Info-exit
+    "]" 'Info-forward-node
+    "[" 'Info-backward-node
+    "m j" 'Info-forward-node
+    "m k" 'Info-backward-node
+    "m p" 'Info-prev
+    "m n" 'Info-next
+    "m <" 'Info-top-node
+    "m >" 'Info-final-node
+    "m u" 'Info-up
+    "m d" 'Info-directory
+    "m h" 'Info-history))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-info-mode)
+#+END_SRC
+
+*** Help
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-help-mode ()
+  (general-evil-define-key 'normal 'help-mode-map
+    "q" 'quit-window
+    "[" 'help-go-back
+    "]" 'help-go-forward))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-help-mode)
+#+END_SRC
+
+*** Shell(s)
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-shell-mode ()
+  (defun my/evil-shell-insert ()
+    "Go to the very end of the buffer and enter insert state."
+    (interactive)
+    (evil-goto-line)
+    (evil-append-line 0))
+  (general-evil-define-key 'normal
+      '(shell-mode-map eshell-mode-map term-mode-map)
+    "I" 'my/evil-shell-insert
+    "A" 'my/evil-shell-insert))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-shell-mode)
+#+END_SRC
+
+*** Ibuffer
+
+#+BEGIN_SRC emacs-lisp
+(defun setup-evil-ibuffer-mode ()
+  (evil-set-initial-state 'ibuffer-mode 'normal)
+  (evil-make-overriding-map ibuffer-mode-map 'normal))
+(add-to-list 'my/evil-other-mode-funs 'setup-evil-ibuffer-mode)
 #+END_SRC
 
 ** Custom/helper functions
@@ -911,7 +1108,7 @@ Inspired by [[https://github.com/tpope/vim-unimpaired][unimpaired]]:
                           ;; TODO: look into cross-platform spell checker
                           "os" 'flyspell-mode
                           "c" 'evil-change-whole-line
-                          ;; "s" 'evil-surround-change
+                          "s" 'evil-surround-change
                           ))
   ;; need this for c to work in visual mode
   (general-define-key :states 'visual "c" 'evil-change)
@@ -1004,190 +1201,9 @@ contains mostly all of my configuration for Evil.
 )
 #+END_SRC
 
-** Compatibility with other modes
-
-Define functions that setup key bindings/settings for various modes and packages
-to "be more evil."
-
-*** Ido
-
-#+BEGIN_SRC emacs-lisp
-(defun setup-evil-ido-mode ()
-  (general-define-key
-   :keymaps '(ido-common-completion-map
-              ido-file-completion-map
-              ido-buffer-completion-map)
-   "C-j" 'ido-next-match
-   "C-k" 'ido-prev-match))
-(add-to-list 'my/evil-other-mode-funs 'setup-evil-ido-mode)
-#+END_SRC
-
-*** Org mode
-
-#+BEGIN_SRC emacs-lisp
-  (defun setup-evil-org-mode ()
-    (general-evil-define-key 'normal 'org-mode-map
-      ">" 'outline-demote
-      "<" 'outline-promote
-      "}" 'org-forward-paragraph
-      "{" 'org-backward-paragraph
-      "z j" 'outline-next-visible-heading
-      "z k" 'outline-previous-visible-heading
-      "z u" 'outline-up-heading
-      "z g" 'org-goto)
-    (general-evil-define-key 'insert 'org-mode-map
-      "C-t" 'outline-demote
-      "C-d" 'outline-promote)
-    (general-evil-define-key '(normal visual insert) 'org-mode-map
-      "M-h" 'org-metaleft
-      "M-j" 'org-metadown
-      "M-k" 'org-metaup
-      "M-l" 'org-metaright
-      "M-S-h" 'org-shiftmetaleft
-      "M-S-j" 'org-shiftmetadown
-      "M-S-k" 'org-shiftmetaup
-      "M-S-l" 'org-shiftmetaright
-      "C-S-h" 'org-shiftcontrolleft
-      "C-S-j" 'org-shiftcontroldown
-      "C-S-k" 'org-shiftcontrolup
-      "C-S-l" 'org-shiftcontrolright))
-  (add-to-list 'my/evil-other-mode-funs 'setup-evil-org-mode)
-#+END_SRC
-
-*** Helm
-
-#+BEGIN_SRC emacs-lisp
-(defun setup-evil-helm-mode ()
-  (general-define-key :keymaps 'helm-map
-                      "C-j" 'helm-next-line
-                      "C-k" 'helm-previous-line
-                      "C-n" 'helm-next-source
-                      "C-p" 'helm-previous-source))
-(add-to-list 'my/evil-other-mode-funs 'setup-evil-helm-mode)
-#+END_SRC
-
-*** Magit
-
-#+BEGIN_SRC emacs-lisp
-  (defun setup-evil-magit-mode ()
-    (evil-set-initial-state 'magit-status-mode 'normal)
-    (evil-set-initial-state 'magit-log-mode 'normal)
-    (evil-set-initial-state 'magit-diff-mode 'normal)
-    (evil-make-overriding-map magit-mode-map 'normal)
-    (general-evil-define-key 'normal 'magit-mode-map
-      "j" (kbd "n")
-      "k" (kbd "p")
-      "c" 'magit-commit-popup
-      ))
-    (general-evil-define-key 'normal 'magit-diff-mode-map
-      "C-j" 'evil-scroll-down)
-  (add-to-list 'my/evil-other-mode-funs 'setup-evil-magit-mode)
-#+END_SRC
-
-*** Dired
-
-Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's vinegar]].
-
-#+BEGIN_SRC emacs-lisp
-(defun setup-evil-dired-mode ()
-  (evil-make-overriding-map dired-mode-map 'normal)
-  (general-define-key :states 'normal "-" (kbd "C-x d RET"))
-  (general-evil-define-key 'normal 'dired-mode-map
-    "-" (lambda ()(interactive) (find-alternate-file ".."))
-    "j" 'dired-next-line
-    "k" 'dired-previous-line))
-(add-to-list 'my/evil-other-mode-funs 'setup-evil-dired-mode)
-#+END_SRC
-
-*** bookmark
-
-#+BEGIN_SRC emacs-lisp
-(defun setup-evil-bookmark-mode ()
-  (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
-  (evil-make-overriding-map bookmark-bmenu-mode-map 'normal)
-  (general-evil-define-key 'normal 'bookmark-bmenu-mode-map
-    "RET" 'bookmark-bmenu-this-window
-    "j" 'evil-next-line
-    "k" 'evil-previous-line))
-(add-to-list 'my/evil-other-mode-funs 'setup-evil-bookmark-mode)
-#+END_SRC
-
-*** occur
-
-#+BEGIN_SRC emacs-lisp
-(defun setup-evil-occur-mode ()
-  (evil-set-initial-state 'occur-mode 'normal)
-  (evil-make-overriding-map occur-mode-map 'normal)
-  (general-evil-define-key 'normal '(occur-mode-map occur-edit-mode-map)
-    "e" 'evil-forward-word-end
-    "m e" 'occur-edit-mode))
-(add-to-list 'my/evil-other-mode-funs 'setup-evil-occur-mode)
-#+END_SRC
-
-*** help
-
-#+BEGIN_SRC emacs-lisp
-(defun setup-evil-help-mode ()
-  (general-evil-define-key 'normal 'help-mode-map
-    "q" 'quit-window
-    "[" 'help-go-back
-    "]" 'help-go-forward))
-(add-to-list 'my/evil-other-mode-funs 'setup-evil-help-mode)
-#+END_SRC
-
-*** info
-
-#+BEGIN_SRC emacs-lisp
-(defun setup-evil-info-mode ()
-  (general-evil-define-key 'normal 'Info-mode-map
-    "TAB" 'Info-next-reference
-    "S-TAB" 'Info-prev-reference
-    "RET" 'Info-follow-nearest-node
-    "C-p" 'Info-history-back
-    "C-n" 'Info-history-forward
-    "q" 'Info-exit
-    "]" 'Info-forward-node
-    "[" 'Info-backward-node
-    "m j" 'Info-forward-node
-    "m k" 'Info-backward-node
-    "m p" 'Info-prev
-    "m n" 'Info-next
-    "m <" 'Info-top-node
-    "m >" 'Info-final-node
-    "m u" 'Info-up
-    "m d" 'Info-directory
-    "m h" 'Info-history))
-(add-to-list 'my/evil-other-mode-funs 'setup-evil-info-mode)
-#+END_SRC
-
-*** shell(s)
-
-#+BEGIN_SRC emacs-lisp
-(defun setup-evil-shell-mode ()
-  (defun my/evil-shell-insert ()
-    "Go to the very end of the buffer and enter insert state."
-    (interactive)
-    (evil-goto-line)
-    (evil-append-line 0))
-  (general-evil-define-key 'normal
-      '(shell-mode-map eshell-mode-map term-mode-map)
-    "I" 'my/evil-shell-insert
-    "A" 'my/evil-shell-insert))
-(add-to-list 'my/evil-other-mode-funs 'setup-evil-shell-mode)
-#+END_SRC
-
-*** ibuffer
-
-#+BEGIN_SRC emacs-lisp
-(defun setup-evil-ibuffer-mode ()
-  (evil-set-initial-state 'ibuffer-mode 'normal)
-  (evil-make-overriding-map ibuffer-mode-map 'normal))
-(add-to-list 'my/evil-other-mode-funs 'setup-evil-ibuffer-mode)
-#+END_SRC
-
 ** START use-package
 
-This is the beginning of the `use-package` block for Evil.
+This is the beginning of the =use-package= block for Evil.
 
 #+BEGIN_SRC emacs-lisp
 (if (eq my/evil-active t)
@@ -1274,7 +1290,7 @@ Make a visual selection, and search it. Convenient and intuitive.
 
 ** END use-package
 
-Activate Evil and finish the `use-package` block.
+Activate Evil and finish the =use-package= block.
 
 #+BEGIN_SRC emacs-lisp
       (evil-mode 1)))
