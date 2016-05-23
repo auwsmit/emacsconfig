@@ -2,7 +2,16 @@
 #+AUTHOR: Austin Smith
 #+EMAIL: AssailantLF@gmail.com
 
+* Preamble
+
+This is my Emacs config, which is in a single file thanks to [[http://orgmode.org/worg/org-contrib/babel/intro.html][org-babel]]. Although
+GitHub does render =.org= files nicely, I recommend viewing it in Emacs, so that
+headers are collapsible. Org-mode gives a nice overview and makes it quick and
+easy to navigate and make changes.
+
 * Package management
+
+Setup general package related settings.
 
 ** package.el
 
@@ -339,7 +348,7 @@ Resize text like every other program does.
 Use =which-key= or =guide-key= to display key bindings. =which-key= is a
 superior package, but isn't compatible with older versions of Emacs.
 
-*** [[https://github.com/kai2nenobu/guide-key][guide-key]]
+*** [[https://github.com/kai2nenobu/guide-key][guide-key]]:
 
 #+BEGIN_SRC emacs-lisp
 (if (version< emacs-version "24.4")
@@ -353,7 +362,7 @@ superior package, but isn't compatible with older versions of Emacs.
       (guide-key-mode 1))
 #+END_SRC
 
-*** [[https://github.com/justbur/emacs-which-key][which-key]]
+*** [[https://github.com/justbur/emacs-which-key][which-key]]:
 
 Show Evil-mode text objects and motions in the guide as well.
 
@@ -593,7 +602,9 @@ Windows has issues allowing Magit to display prompts (when pushing a repo, for
 example), so this package deals with that and fixes it somehow.
 
 #+BEGIN_SRC emacs-lisp
-(use-package ssh-agency)
+  (use-package ssh-agency
+    :init
+    (setenv "SSH_ASKPASS" "git-gui--askpass"))
 #+END_SRC
 
 ** Yasnippet
@@ -859,13 +870,13 @@ Basically avoid Motion state and use Normal state instead.
 This matches GVim's cursor shapes.
 
 #+BEGIN_SRC emacs-lisp
-(setq evil-normal-state-cursor   '("dodger blue" box)
-    evil-insert-state-cursor   '("dodger blue" bar)
-    evil-replace-state-cursor  '("dodger blue" hbar)
-    evil-operator-state-cursor '("dodger blue" (hbar . 7))
-    evil-visual-state-cursor   '("orange" box)
-    evil-motion-state-cursor   '("deep pink" box)
-    evil-emacs-state-cursor    '("red2" box))
+  (setq evil-normal-state-cursor   '("dodger blue" box)
+        evil-insert-state-cursor   '("dodger blue" bar)
+        evil-replace-state-cursor  '("dodger blue" hbar)
+        evil-operator-state-cursor '("dodger blue" (hbar . 7))
+        evil-visual-state-cursor   '("orange" box)
+        evil-motion-state-cursor   '("deep pink" box)
+        evil-emacs-state-cursor    '("red2" box))
 #+END_SRC
 
 *** Auto-switch to help window like Vim
@@ -1158,6 +1169,7 @@ The "leader" key is a concept from Vim, and it's just a global prefix key like
    "TAB" 'other-window
    "s"  'evil-write
    "e"  'eval-last-sexp
+   "q"  'quit-window
    "f"  'ido-find-file
    "b"  'ido-switch-buffer
    "B"  'ibuffer
