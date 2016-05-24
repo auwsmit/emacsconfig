@@ -4,12 +4,13 @@
 
 * Preamble
 
-This is my Emacs config, which is in a single file thanks to [[http://orgmode.org/worg/org-contrib/babel/intro.html][org-babel]]. Although
-GitHub does render =.org= files nicely, I recommend viewing it in Emacs, so that
-headers are collapsible. Org-mode gives a nice overview and makes it quick and
-easy to navigate and make changes.
+This is my Emacs config, which is in a single file thanks to [[http://orgmode.org/worg/org-contrib/babel/intro.html][org-babel]].
 
-* Package management
+Although GitHub does render =.org= files nicely, I recommend viewing it in
+Emacs, so that headers are collapsible. Org-mode gives a nice overview and makes
+it quick and easy to navigate and make changes.
+
+* Package related
 
 Setup general package related settings.
 
@@ -29,10 +30,11 @@ These are the package repositories I use:
                          ("melpa-stable" . "http://stable.melpa.org/packages/")))
 #+END_SRC
 
-** use-package
+** [[https://github.com/jwiegley/use-package][use-package]]
 
-Use [[https://github.com/jwiegley/use-package][use-package]] to install and configure packages. The following snippet
-automatically installs use-package if it isn't already installed.
+This package makes installing and configuring other packages nicer and easier.
+The following snippet automatically installs use-package if it isn't already
+installed.
 
 #+BEGIN_SRC emacs-lisp
 (unless (package-installed-p 'use-package)
@@ -1234,10 +1236,12 @@ These need to be set before Evil-mode is activated.
             evil-overriding-maps nil)
 #+END_SRC
 
-*** Let me handle key bindings myself plz
+** Disable evil-make-overriding/intercept-map at start-up.
+
+Otherwise, Evil will mess with other mode's mappings. I want to mess with them
+myself, instead.
 
 #+BEGIN_SRC emacs-lisp
-;; Disable evil-make-overriding/intercept-map (at start-up)
 (advice-add 'evil-make-intercept-map
             :around (defun my-kill-intercept-maps (_ &rest _)))
 (advice-add 'evil-make-overriding-map
@@ -1298,6 +1302,23 @@ Make a visual selection, and search it. Convenient and intuitive.
 (use-package evil-visualstar
   :config
   (global-evil-visualstar-mode))
+#+END_SRC
+
+*** [[https://github.com/CodeFalling/nlinum-relative][nlinum-relative]]
+
+Relative line numbers
+
+#+BEGIN_SRC emacs-lisp
+  (use-package nlinum-relative
+    :init
+    ;; (setq nlinum-relative-current-symbol "")
+    :config
+    (nlinum-relative-setup-evil)
+    (add-hook 'prog-mode-hook 'nlinum-relative-mode)
+    (add-hook 'evil-visual-state-entry-hook 'nlinum-relative-on)
+    (add-hook 'evil-insert-state-entry-hook 'nlinum-relative-on)
+    ;; (remove-hook 'org-mode-hook 'nlinum-relative-mode)
+    )
 #+END_SRC
 
 ** END use-package
