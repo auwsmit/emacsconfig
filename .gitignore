@@ -1,0 +1,12 @@
+.saves/*
+auto-save-list/*
+bookmarks
+config.el
+# elpa/*
+eshell/*
+ido.last*
+projectile*
+server/*
+setup/*
+tags
+tmp/*
