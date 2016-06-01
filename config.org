@@ -456,6 +456,8 @@ Useful because I edit my config frequently
 
 ** Org-mode
 
+*** [[Evil Org][Evil-mode compatibility]]
+
 *** Prettier bullets
 
 Automatically hides preceding asterisks, and makes the leading one
@@ -529,8 +531,6 @@ These are available everywhere, even outside of org-mode.
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
 #+END_SRC
-
-*** [[*Evil%20Org][Evil-mode compatibility]]
 
 ** Dired
 
