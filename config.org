@@ -8,8 +8,8 @@ This is my Emacs config, which is (pretty much) in a single file thanks to
 [[http://orgmode.org/worg/org-contrib/babel/intro.html][org-babel]].
 
 Although GitHub does render =.org= files nicely, I recommend viewing it in
-Emacs, so that headers are collapsible. Org-mode gives a nice overview and makes
-it quick and easy to navigate and make changes.
+Emacs, as GitHub isn't fully compatible. Using org-mode gives a nice overview
+and makes it quick and easy to navigate and make changes.
 
 * Package related
 
@@ -77,8 +77,7 @@ Remove unnecessary GUI elements: menu-bar, tool-bar, and scroll-bar.
 
 ** No splash screen
 
-Emacs will open to the scratch buffer instead. Interesting trivia: Emacs
-originally opened to the scratch buffer by default.
+Interesting trivia: Emacs originally opened to the scratch buffer by default.
 
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-splash-screen t)
@@ -397,13 +396,6 @@ Resize text like every other program does.
  "C--" 'text-scale-decrease)
 #+END_SRC
 
-** Kill current buffer, no questions asked
-
-#+BEGIN_SRC emacs-lisp
-  (general-define-key
-   "C-x K" 'kill-this-buffer)
-#+END_SRC
-
 * Language-specific modes
 
 ** c-mode
@@ -456,8 +448,6 @@ Useful because I edit my config frequently
 
 ** Org-mode
 
-*** [[Evil Org][Evil-mode compatibility]]
-
 *** Prettier bullets
 
 Automatically hides preceding asterisks, and makes the leading one
@@ -478,15 +468,6 @@ text, but I think that's too subtle, so this makes them stand out more.
 
 #+BEGIN_SRC emacs-lisp
 (setq org-ellipsis "•••")
-#+END_SRC
-
-*** Default location for notes
-
-Just put them in the default org directory. I'll probably think of a better
-place soon.
-
-#+BEGIN_SRC emacs-lisp
-;; (setq org-default-notes-file (concat org-directory "/notes.org"))
 #+END_SRC
 
 *** Don't adapt indentation
@@ -531,6 +512,8 @@ These are available everywhere, even outside of org-mode.
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
 #+END_SRC
+
+*** [[*Evil Org][Evil-mode compatibility]]
 
 ** Dired
 
@@ -597,46 +580,6 @@ example), so this package deals with that and fixes it somehow.
 
 *** [[*Evil%20Projectile][Evil-mode compatibility]]
 
-** Helm
-
-Currently disabled in favor of [[https://github.com/abo-abo/swiper#ivy][ivy mode]]
-
-# *** Install/activate
-
-# #+BEGIN_SRC emacs-lisp
-#   (use-package helm
-#     :diminish ""
-#     :init
-#     (require 'helm-config)
-#     (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
-#           helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-#           helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-#           helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-#           helm-ff-file-name-history-use-recentf t)
-
-
-#     :config
-#     (helm-mode 1)
-
-#     ;; Enable fuzzy searching
-#     ;; we'll see how this affects performance...
-#     (custom-set-variables
-#      '(helm-recentf-fuzzy-match t)
-#      '(helm-buffers-fuzzy-matching t)
-#      '(helm-M-x-fuzzy-match t)
-#      '(helm-apropos-fuzzy-match t)
-#      '(helm-completion-in-region-fuzzy-match t))
-
-#     ;; Projectile compatibility
-#     (use-package helm-projectile
-#       :config
-#       (projectile-global-mode)
-#       (setq projectile-completion-system 'helm)
-#       (helm-projectile-on)))
-# #+END_SRC
-
-# *** [[*Evil%20Helm][Evil-mode compatibility]]
-
 ** Ivy
 
 *** Install/activate
@@ -664,40 +607,6 @@ Currently disabled in favor of [[https://github.com/abo-abo/swiper#ivy][ivy mode
 #+END_SRC
 
 *** [[*Evil%20Ivy][Evil-mode compatibility]]
-
-** Ido
-
-Currently disabled in favor of [[https://github.com/abo-abo/swiper#ivy][ivy mode]]
-
-# *** Interactively do things by default
-
-# #+BEGIN_SRC emacs-lisp
-# (ido-mode 1)
-# #+END_SRC
-
-# *** Always open a new buffer when there's no match
-
-# #+BEGIN_SRC emacs-lisp
-# (setq ido-create-new-buffer 'always)
-# #+END_SRC
-
-# *** Allow flexible matching
-
-# #+BEGIN_SRC emacs-lisp
-# (setq ido-enable-flex-matching t)
-# #+END_SRC
-
-# *** Show results vertically
-
-# It might show less results, but it makes more sense to my brain.
-
-# #+BEGIN_SRC emacs-lisp
-# (use-package ido-vertical-mode
-#   :config
-#   (ido-vertical-mode 1))
-# #+END_SRC
-
-# *** [[*Evil%20Ido][Evil-mode compatibility]]
 
 ** Yasnippet
 
@@ -804,8 +713,8 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
         (evil-set-initial-state 'magit-diff-mode 'normal)
         (evil-make-overriding-map magit-mode-map 'normal)
         (general-evil-define-key 'normal 'magit-mode-map
-          "j" (kbd "n")
-          "k" (kbd "p")
+          "j" [down]
+          "k" [up]
           "c" 'magit-commit-popup)
         (general-evil-define-key 'normal 'magit-diff-mode-map
           "C-j" 'evil-scroll-down)))
@@ -835,41 +744,6 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
      :prefix "SPC"
      "p"  (general-simulate-keys "C-c p")))
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-projectile-mode)
-#+END_SRC
-
-*** Evil Helm
-
-#+BEGIN_SRC emacs-lisp
-  ;; (defun setup-evil-helm-mode ()
-  ;;   (general-define-key :keymaps 'helm-map
-  ;;                       "C-j" 'helm-next-line
-  ;;                       "C-k" 'helm-previous-line
-  ;;                       "C-n" 'helm-next-source
-  ;;                       "C-p" 'helm-previous-source)
-
-  ;;   ;; Leader shortcuts
-  ;;   (general-define-key
-  ;;    :states '(normal motion emacs)
-  ;;    :prefix "SPC"
-  ;;    "SPC" 'helm-M-x
-  ;;    "C-r"  'helm-recentf
-  ;;    "C-b"  'helm-buffers-list
-  ;;    "C-f"  'helm-find-files
-  ;;    "C-h"  'helm-apropos))
-  ;; (add-to-list 'my/evil-other-mode-funs 'setup-evil-helm-mode)
-#+END_SRC
-
-*** Evil Ido
-
-#+BEGIN_SRC emacs-lisp
-  ;; (defun setup-evil-ido-mode ()
-  ;;   (general-define-key
-  ;;    :keymaps '(ido-common-completion-map
-  ;;               ido-file-completion-map
-  ;;               ido-buffer-completion-map)
-  ;;    "C-j" 'ido-next-match
-  ;;    "C-k" 'ido-prev-match))
-  ;; (add-to-list 'my/evil-other-mode-funs 'setup-evil-ido-mode)
 #+END_SRC
 
 *** Evil Ivy
@@ -1047,15 +921,6 @@ Match GVim's cursor shapes.
 (setq help-window-select t)
 #+END_SRC
 
-*** Use Evil search over Emacs search
-
-(C-s/C-r are still i-search)
-
-#+BEGIN_SRC emacs-lisp
-(custom-set-variables
-'(evil-search-module (quote evil-search)))
-#+END_SRC
-
 *** Center evil search & dehighlight when finished searching
 
 #+BEGIN_SRC emacs-lisp
@@ -1127,16 +992,6 @@ These are mostly remaps and convenience shortcuts for Evil mode.
 
 #+BEGIN_SRC emacs-lisp
   (nmap "Q" "@q")
-#+END_SRC
-
-*** K (join line above) as inverse of J (join line below)
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/evil-join-above ()
-  (interactive)
-  (transpose-lines 1) (previous-line 2)
-  (evil-join (+ (line-number-at-pos) 1) (line-number-at-pos)))
-  (nmap "K" 'my/evil-join-above)
 #+END_SRC
 
 *** [S]plit Line (sister to [J]oin Line)
@@ -1318,8 +1173,8 @@ configuration]].
 
 ** Run compatibility functions
 
-Run a list of functions to make other modes "more evil," to help keep Evil-mode
-separate from other packages/modes.
+Run a list of functions to make other modes "more evil." See [[Compatibility with
+other modes]].
 
 #+BEGIN_SRC emacs-lisp
 (dolist (fun my/evil-other-mode-funs) (funcall fun))
@@ -1348,12 +1203,13 @@ The beginning of the =use-package= block for Evil.
 These need to be set before Evil-mode is activated.
 
 #+BEGIN_SRC emacs-lisp
-      :init
-      ;; Pre-defined Evil options
-      (setq evil-ex-substitute-global t
-            evil-want-fine-undo "No"
-            evil-want-Y-yank-to-eol t
-            evil-overriding-maps nil)
+  :init
+  ;; Pre-defined Evil options
+  (setq evil-ex-substitute-global t
+        evil-want-fine-undo "No"
+        evil-want-Y-yank-to-eol t
+        evil-overriding-maps nil
+        evil-search-module 'evil-search)
 #+END_SRC
 
 ** Disable evil-make-overriding/intercept-map at start-up.
