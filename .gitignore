@@ -1,8 +1,9 @@
+\#*\#
+.\#*
 .saves/*
 auto-save-list/*
 bookmarks
 config.el
-# elpa/*
 eshell/*
 ido.last*
 projectile*
