@@ -1480,7 +1480,7 @@ myself, instead.
 ** Evil-specific packages
 
 These packages are installed/configured *after* Evil is loaded, but *before*
-it's is activated. In my experience, this works well with Evil-related packages.
+it's activated. In my experience, this works well with Evil-related packages.
 
 *** [[https://github.com/timcharper/evil-surround][evil-surround]]
 
