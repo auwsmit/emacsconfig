@@ -803,15 +803,10 @@ Otherwise they add unnecessary clutter.
 
 #+BEGIN_SRC emacs-lisp
   (defun setup-evil-org-mode ()
-    (defun my/show-header ()
-      (interactive)
-      (show-children)
-      (show-entry))
-
     (defhydra hydra-org-nav (:color red :hint nil)
       "
-   ^^^^Nav ^ ^ | ^^View^^           | ^Search^   | ^^Exit Hydra^^
-  -^-^-^-^-^-^-+-^^----^^-----------+-^------^---+-^^----------^^-
+   ^Nav^   ^^^^| ^View^           ^^| ^Search^   | ^Exit Hydra
+  -^---^---^^^^+-^----^-----------^^+-^------^---+-^-----------
    ^ ^ _k_ ^ ^ | _o_pen (_a_ppear), | _g_oto     | _b_ack_._
    _h_ ^+^ _l_ | hi_d_e,  _c_ycle,  | _s_wiper   | _q_uit_._
    ^ ^ _j_ ^ ^ | ^globally^ _C_ycle | ^ ^        | _w_oops!
@@ -829,6 +824,11 @@ Otherwise they add unnecessary clutter.
       ("s" swiper)
       ("q" nil) ("b" nil)
       ("w" nil) ("." nil))
+
+    (defun my/show-header ()
+      (interactive)
+      (show-children)
+      (show-entry))
 
     (defhydra hydra-org-template (:color blue :hint nil)
       "
@@ -852,8 +852,9 @@ Otherwise they add unnecessary clutter.
       ("p" (hot-expand "<s" "perl"))
       ("u" (hot-expand "<s" "plantuml :file CHANGE.png"))
       ("P" (progn
-             (insert "#+HEADERS: :results output :exports both :shebang \"#!/usr/bin/env perl\"\n")
-             (hot-expand "<s" "perl")))
+             (insert "#+HEADERS: :results output :exports "
+             (insert "both :shebang \"#!/usr/bin/env perl\"\n")
+             (hot-expand "<s" "perl"))))
       ("I" (hot-expand "<I"))
       ("H" (hot-expand "<H"))
       ("A" (hot-expand "<A"))
