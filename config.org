@@ -31,9 +31,9 @@ These are the package repositories I use:
                            ("melpa-stable" . "http://stable.melpa.org/packages/")))
 #+END_SRC
 
-** [[https://github.com/jwiegley/use-package][use-package]]
+** use-package
 
-Install/activate =use-package=, a nice wrapper for =package.el=.
+Install/activate [[https://github.com/jwiegley/use-package][use-package]], basically a wrapper for =package.el=.
 
 - makes installing and configuring other packages nicer and easier
 - helps with autoloading packages to greatly reduce initial startup time
@@ -369,10 +369,10 @@ bind keys. Particularly useful for Evil mode and its various states.
 (use-package general)
 #+END_SRC
 
-** The Mighty [[https://github.com/abo-abo/hydra][Hydra]]
+** The Mighty
 
-I'm a big fan of hydras. Search for =defhydra= in this file to check 'em all
-out.
+I'm a big fan of [[https://github.com/abo-abo/hydra][Hydra]]. Search for =defhydra= in this file to check out all my
+hydras.
 
 What is a hydra? From the README:
 
@@ -402,37 +402,30 @@ seamless, it's like a minor mode that disables itself auto-magically.
 
 ** Show available key bindings
 
-Use =which-key= or =guide-key= to display key bindings. =which-key= is a
+Use [[https://github.com/justbur/emacs-which-key][which-key]] or [[https://github.com/kai2nenobu/guide-key][guide-key]] to display key bindings. =which-key= is a
 superior package, but isn't compatible with older versions of Emacs.
 
-*** [[https://github.com/kai2nenobu/guide-key][guide-key]]:
-
 #+BEGIN_SRC emacs-lisp
-(if (version< emacs-version "24.4")
-    (use-package guide-key
-      :init
-      (setq guide-key/guide-key-sequence t
-            guide-key/recursive-key-sequence-flag t
-            guide-key/popup-window-position 'bottom
-            guide-key/idle-delay 0.5)
+  (if (version< emacs-version "24.4")
+      (use-package guide-key
+          :init
+        (setq guide-key/guide-key-sequence t
+              guide-key/recursive-key-sequence-flag t
+              guide-key/popup-window-position 'bottom
+              guide-key/idle-delay 0.5)
+        :config
+        (guide-key-mode 1))
+      (use-package which-key
+          :diminish ""
+          :init
+          (setq which-key-idle-delay 0.5
+                which-key-side-window-max-height 0.50
+                which-key-allow-evil-operators t
+                which-key-show-operator-state-maps nil))
       :config
-      (guide-key-mode 1))
-#+END_SRC
-
-*** [[https://github.com/justbur/emacs-which-key][which-key]]:
-
-#+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :diminish ""
-    :init
-    (setq which-key-idle-delay 0.5
-          which-key-side-window-max-height 0.50
-          which-key-allow-evil-operators t
-          which-key-show-operator-state-maps nil))
-    :config
-    (which-key-mode)
-    ;; show top-level bindings, I don't need the Emacs tutorial
-    (general-define-key "C-h t" 'which-key-show-top-level))
+      (which-key-mode)
+      ;; show top-level bindings, I don't need the Emacs tutorial
+      (general-define-key "C-h t" 'which-key-show-top-level))
 #+END_SRC
 
 ** Resize text easier
@@ -1299,7 +1292,7 @@ These are mostly remaps and convenience shortcuts for Evil mode.
   (general-evil-setup t 'current-global-map)
 #+END_SRC
 
-**** Just in case M-x is weirdly undefined
+**** In case M-x is weirdly undefined
 
 #+BEGIN_SRC emacs-lisp
   (nmap "M-x" 'execute-extended-command)
