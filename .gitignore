@@ -1,6 +1,16 @@
+# ignore everything
 *
-!elisp
-!elpa
+
+# unignore everything within elisp
+!elisp/
+!elisp/*
+
+# unignore everything recursively within elisp
+!elpa/
+!elpa/*
+!elpa/**/*
+
+# unignore the rest
 !init.el
 !config.org
 !README.org
