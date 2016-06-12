@@ -623,6 +623,31 @@ is called.
                magit-unstage-file))
 #+END_SRC
 
+*** Magit is slow for Windows
+
+WORKAROUND SOURCE: https://github.com/magit/magit/issues/2395
+
+In summary: Magit isn't the problem. Git for Windows is just horribly slow with
+multiple calls, so these simplified functions make things less painful by
+calling less git commands.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+      :config
+    (when (eq system-type 'windows-nt)
+      (define-derived-mode magit-staging-mode magit-status-mode "Magit staging"
+                           "Mode for showing staged and unstaged changes."
+                           :group 'magit-status)
+      (defun magit-staging-refresh-buffer ()
+        (magit-insert-section (status)
+            (magit-insert-untracked-files)
+          (magit-insert-unstaged-changes)
+          (magit-insert-staged-changes)))
+      (defun magit-staging ()
+        (interactive)
+        (magit-mode-setup #'magit-staging-mode))))
+#+END_SRC
+
 *** Use =ssh-agency= for Windows login prompt
 
 Windows has issues allowing Magit to display prompts (when pushing a repo, for
@@ -1121,18 +1146,20 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-shell-mode)
 #+END_SRC
 
-** START evil-setup function
+** Post-activation setup function
 
-The beginning of the function that runs after Evil-mode is activated, and
-contains mostly all of my configuration for Evil.
+Runs after Evil-mode is activated, and contains mostly all of my configuration
+for Evil.
+
+*** START function
 
 #+BEGIN_SRC emacs-lisp
 (defun setup-evil-settings ()
 #+END_SRC
 
-** General settings
+*** General settings
 
-*** Normal state == Motion state
+**** Normal state == Motion state
 
 Basically avoid Motion state and use Normal state instead. I don't need Motion
 state, so it adds unnecessary complexity.
@@ -1142,7 +1169,7 @@ state, so it adds unnecessary complexity.
 (setq evil-motion-state-modes nil)
 #+END_SRC
 
-*** Cursor color/shape to indicate modes/states
+**** Cursor color/shape to indicate modes/states
 
 Match GVim's cursor shapes.
 
@@ -1156,13 +1183,13 @@ Match GVim's cursor shapes.
         evil-emacs-state-cursor    '("red2" box))
 #+END_SRC
 
-*** Auto-switch to help window like Vim
+**** Auto-switch to help window like Vim
 
 #+BEGIN_SRC emacs-lisp
 (setq help-window-select t)
 #+END_SRC
 
-*** Dehighlight search when finished searching
+**** Dehighlight search when finished searching
 
 #+BEGIN_SRC emacs-lisp
   (defun my/evil-search-nohl-on-move ()
@@ -1181,7 +1208,7 @@ Match GVim's cursor shapes.
   (advice-add 'evil-ex-search :after #'my/add-hook-evil-search)
 #+END_SRC
 
-*** Center view advice
+**** Center view advice
 
 Center the view when certain functions are called.
 
@@ -1199,13 +1226,13 @@ Center the view when certain functions are called.
     (advice-add fun :after #'my/scroll-to-center))
 #+END_SRC
 
-*** clear trailing whitespace ex command
+**** clear trailing whitespace ex command
 
 #+BEGIN_SRC emacs-lisp
 (evil-ex-define-cmd "ctw" 'delete-trailing-whitespace)
 #+END_SRC
 
-*** Re-enable evil-make-overriding/intercept-map
+**** Re-enable evil-make-overriding/intercept-map
 
 They were disabled before so that I can have complete control over key bindings.
 They're being enabled again so that I can make use of them.
@@ -1215,11 +1242,11 @@ They're being enabled again so that I can make use of them.
 (advice-remove 'evil-make-intercept-map #'my-kill-intercept-maps)
 #+END_SRC
 
-** Global bindings
+*** Global bindings
 
 These are mostly remaps and convenience shortcuts for Evil mode.
 
-*** Make defining bindings more vim-like with [[*Enhanced%20key%20binding][general.el]]
+**** Make defining bindings more vim-like with [[*Enhanced%20key%20binding][general.el]]
 
 =nmap= looks so much nicer than =general-define-key :states 'normal=.
 
@@ -1227,31 +1254,31 @@ These are mostly remaps and convenience shortcuts for Evil mode.
   (general-evil-setup t 'current-global-map)
 #+END_SRC
 
-*** Just in case M-x is weirdly undefined
+**** Just in case M-x is weirdly undefined
 
 #+BEGIN_SRC emacs-lisp
   (nmap "M-x" 'execute-extended-command)
 #+END_SRC
 
-*** Back to last buffer
+**** Back to last buffer
 
 #+BEGIN_SRC emacs-lisp
   (nmap "DEL" 'evil-switch-to-windows-last-buffer)
 #+END_SRC
 
-*** U instead of C-r for redo
+**** U instead of C-r for redo
 
 #+BEGIN_SRC emacs-lisp
   (nmap "U" 'redo)
 #+END_SRC
 
-*** Q to replay q register
+**** Q to replay q register
 
 #+BEGIN_SRC emacs-lisp
   (nmap "Q" "@q")
 #+END_SRC
 
-*** [S]plit Line (sister to [J]oin Line)
+**** [S]plit Line (sister to [J]oin Line)
 
 #+BEGIN_SRC emacs-lisp
   (defun my/split-line ()
@@ -1260,7 +1287,7 @@ These are mostly remaps and convenience shortcuts for Evil mode.
   (nmap "S" 'my/split-line )
 #+END_SRC
 
-*** =_= and =|= to split windows
+**** =_= and =|= to split windows
 
 also focus on the new split window like Vim
 
@@ -1279,20 +1306,20 @@ also focus on the new split window like Vim
         "_" 'evil-window-split)
 #+END_SRC
 
-*** Jump list (previous, next)
+**** Jump list (previous, next)
 
 #+BEGIN_SRC emacs-lisp
   (nmap "C-p" 'evil-jump-backward
         "C-n" 'evil-jump-forward)
 #+END_SRC
 
-*** select last pasted/changed text
+**** select last pasted/changed text
 
 #+BEGIN_SRC emacs-lisp
   (nmap "gp" (general-simulate-keys "` [ v ` ]"))
 #+END_SRC
 
-*** Convenient scrolling
+**** Convenient scrolling
 
 Aside from being more comfortable, this keeps standard =C-u=
 (universal-argument) available.
@@ -1302,13 +1329,13 @@ Aside from being more comfortable, this keeps standard =C-u=
         "C-k" 'evil-scroll-up)
 #+END_SRC
 
-*** format last pasted/changed text
+**** format last pasted/changed text
 
 #+BEGIN_SRC emacs-lisp
   (nmap "g=" (general-simulate-keys "` [ v ` ] ="))
 #+END_SRC
 
-*** evil-unimpaired
+**** evil-unimpaired
 
 Inspired by [[https://github.com/tpope/vim-unimpaired][unimpaired]]:
 
@@ -1339,20 +1366,20 @@ Inspired by [[https://github.com/tpope/vim-unimpaired][unimpaired]]:
         "] b" 'next-buffer)
 #+END_SRC
 
-*** C-g to see total line numbers like Vim
+**** C-g to see total line numbers like Vim
 
 #+BEGIN_SRC emacs-lisp
   (nmap "C-g" 'count-words)
 #+END_SRC
 
-*** Insert movement
+**** Insert movement
 
 #+BEGIN_SRC emacs-lisp
   (imap "C-a" 'move-beginning-of-line
         "C-e" 'move-end-of-line)
 #+END_SRC
 
-*** Always cancel/escape to normal state
+**** Always cancel/escape to normal state
 
 #+BEGIN_SRC emacs-lisp
 (general-define-key :states '(visual insert replace motion)
@@ -1360,7 +1387,7 @@ Inspired by [[https://github.com/tpope/vim-unimpaired][unimpaired]]:
                     "C-[" 'evil-normal-state)
 #+END_SRC
 
-*** "entire" text object (ae and ie)
+**** "entire" text object (ae and ie)
 
 For operating on the entire file.
 
@@ -1368,7 +1395,7 @@ For operating on the entire file.
 (load-file "~/.emacs.d/elisp/evil-textobj-entire.el")
 #+END_SRC
 
-** Leader bindings
+*** Leader bindings
 
 The "leader" key is a concept from Vim, and it's just a global prefix key like
 =C-x= or =C-c=, but for personal use. I use the spacebar as my primary leader
@@ -1413,7 +1440,7 @@ Leader bindings may be defined for other packages under [[*Compatibility%20with%
    "i"  'my/open-init-el)
 #+END_SRC
 
-** Run compatibility functions
+*** Run compatibility functions
 
 Run a list of functions to make other modes "more evil." See [[Compatibility with
 other modes]].
@@ -1422,40 +1449,35 @@ other modes]].
 (dolist (fun my/evil-other-mode-funs) (funcall fun))
 #+END_SRC
 
-** END evil-setup function
-
-The end of the function that runs after Evil-mode is activated, and
-contains mostly all of my configuration for Evil.
+*** END function
 
 #+BEGIN_SRC emacs-lisp
   )
 #+END_SRC
 
-** START use-package
+** Install Evil mode
 
-The beginning of the =use-package= block for Evil.
+Just to be explicit.
 
 #+BEGIN_SRC emacs-lisp
-(if (eq my/evil-active t)
-    (use-package evil
+  (use-package evil)
 #+END_SRC
 
 ** Basic options
 
-These need to be set before Evil-mode is activated.
-
 #+BEGIN_SRC emacs-lisp
-  :init
-  ;; Pre-defined Evil options
-  (setq evil-ex-substitute-global t
-        evil-want-fine-undo "No"
-        evil-want-Y-yank-to-eol t
-        evil-overriding-maps nil
-        evil-search-module 'evil-search)
+  (use-package evil
+    :init
+    ;; Pre-defined Evil options
+    (setq evil-ex-substitute-global t
+          evil-want-fine-undo "No"
+          evil-want-Y-yank-to-eol t
+          evil-overriding-maps nil
+          evil-search-module 'evil-search)
 
-  ;; Persistent undo history (save info to file)
-  (setq undo-tree-auto-save-history t
-        undo-tree-history-directory-alist `((".*" . "~/.emacs.d/tmp")))
+    ;; Persistent undo history (save info to file)
+    (setq undo-tree-auto-save-history t
+          undo-tree-history-directory-alist `((".*" . "~/.emacs.d/tmp"))))
 #+END_SRC
 
 ** Disable evil-make-overriding/intercept-map at start-up.
@@ -1464,23 +1486,33 @@ Otherwise, Evil will mess with other mode's mappings. I want to mess with them
 myself, instead.
 
 #+BEGIN_SRC emacs-lisp
-(advice-add 'evil-make-intercept-map
-            :override (defun my-kill-intercept-maps (&rest _)))
-(advice-add 'evil-make-overriding-map
-            :override (defun my-kill-overriding-maps (&rest _)))
+  (use-package evil
+    :init
+    (advice-add 'evil-make-intercept-map
+                :override (defun my-kill-intercept-maps (&rest _)))
+    (advice-add 'evil-make-overriding-map
+                :override (defun my-kill-overriding-maps (&rest _))))
 #+END_SRC
 
 ** Hook to configure Evil after activation
 
 #+BEGIN_SRC emacs-lisp
-  :config
-  (add-hook 'evil-mode-hook 'setup-evil-settings)
+  (use-package evil
+    :config
+    (add-hook 'evil-mode-hook 'setup-evil-settings))
 #+END_SRC
 
 ** Evil-specific packages
 
 These packages are installed/configured *after* Evil is loaded, but *before*
 it's activated. In my experience, this works well with Evil-related packages.
+
+*** START :config
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil
+      :config
+#+END_SRC
 
 *** [[https://github.com/timcharper/evil-surround][evil-surround]]
 
@@ -1568,11 +1600,9 @@ Better lisp editing for Evil. (With some help from [[https://github.com/abo-abo/
     (add-hook 'emacs-lisp-mode-hook #'lispyville-mode))
 #+END_SRC
 
-** END use-package
-
-Activate Evil and finish the =use-package= block.
+*** END :config (also activate Evil)
 
 #+BEGIN_SRC emacs-lisp
-  (evil-mode 1)))
+  (evil-mode 1))
 #+END_SRC
 
