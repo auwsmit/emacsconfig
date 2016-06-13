@@ -229,6 +229,23 @@ without this. I use the =:diminish= key word for =use-package= when I can.
 These settings don't belong to any specific mode or package. Some packages are
 exceptional for being very simple.
 
+** Optimize org-babel config for faster startup
+
+Running =org-babel-load-file= increases startup time, so only do it when there
+are changes to update. Only run it when =config.el= is missing, and delete
+=config.el= when =config.org= changes. (see [[file:init.el::%3B%3B%20`org-babel-load-file`%20increases%20startup%20time,%20so%20only%20do%20it%20if%20necessary.][init.el]])
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/delete-config-el ()
+    "Delete ~/.emacs.d/config.el when the current buffer is ~/.emacs.d/config.org"
+    (setq configel "~/.emacs.d/config.el")
+    (if (s-suffix? ".emacs.d/config.org" buffer-file-name)
+        (if (file-exists-p configel)
+            (delete-file "~/.emacs.d/config.el"))))
+
+  (add-hook 'after-save-hook 'my/delete-config-el)
+#+END_SRC
+
 ** Start server if it isn't started
 
 Turn the first Emacs process into a server, which allows reuse of a that process
