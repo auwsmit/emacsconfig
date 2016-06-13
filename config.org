@@ -733,6 +733,14 @@ Snippets are located under the typical =~/.emacs.d/snippets=
 ;;   (yas-global-mode 1))
 #+END_SRC
 
+** s.el 
+
+The long lost Emacs string manipulation library.
+
+#+BEGIN_SRC emacs-lisp
+(use-package s)
+#+END_SRC
+
 * EVIL-MODE
 
 Evil is so big and important that it gets its own top-level header. In all caps.
