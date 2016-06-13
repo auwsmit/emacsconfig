@@ -317,7 +317,7 @@ languages and layouts than others.
 
 ** Recent Files
 
-Enable =recentf-mode= remember a lot of files.
+Enable =recentf-mode= and remember a lot of files.
 
 #+BEGIN_SRC emacs-lisp
   (recentf-mode 1)
@@ -348,12 +348,12 @@ apart.
 See [[http://tiny.cc/7wd7ay][this article]] for more info.
 
 #+BEGIN_SRC emacs-lisp
-(defun my-minibuffer-setup-hook ()
+(defun my/minibuffer-setup-hook ()
   (setq gc-cons-threshold most-positive-fixnum))
-(defun my-minibuffer-exit-hook ()
+(defun my/minibuffer-exit-hook ()
   (setq gc-cons-threshold 800000))
-(add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
-(add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
+(add-hook 'minibuffer-setup-hook #'my/minibuffer-setup-hook)
+(add-hook 'minibuffer-exit-hook #'my/minibuffer-exit-hook)
 #+END_SRC
 
 * Key binding related
@@ -369,7 +369,7 @@ bind keys. Particularly useful for Evil mode and its various states.
 (use-package general)
 #+END_SRC
 
-** The Mighty
+** The Mighty Hydra
 
 I'm a big fan of [[https://github.com/abo-abo/hydra][Hydra]]. Search for =defhydra= in this file to check out all my
 hydras.
@@ -518,7 +518,8 @@ When headers are collapsed, =org-mode= uses ellipses to represent the hidden
 text, but I think that's too subtle, so this makes them stand out more.
 
 #+BEGIN_SRC emacs-lisp
-(setq org-ellipsis "•••")
+  (setq org-ellipsis "•••")
+  ;; (setq org-ellipsis " 隠")
 #+END_SRC
 
 *** Don't adapt indentation
@@ -618,7 +619,7 @@ is called.
 
 *** Magit is slow for Windows
 
-WORKAROUND SOURCE: https://github.com/magit/magit/issues/2395
+[[https://github.com/magit/magit/issues/2395][WORKAROUND SOURCE]]
 
 In summary: Magit isn't the problem. Git for Windows is just horribly slow with
 multiple calls, so these simplified functions make things less painful by
