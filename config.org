@@ -155,7 +155,10 @@ Trailing white space is something that you hate once you know it's there. Or at
 least it is for me.
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
+  (defun my/buf-show-trailing-whitespace ()
+    (interactive)
+    (setq show-trailing-whitespace t))
+  (add-hook 'prog-mode-hook 'my/buf-show-trailing-whitespace)
   (custom-set-faces '(trailing-whitespace ((t (:background "dim gray")))))
 #+END_SRC
 
@@ -312,7 +315,10 @@ Useful for getting an overview of the code. It works better in some
 languages and layouts than others.
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook (lambda () (hs-minor-mode t)))
+  (defun my/enable-hideshow ()
+    (interactive)
+    (hs-minor-mode t))
+  (add-hook 'prog-mode-hook 'my/enable-hideshow)
 #+END_SRC
 
 ** Recent Files
@@ -433,10 +439,14 @@ superior package, but isn't compatible with older versions of Emacs.
 Resize text like every other program does.
 
 #+BEGIN_SRC emacs-lisp
-(general-define-key
- "C-0" (lambda() (interactive) (text-scale-set 0))
- "C-=" 'text-scale-increase
- "C--" 'text-scale-decrease)
+  (defun text-scale-reset ()
+    "Reset the text scale to 0."
+    (interactive)
+    (text-scale-set 0))
+  (general-define-key
+   "C-0" 'text-scale-reset
+   "C-=" 'text-scale-increase
+   "C--" 'text-scale-decrease)
 #+END_SRC
 
 * Language-specific
@@ -1021,10 +1031,13 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
   (defun setup-evil-dired-mode ()
     (with-eval-after-load "dired"
       (progn
+        (defun my/up-dir ()
+          (interactive)
+          (find-alternate-file ".."))
         (evil-make-overriding-map dired-mode-map 'normal)
         (general-define-key :states 'normal "-" (kbd "C-x d RET"))
         (general-evil-define-key 'normal 'dired-mode-map
-          "-" (lambda ()(interactive) (find-alternate-file ".."))
+          "-" 'my/up-dir
           "RET" 'dired-find-alternate-file
           "i" 'ido-find-file
           "j" 'dired-next-line
