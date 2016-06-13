@@ -129,7 +129,7 @@ because it looks that good.
 
 ** RainbowDelimiters
 
-Highlight matching delimiters with unique colors. It's pretty indespensible
+Highlight matching delimiters with unique colors. It's pretty indispensable.
 for lisp with all its mad parenthesis.
 
 #+BEGIN_SRC emacs-lisp
@@ -429,26 +429,29 @@ Use [[https://github.com/justbur/emacs-which-key][which-key]] or [[https://githu
 superior package, but isn't compatible with older versions of Emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (if (version< emacs-version "24.4")
-      (use-package guide-key
-          :init
-        (setq guide-key/guide-key-sequence t
-              guide-key/recursive-key-sequence-flag t
-              guide-key/popup-window-position 'bottom
-              guide-key/idle-delay 0.5)
-        :config
-        (guide-key-mode 1))
-      (use-package which-key
-          :diminish ""
-          :init
-          (setq which-key-idle-delay 0.5
-                which-key-side-window-max-height 0.50
-                which-key-allow-evil-operators t
-                which-key-show-operator-state-maps nil))
-      :config
-      (which-key-mode)
-      ;; show top-level bindings, I don't need the Emacs tutorial
-      (general-define-key "C-h t" 'which-key-show-top-level))
+  (run-with-idle-timer
+   3 nil ;; Autoload via idle timer
+   (lambda ()
+     (if (version< emacs-version "24.4")
+         (use-package guide-key
+             :init
+           (setq guide-key/guide-key-sequence t
+                 guide-key/recursive-key-sequence-flag t
+                 guide-key/popup-window-position 'bottom
+                 guide-key/idle-delay 0.5)
+           :config
+           (guide-key-mode 1))
+         (use-package which-key
+             :diminish ""
+             :init
+             (setq which-key-idle-delay 0.5
+                   which-key-side-window-max-height 0.50
+                   which-key-allow-evil-operators t
+                   which-key-show-operator-state-maps nil))
+         :config
+         (which-key-mode)
+         ;; show top-level bindings, I don't need the Emacs tutorial
+         (general-define-key "C-h t" 'which-key-show-top-level))))
 #+END_SRC
 
 ** Resize text easier
@@ -526,6 +529,17 @@ Useful because I edit my config frequently
 
 ** Org-mode
 
+*** Autoload
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+      :commands (org-babel-load-file))
+
+  (run-with-idle-timer
+   3 nil ;; Autoload via idle timer
+   (lambda () (use-package org)))
+#+END_SRC
+
 *** Prettier bullets
 
 Automatically hides preceding asterisks, and makes the leading one
@@ -554,23 +568,22 @@ text, but I think that's too subtle, so this makes them stand out more.
 The hierarchy of headers already does the job that indenting would do.
 
 #+BEGIN_SRC emacs-lisp
-(setq org-adapt-indentation nil)
+  (setq org-adapt-indentation nil)
 #+END_SRC
 
 *** utf-8 encoding plz
 
 #+BEGIN_SRC emacs-lisp
-(setq utf-translate-cjk-mode nil)
-(set-locale-environment "pl_PL.UTF-8")
-(set-language-environment 'utf-8)
-(setq locale-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(unless (eq system-type 'windows-nt)
-  (progn
-    (set-selection-coding-system 'utf-8)
-    (set-keyboard-coding-system 'utf-8-mac)))
-(prefer-coding-system 'utf-8)
+  (set-locale-environment "pl_PL.UTF-8")
+  (set-language-environment 'utf-8)
+  (setq locale-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (unless (eq system-type 'windows-nt)
+    (progn
+      (set-selection-coding-system 'utf-8)
+      (set-keyboard-coding-system 'utf-8-mac)))
+  (prefer-coding-system 'utf-8)
 #+END_SRC
 
 *** More convenient bindings
@@ -598,7 +611,8 @@ Worf is a minor mode for providing vi-like bindings for org-mode. However, I'm
 only using it to take advantage of some of its nice functions.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package worf)
+  (use-package worf
+    :after (org))
 #+END_SRC
 
 *** [[*Evil Org][Evil-mode compatibility]]
@@ -623,25 +637,25 @@ is called.
 *** Dired+
 
 #+BEGIN_SRC emacs-lisp
-(use-package dired+)
+  (use-package dired+
+      :after (dired))
 #+END_SRC
 
 *** [[*Evil%20Dired][Evil-mode compatibility]]
 
 ** Magit
 
-*** Install/activate
+*** Autoload
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
-    ;; Autoload related
     :commands (magit-status
                magit-diff
                magit-commit
                magit-log
                magit-push
                magit-stage-file
-               magit-unstage-file))
+               magit-unstage-file)
 #+END_SRC
 
 *** Magit is slow for Windows
@@ -653,8 +667,7 @@ multiple calls, so these simplified functions make things less painful by
 calling less git commands.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package magit
-      :config
+    :config
     (when (eq system-type 'windows-nt)
       (define-derived-mode magit-staging-mode magit-status-mode "Magit staging"
                            "Mode for showing staged and unstaged changes."
@@ -685,14 +698,17 @@ example), so this package deals with that and fixes it somehow.
 
 ** Projectile
 
-*** Install/activate
+*** Autoload
 
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
-    ;; Autoload related
     :commands (projectile-global-mode)
     :bind-keymap ("C-c p" . projectile-command-map)
+#+END_SRC
 
+*** Activate
+
+#+BEGIN_SRC emacs-lisp
     :config
     (projectile-mode t))
 #+END_SRC
@@ -701,40 +717,54 @@ example), so this package deals with that and fixes it somehow.
 
 ** Ivy
 
-*** Install/activate
-
+*** Autoload
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
-    ;; Autoload related
     :commands (ivy-read)
     :bind (("C-h f" . counsel-describe-function)
            ("C-h v" . counsel-describe-variable)
            ("C-s" . swiper))
+#+END_SRC
 
-    :init
-    (setq
-     ;; recenter after swiper is finished
-     swiper-action-recenter t
+*** Options
 
-     ;; list recent files in buffer list as "virtual"
-     ivy-use-virtual-buffers t
+#+BEGIN_SRC emacs-lisp
+  :init
+  (setq
+   ;; recenter after swiper is finished
+   swiper-action-recenter t
 
-     ;; wrap around ivy results
-     ivy-wrap t
+   ;; list recent files in buffer list as "virtual"
+   ivy-use-virtual-buffers t
 
-     ;; use ivy as backend
-     magit-completing-read-function 'ivy-completing-read
-     projectile-completion-system 'ivy)
+   ;; wrap around ivy results
+   ivy-wrap t
 
-    :config
-    (ivy-mode 1)
-    (diminish 'ivy-mode)
+   ;; use ivy as backend
+   magit-completing-read-function 'ivy-completing-read
+   projectile-completion-system 'ivy)
+#+END_SRC
 
-    ;; Adds enhanced ivy versions of many commands
-    (use-package counsel)
+*** Activate
 
-    ;; A nice ivy hydra
-    (use-package ivy-hydra))
+#+BEGIN_SRC emacs-lisp
+  :config
+  (ivy-mode 1)
+  (diminish 'ivy-mode)
+#+END_SRC
+
+*** Ivy counsel
+
+Adds enhanced ivy versions of many commands
+
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel)
+#+END_SRC
+
+*** A nice ivy hydra
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy-hydra))
 #+END_SRC
 
 *** [[*Evil%20Ivy][Evil-mode compatibility]]
@@ -755,7 +785,8 @@ Snippets are located under the typical =~/.emacs.d/snippets=
 The long lost Emacs string manipulation library.
 
 #+BEGIN_SRC emacs-lisp
-(use-package s)
+  (use-package s
+      :commands (s-suffix?))
 #+END_SRC
 
 * EVIL-MODE
@@ -1581,22 +1612,13 @@ myself, instead.
 
 ** Evil-specific packages
 
-These packages are installed/configured *after* Evil is loaded, but *before*
-it's activated. In my experience, this works well with Evil-related packages.
-
-*** START :config
-
-#+BEGIN_SRC emacs-lisp
-  (use-package evil
-      :config
-#+END_SRC
-
 *** [[https://github.com/timcharper/evil-surround][evil-surround]]
 
 Manipulate surroundings
 
 #+BEGIN_SRC emacs-lisp
 (use-package evil-surround
+  :after (evil)
   :config
   (global-evil-surround-mode))
 #+END_SRC
@@ -1607,7 +1629,8 @@ Exchange operator
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-exchange
-      :config
+    :after (evil)
+    :config
     ;; "[g]o e[x]change"
     ;; gX is cancel
     (evil-exchange-install))
@@ -1618,10 +1641,11 @@ Exchange operator
 Comment operator
 
 #+BEGIN_SRC emacs-lisp
-(use-package evil-nerd-commenter
-  :config
-  (general-define-key :states '(normal visual) "gc"
-  'evilnc-comment-operator))
+  (use-package evil-nerd-commenter
+    :after (evil)
+    :config
+    (general-define-key :states '(normal visual) "gc"
+    'evilnc-comment-operator))
 #+END_SRC
 
 *** [[https://github.com/bling/evil-visualstar][evil-visualstar]]
@@ -1629,9 +1653,10 @@ Comment operator
 Make a visual selection, and search it. Convenient and intuitive.
 
 #+BEGIN_SRC emacs-lisp
-(use-package evil-visualstar
-  :config
-  (global-evil-visualstar-mode))
+  (use-package evil-visualstar
+    :after (evil)
+    :config
+    (global-evil-visualstar-mode))
 #+END_SRC
 
 *** [[https://github.com/CodeFalling/nlinum-relative][nlinum-relative]]
@@ -1640,6 +1665,7 @@ Relative line numbers
 
 #+BEGIN_SRC emacs-lisp
   (use-package nlinum-relative
+    :after (evil)
     :init
     (setq nlinum-relative-current-symbol "->")
     :config
@@ -1652,6 +1678,7 @@ Improved sentence logic and navigation.
 
 #+BEGIN_SRC emacs-lisp
   (use-package sentence-navigation
+    :after (evil)
     :config
     (define-key evil-normal-state-map ")" 'sentence-nav-evil-forward)
     (define-key evil-normal-state-map "(" 'sentence-nav-evil-backward)
@@ -1667,19 +1694,23 @@ Improved sentence logic and navigation.
 Better lisp editing for Evil. (With some help from [[https://github.com/abo-abo/lispy][lispy]])
 
 #+BEGIN_SRC emacs-lisp
-  (use-package lispy
-    :diminish lispyville-mode
-    :config
-    (with-eval-after-load 'lispyville
-      (lispyville-set-key-theme '(slurp/barf-cp)))
+  (defun my/load-lispy ()
+    (interactive)
+    (use-package lispy
+        :after (evil)
+        :config
+        (with-eval-after-load 'lispyville
+          (lispyville-set-key-theme '(slurp/barf-cp))))
     (load-file "~/.emacs.d/elisp/lispyville.el")
-    (add-hook 'lisp-mode-hook #'lispyville-mode)
-    (add-hook 'emacs-lisp-mode-hook #'lispyville-mode))
+    (lispyville-mode)
+    (diminish 'lispyville-mode))
+    (add-hook 'lisp-mode-hook 'my/load-lispy)
+    (add-hook 'emacs-lisp-mode-hook 'my/load-lispy)
 #+END_SRC
 
-*** END :config (also activate Evil)
+** Activate Evil
 
 #+BEGIN_SRC emacs-lisp
-  (evil-mode 1))
+  (evil-mode 1)
 #+END_SRC
 
