@@ -62,7 +62,7 @@ This snippet works in *nix and all (relevant) versions of Windows.
     (w32-send-sys-command 61488))
   (if (eq system-type 'windows-nt)
       (progn
-        (add-hook 'window-setup-hook 'w32-maximize-frame t))
+        (add-hook 'window-setup-hook #'w32-maximize-frame t))
     (set-frame-parameter nil 'fullscreen 'maximized))
 #+END_SRC
 
@@ -158,7 +158,7 @@ least it is for me.
   (defun my/buf-show-trailing-whitespace ()
     (interactive)
     (setq show-trailing-whitespace t))
-  (add-hook 'prog-mode-hook 'my/buf-show-trailing-whitespace)
+  (add-hook 'prog-mode-hook #'my/buf-show-trailing-whitespace)
   (custom-set-faces '(trailing-whitespace ((t (:background "dim gray")))))
 #+END_SRC
 
@@ -243,7 +243,7 @@ are changes to update. Only run it when =config.el= is missing, and delete
         (if (file-exists-p configel)
             (delete-file "~/.emacs.d/config.el"))))
 
-  (add-hook 'after-save-hook 'my/delete-config-el)
+  (add-hook 'after-save-hook #'my/delete-config-el)
 #+END_SRC
 
 ** Start server if it isn't started
@@ -323,7 +323,7 @@ When saving a file that starts with =#!=, make it executable.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'after-save-hook
-          'executable-make-buffer-file-executable-if-script-p)
+          #'executable-make-buffer-file-executable-if-script-p)
 #+END_SRC
 
 ** Enable HideShow in programming modes
@@ -335,7 +335,7 @@ languages and layouts than others.
   (defun my/enable-hideshow ()
     (interactive)
     (hs-minor-mode t))
-  (add-hook 'prog-mode-hook 'my/enable-hideshow)
+  (add-hook 'prog-mode-hook #'my/enable-hideshow)
 #+END_SRC
 
 ** Recent Files
@@ -429,29 +429,28 @@ Use [[https://github.com/justbur/emacs-which-key][which-key]] or [[https://githu
 superior package, but isn't compatible with older versions of Emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (run-with-idle-timer
-   3 nil ;; Autoload via idle timer
-   (lambda ()
-     (if (version< emacs-version "24.4")
-         (use-package guide-key
-             :init
-           (setq guide-key/guide-key-sequence t
-                 guide-key/recursive-key-sequence-flag t
-                 guide-key/popup-window-position 'bottom
-                 guide-key/idle-delay 0.5)
-           :config
-           (guide-key-mode 1))
-         (use-package which-key
-             :diminish ""
-             :init
-             (setq which-key-idle-delay 0.5
-                   which-key-side-window-max-height 0.50
-                   which-key-allow-evil-operators t
-                   which-key-show-operator-state-maps nil))
-         :config
-         (which-key-mode)
-         ;; show top-level bindings, I don't need the Emacs tutorial
-         (general-define-key "C-h t" 'which-key-show-top-level))))
+  (if (version< emacs-version "24.4")
+      (use-package guide-key
+          :defer 2
+          :init
+          (setq guide-key/guide-key-sequence t
+                guide-key/recursive-key-sequence-flag t
+                guide-key/popup-window-position 'bottom
+                guide-key/idle-delay 0.5)
+          :config
+          (guide-key-mode 1))
+      (use-package which-key
+          :defer 10
+          :diminish ""
+          :init
+          (setq which-key-idle-delay 0.5
+                which-key-side-window-max-height 0.50
+                which-key-allow-evil-operators t
+                which-key-show-operator-state-maps nil)
+          :config
+          (which-key-mode)
+          ;; show top-level bindings, I don't need the Emacs tutorial
+          (general-define-key "C-h t" 'which-key-show-top-level)))
 #+END_SRC
 
 ** Resize text easier
@@ -533,11 +532,8 @@ Useful because I edit my config frequently
 
 #+BEGIN_SRC emacs-lisp
   (use-package org
-      :commands (org-babel-load-file))
-
-  (run-with-idle-timer
-   3 nil ;; Autoload via idle timer
-   (lambda () (use-package org)))
+      :commands (org-babel-load-file)
+      :mode ("\\.org\\'" . org-mode))
 #+END_SRC
 
 *** Prettier bullets
@@ -550,7 +546,7 @@ pretty.
   :commands (org-bullets-mode)
   :init
   (setq org-bullets-bullet-list '("●"))
-  (add-hook 'org-mode-hook 'org-bullets-mode))
+  (add-hook 'org-mode-hook #'org-bullets-mode))
 #+END_SRC
 
 *** Noticeable ellipsis
@@ -863,63 +859,64 @@ Otherwise they add unnecessary clutter.
 
 #+BEGIN_SRC emacs-lisp
   (defun setup-evil-org-mode ()
-    (defhydra hydra-org-nav (:color red :hint nil)
-      "
+    (with-eval-after-load "org"
+      (defhydra hydra-org-nav (:color red :hint nil)
+        "
    ^Nav^   ^^^^| ^View^           ^^| ^Search^   | ^Exit Hydra
   -^---^---^^^^+-^----^-----------^^+-^------^---+-^-----------
    ^ ^ _k_ ^ ^ | _o_pen (_a_ppear), | _g_oto     | _b_ack_._
    _h_ ^+^ _l_ | hi_d_e,  _c_ycle,  | _s_wiper   | _q_uit_._
    ^ ^ _j_ ^ ^ | ^globally^ _C_ycle | ^ ^        | _w_oops!
   "
-      ("j" worf-down)
-      ("k" worf-up)
-      ("h" worf-left)
-      ("l" worf-right)
-      ("a" my/show-header)
-      ("o" my/show-header)
-      ("d" hide-subtree)
-      ("c" org-cycle)
-      ("C" org-shifttab)
-      ("g" org-goto :exit t)
-      ("s" swiper)
-      ("q" nil) ("b" nil)
-      ("w" nil) ("." nil))
+        ("j" worf-down)
+        ("k" worf-up)
+        ("h" worf-left)
+        ("l" worf-right)
+        ("a" my/show-header)
+        ("o" my/show-header)
+        ("d" hide-subtree)
+        ("c" org-cycle)
+        ("C" org-shifttab)
+        ("g" org-goto :exit t)
+        ("s" swiper)
+        ("q" nil) ("b" nil)
+        ("w" nil) ("." nil))
 
-    (defun my/show-header ()
-      (interactive)
-      (show-children)
-      (show-entry))
+      (defun my/show-header ()
+        (interactive)
+        (show-children)
+        (show-entry))
 
-    (defhydra hydra-org-template (:color blue :hint nil)
-      "
+      (defhydra hydra-org-template (:color blue :hint nil)
+        "
   _c_enter  _q_uote     _e_macs-lisp    _L_aTeX:
   _l_atex   _E_xample   _p_erl          _i_ndex:
   _a_scii   _v_erse     _P_erl tangled  _I_NCLUDE:
   _s_rc     ^ ^         plant_u_ml      _H_TML:
   _h_tml    ^ ^         ^ ^             _A_SCII:
   "
-      ("s" (hot-expand "<s"))
-      ("E" (hot-expand "<e"))
-      ("q" (hot-expand "<q"))
-      ("v" (hot-expand "<v"))
-      ("c" (hot-expand "<c"))
-      ("l" (hot-expand "<l"))
-      ("h" (hot-expand "<h"))
-      ("a" (hot-expand "<a"))
-      ("L" (hot-expand "<L"))
-      ("i" (hot-expand "<i"))
-      ("e" (hot-expand "<s" "emacs-lisp"))
-      ("p" (hot-expand "<s" "perl"))
-      ("u" (hot-expand "<s" "plantuml :file CHANGE.png"))
-      ("P" (progn
-             (insert "#+HEADERS: :results output :exports "
-             (insert "both :shebang \"#!/usr/bin/env perl\"\n")
-             (hot-expand "<s" "perl"))))
-      ("I" (hot-expand "<I"))
-      ("H" (hot-expand "<H"))
-      ("A" (hot-expand "<A"))
-      ("<" self-insert-command "ins")
-      ("o" nil "quit"))
+        ("s" (hot-expand "<s"))
+        ("E" (hot-expand "<e"))
+        ("q" (hot-expand "<q"))
+        ("v" (hot-expand "<v"))
+        ("c" (hot-expand "<c"))
+        ("l" (hot-expand "<l"))
+        ("h" (hot-expand "<h"))
+        ("a" (hot-expand "<a"))
+        ("L" (hot-expand "<L"))
+        ("i" (hot-expand "<i"))
+        ("e" (hot-expand "<s" "emacs-lisp"))
+        ("p" (hot-expand "<s" "perl"))
+        ("u" (hot-expand "<s" "plantuml :file CHANGE.png"))
+        ("P" (progn
+               (insert "#+HEADERS: :results output :exports "
+                       (insert "both :shebang \"#!/usr/bin/env perl\"\n")
+                       (hot-expand "<s" "perl"))))
+        ("I" (hot-expand "<I"))
+        ("H" (hot-expand "<H"))
+        ("A" (hot-expand "<A"))
+        ("<" self-insert-command "ins")
+        ("o" nil "quit"))
 
       (defun hot-expand (str &optional mod)
         "Expand org template."
@@ -929,49 +926,49 @@ Otherwise they add unnecessary clutter.
 
       (defun call-hydra-org-template ()
         (interactive)
-           (if (looking-back "^")
-               (hydra-org-template/body)
-               (self-insert-command 1)))
+        (if (looking-back "^")
+            (hydra-org-template/body)
+            (self-insert-command 1)))
 
       (general-evil-define-key 'normal 'org-mode-map
-      "RET" 'org-open-at-point
-      ">" 'outline-demote
-      "<" 'outline-promote
-      "z g" 'org-goto
-      "z ." 'hydra-org-nav/body
-      "z j" 'hydra-org-nav/worf-down
-      "z k" 'hydra-org-nav/worf-up
-      "z h" 'hydra-org-nav/worf-left
-      "z l" 'hydra-org-nav/worf-right)
-    (general-evil-define-key 'insert 'org-mode-map
-      "C-t" 'outline-demote
-      "C-d" 'outline-promote
-      "<" 'call-hydra-org-template)
-    (general-evil-define-key '(normal visual insert) 'org-mode-map
-      "M-h" 'org-metaleft
-      "M-j" 'org-metadown
-      "M-k" 'org-metaup
-      "M-l" 'org-metaright
-      "M-S-h" 'org-shiftmetaleft
-      "M-S-j" 'org-shiftmetadown
-      "M-S-k" 'org-shiftmetaup
-      "M-S-l" 'org-shiftmetaright
-      "C-S-h" 'org-shiftcontrolleft
-      "C-S-j" 'org-shiftcontroldown
-      "C-S-k" 'org-shiftcontrolup
-      "C-S-l" 'org-shiftcontrolright)
+        "RET" 'org-open-at-point
+        ">" 'outline-demote
+        "<" 'outline-promote
+        "z g" 'org-goto
+        "z ." 'hydra-org-nav/body
+        "z j" 'hydra-org-nav/worf-down
+        "z k" 'hydra-org-nav/worf-up
+        "z h" 'hydra-org-nav/worf-left
+        "z l" 'hydra-org-nav/worf-right)
+      (general-evil-define-key 'insert 'org-mode-map
+        "C-t" 'outline-demote
+        "C-d" 'outline-promote
+        "<" 'call-hydra-org-template)
+      (general-evil-define-key '(normal visual insert) 'org-mode-map
+        "M-h" 'org-metaleft
+        "M-j" 'org-metadown
+        "M-k" 'org-metaup
+        "M-l" 'org-metaright
+        "M-S-h" 'org-shiftmetaleft
+        "M-S-j" 'org-shiftmetadown
+        "M-S-k" 'org-shiftmetaup
+        "M-S-l" 'org-shiftmetaright
+        "C-S-h" 'org-shiftcontrolleft
+        "C-S-j" 'org-shiftcontroldown
+        "C-S-k" 'org-shiftcontrolup
+        "C-S-l" 'org-shiftcontrolright)
 
-    ;; Reveal cursor when going to marks
-    (defun my/reveal-cursor (&rest _)
-      (worf--ensure-visible))
-    (advice-add 'evil-goto-mark :after #'my/reveal-cursor)
+      ;; Reveal cursor when going to marks
+      (defun my/reveal-cursor (&rest _)
+        (worf--ensure-visible))
+      (advice-add 'evil-goto-mark :after #'my/reveal-cursor)
 
-    (defun my/fix-org-evil-paragraphs ()
-      "Make Evil mode's paragraph motions work correctly in Org mode."
-      (setq paragraph-start "\\|[     ]*$"
-            paragraph-separate "[       ]*$"))
+      (defun my/fix-org-evil-paragraphs ()
+        "Make Evil mode's paragraph motions work correctly in Org mode."
+        (setq paragraph-start "\\|[     ]*$"
+              paragraph-separate "[       ]*$"))
 
-    (add-hook 'org-mode-hook #'my/fix-org-evil-paragraphs))
+      (add-hook 'org-mode-hook #'my/fix-org-evil-paragraphs)))
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-org-mode)
 #+END_SRC
 
@@ -1310,7 +1307,7 @@ Match GVim's cursor shapes.
                             'my/evil-search-nohl-on-move))))
 
   (defun my/add-hook-evil-search (&rest _)
-    (add-hook 'pre-command-hook 'my/evil-search-nohl-on-move))
+    (add-hook 'pre-command-hook #'my/evil-search-nohl-on-move))
 
   (advice-add 'evil-ex-start-search :after #'my/add-hook-evil-search)
   (advice-add 'evil-ex-search :after #'my/add-hook-evil-search)
@@ -1390,8 +1387,8 @@ These are mostly remaps and convenience shortcuts for Evil mode.
 
 #+BEGIN_SRC emacs-lisp
   (defun my/split-line ()
-  (interactive)
-  (newline-and-indent) (forward-line -1) (move-end-of-line 1))
+    (interactive)
+    (newline-and-indent) (forward-line -1) (move-end-of-line 1))
   (nmap "S" 'my/split-line )
 #+END_SRC
 
@@ -1540,6 +1537,7 @@ Leader bindings may be defined for other packages under [[*Compatibility%20with%
    "TAB" 'other-window
    "s"  'evil-write
    "e"  'eval-last-sexp
+   "E"  'pp-macroexpand-last-sexp
    "q"  'quit-window
    "f"  'ido-find-file
    "b"  'ido-switch-buffer
@@ -1590,8 +1588,7 @@ Just to be explicit.
 
 ** Disable evil-make-overriding/intercept-map at start-up.
 
-Otherwise, Evil will mess with other mode's mappings. I want to mess with them
-myself, instead.
+Otherwise, Evil will mess with other mode's mappings.
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil
@@ -1607,7 +1604,7 @@ myself, instead.
 #+BEGIN_SRC emacs-lisp
   (use-package evil
     :config
-    (add-hook 'evil-mode-hook 'setup-evil-settings))
+    (add-hook 'evil-mode-hook #'setup-evil-settings))
 #+END_SRC
 
 ** Evil-specific packages
@@ -1669,7 +1666,7 @@ Relative line numbers
     :init
     (setq nlinum-relative-current-symbol "->")
     :config
-    (add-hook 'prog-mode-hook 'nlinum-relative-mode))
+    (add-hook 'prog-mode-hook #'nlinum-relative-mode))
 #+END_SRC
 
 *** [[https://github.com/noctuid/emacs-sentence-navigation][emacs-sentence-navigation]]
@@ -1685,8 +1682,7 @@ Improved sentence logic and navigation.
     (define-key evil-normal-state-map "g)" 'sentence-nav-evil-forward-end)
     (define-key evil-normal-state-map "g(" 'sentence-nav-evil-backward-end)
     (define-key evil-outer-text-objects-map "s" 'sentence-nav-evil-outer-sentence)
-    (define-key evil-inner-text-objects-map "s" 'sentence-nav-evil-inner-sentence)
-    :defer t)
+    (define-key evil-inner-text-objects-map "s" 'sentence-nav-evil-inner-sentence))
 #+END_SRC
 
 *** [[https://github.com/noctuid/lispyville][lispyville]]
@@ -1704,8 +1700,8 @@ Better lisp editing for Evil. (With some help from [[https://github.com/abo-abo/
     (load-file "~/.emacs.d/elisp/lispyville.el")
     (lispyville-mode)
     (diminish 'lispyville-mode))
-    (add-hook 'lisp-mode-hook 'my/load-lispy)
-    (add-hook 'emacs-lisp-mode-hook 'my/load-lispy)
+    (add-hook 'lisp-mode-hook #'my/load-lispy)
+    (add-hook 'emacs-lisp-mode-hook #'my/load-lispy)
 #+END_SRC
 
 ** Activate Evil
