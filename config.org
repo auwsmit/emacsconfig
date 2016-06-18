@@ -534,6 +534,15 @@ Useful because I edit my config frequently
     :bind ("C-x C-r" . restart-emacs))
 #+END_SRC
 
+** s.el
+
+The long lost Emacs string manipulation library.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package s
+      :commands (s-suffix?))
+#+END_SRC
+
 ** Org-mode
 
 *** Autoload
@@ -615,7 +624,8 @@ only using it to take advantage of some of its nice functions.
 
 #+BEGIN_SRC emacs-lisp
   (use-package worf
-    :after (org))
+    :after (org)
+    :commands (worf--ensure-visible))
 #+END_SRC
 
 *** Optimize org-babel config for faster startup
@@ -752,6 +762,61 @@ Dired enhancements.
 
 *** [[*Evil%20Dired][Evil-mode compatibility]]
 
+** Ivy & Swiper
+
+*** Autoload
+
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :commands (ivy-read)
+    :bind (("C-h f" . counsel-describe-function)
+           ("C-h v" . counsel-describe-variable)
+           ("C-s" . swiper))
+#+END_SRC
+
+*** Options
+
+#+BEGIN_SRC emacs-lisp
+  :init
+  (setq
+   ;; recenter after swiper is finished
+   swiper-action-recenter t
+
+   ;; list recent files in buffer list as "virtual"
+   ivy-use-virtual-buffers t
+
+   ;; wrap around ivy results
+   ivy-wrap t
+
+   ;; use ivy as backend
+   magit-completing-read-function 'ivy-completing-read
+   projectile-completion-system 'ivy)
+#+END_SRC
+
+*** Activate
+
+#+BEGIN_SRC emacs-lisp
+  :config
+  (ivy-mode 1)
+  (diminish 'ivy-mode)
+#+END_SRC
+
+*** Ivy counsel
+
+Adds enhanced ivy versions of many commands
+
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel)
+#+END_SRC
+
+*** A nice ivy hydra
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy-hydra))
+#+END_SRC
+
+*** [[*Evil%20Ivy%2BSwiper][Evil-mode compatibility]]
+
 ** Magit
 
 *** Autoload
@@ -824,60 +889,6 @@ example), so this package deals with that and fixes it somehow.
 
 *** [[*Evil%20Projectile][Evil-mode compatibility]]
 
-** Ivy
-
-*** Autoload
-#+BEGIN_SRC emacs-lisp
-  (use-package swiper
-    :commands (ivy-read)
-    :bind (("C-h f" . counsel-describe-function)
-           ("C-h v" . counsel-describe-variable)
-           ("C-s" . swiper))
-#+END_SRC
-
-*** Options
-
-#+BEGIN_SRC emacs-lisp
-  :init
-  (setq
-   ;; recenter after swiper is finished
-   swiper-action-recenter t
-
-   ;; list recent files in buffer list as "virtual"
-   ivy-use-virtual-buffers t
-
-   ;; wrap around ivy results
-   ivy-wrap t
-
-   ;; use ivy as backend
-   magit-completing-read-function 'ivy-completing-read
-   projectile-completion-system 'ivy)
-#+END_SRC
-
-*** Activate
-
-#+BEGIN_SRC emacs-lisp
-  :config
-  (ivy-mode 1)
-  (diminish 'ivy-mode)
-#+END_SRC
-
-*** Ivy counsel
-
-Adds enhanced ivy versions of many commands
-
-#+BEGIN_SRC emacs-lisp
-  (use-package counsel)
-#+END_SRC
-
-*** A nice ivy hydra
-
-#+BEGIN_SRC emacs-lisp
-  (use-package ivy-hydra))
-#+END_SRC
-
-*** [[*Evil%20Ivy%2BSwiper][Evil-mode compatibility]]
-
 ** Yasnippet
 
 Snippets are located under the typical =~/.emacs.d/snippets=
@@ -887,15 +898,6 @@ Snippets are located under the typical =~/.emacs.d/snippets=
 ;;   :diminish yas-minor-mode
 ;;   :config
 ;;   (yas-global-mode 1))
-#+END_SRC
-
-** s.el 
-
-The long lost Emacs string manipulation library.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package s
-      :commands (s-suffix?))
 #+END_SRC
 
 * EVIL-MODE
@@ -1253,6 +1255,35 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-dired-mode)
 #+END_SRC
 
+*** Evil Ivy+Swiper
+
+#+BEGIN_SRC emacs-lisp
+  (defun setup-evil-ivyswiper-mode ()
+    ;; Vimish bindings
+    (general-define-key
+     :keymaps 'ivy-minibuffer-map
+     "C-j" 'ivy-next-line
+     "C-k" 'ivy-previous-line
+     "C-n" 'ivy-next-history-element
+     "C-p" 'ivy-previous-history-element
+     "<C-return>" 'ivy-immediate-done
+     "C-l" 'ivy-immediate-done
+     "C-w" 'ivy-backward-kill-word)
+    (general-define-key
+     :keymaps 'swiper-map
+     "C-r" 'swiper-query-replace)
+
+    ;; Leader shortcuts
+    (general-define-key
+     :states '(normal motion emacs)
+     :prefix "SPC"
+     "SPC"  'counsel-M-x
+     "b" 'ivy-switch-buffer
+     "f" 'counsel-find-file
+     ))
+  (add-to-list 'my/evil-other-mode-funs 'setup-evil-ivyswiper-mode)
+#+END_SRC
+
 *** Evil Magit
 
 #+BEGIN_SRC emacs-lisp
@@ -1294,35 +1325,6 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
      :prefix "SPC"
      "p"  (general-simulate-keys "C-c p")))
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-projectile-mode)
-#+END_SRC
-
-*** Evil Ivy+Swiper
-
-#+BEGIN_SRC emacs-lisp
-  (defun setup-evil-ivyswiper-mode ()
-    ;; Vimish bindings
-    (general-define-key
-     :keymaps 'ivy-minibuffer-map
-     "C-j" 'ivy-next-line
-     "C-k" 'ivy-previous-line
-     "C-n" 'ivy-next-history-element
-     "C-p" 'ivy-previous-history-element
-     "<C-return>" 'ivy-immediate-done
-     "C-l" 'ivy-immediate-done
-     "C-w" 'ivy-backward-kill-word)
-    (general-define-key
-     :keymaps 'swiper-map
-     "C-r" 'swiper-query-replace)
-
-    ;; Leader shortcuts
-    (general-define-key
-     :states '(normal motion emacs)
-     :prefix "SPC"
-     "SPC"  'counsel-M-x
-     "b" 'ivy-switch-buffer
-     "f" 'counsel-find-file
-     ))
-  (add-to-list 'my/evil-other-mode-funs 'setup-evil-ivyswiper-mode)
 #+END_SRC
 
 *** Evil Info
@@ -1832,16 +1834,16 @@ Better lisp editing for Evil. (With some help from [[https://github.com/abo-abo/
 #+BEGIN_SRC emacs-lisp
   (defun my/load-lispy ()
     (interactive)
-    (use-package lispy
-        :after (evil)
-        :config
-        (with-eval-after-load 'lispyville
-          (lispyville-set-key-theme '(slurp/barf-cp))))
-    (load-file "~/.emacs.d/elisp/lispyville.el")
     (lispyville-mode)
     (diminish 'lispyville-mode))
-    (add-hook 'lisp-mode-hook #'my/load-lispy)
-    (add-hook 'emacs-lisp-mode-hook #'my/load-lispy)
+  (use-package lispy
+      :after (evil)
+      :commands (lispyville-mode)
+      :config
+      (load-file "~/.emacs.d/elisp/lispyville.el")
+      (lispyville-set-key-theme '(slurp/barf-cp)))
+  (add-hook 'lisp-mode-hook #'my/load-lispy)
+  (add-hook 'emacs-lisp-mode-hook #'my/load-lispy)
 #+END_SRC
 
 ** Activate Evil
