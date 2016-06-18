@@ -107,17 +107,14 @@ Interesting trivia: Emacs originally opened to the scratch buffer by default.
 
 ** Theme
 
-*** Leuven
+*** Eclipse theme
 
 A nice, light theme. Currently my default.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package leuven-theme
-      :init
-    ;; (setq leuven-scale-outline-headlines nil)
-    :config
-    ;; (load-theme 'leuven t)
-    )
+  (load-file "~/.emacs.d/elisp/eclipse-theme.el")
+  (require 'eclipse-theme)
+  (load-theme 'eclipse t)
 #+END_SRC
 
 *** Monokai
@@ -139,8 +136,8 @@ A nice, dark theme. I use this when the light is too bright.
 
 ** RainbowDelimiters
 
-Highlight matching delimiters with unique colors. It's pretty indispensable.
-for lisp with all its mad parenthesis.
+Highlight matching delimiters with unique colors. It's pretty indispensable for
+lisp with all its mad parenthesis.
 
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
@@ -150,6 +147,7 @@ for lisp with all its mad parenthesis.
 #+END_SRC
 
 ** Highlight matching parenthesis
+
 Specifically the ones under the cursor.
 
 #+BEGIN_SRC emacs-lisp
@@ -216,7 +214,7 @@ Mostly makes the mode line easier to read.
   (use-package smart-mode-line
     :config
     (setq sml/no-confirm-load-theme t)
-    (setq sml/theme 'light)
+    (setq sml/theme 'respectful)
     (sml/setup))
 #+END_SRC
 
@@ -372,38 +370,21 @@ See [[http://tiny.cc/7wd7ay][this article]] for more info.
 (add-hook 'minibuffer-exit-hook #'my/minibuffer-exit-hook)
 #+END_SRC
 
-** Optimize org-babel config for faster startup
+** UTF-8 encoding plz
 
-Running =org-babel-load-file= increases startup time, so only do it when there
-are changes to update. Only run it when =config.el= is missing. (see [[file:init.el::%3B%3B%20`org-babel-load-file`%20increases%20startup%20time,%20so%20only%20do%20it%20if%20necessary.][init.el]])
-
-*** Delete =config.el= when =config.org= is saved
+I loves me some unicode.
 
 #+BEGIN_SRC emacs-lisp
-  (defun my/delete-config-el ()
-    "Delete ~/.emacs.d/config.el when the current buffer is ~/.emacs.d/config.org"
-    (setq configel "~/.emacs.d/config.el")
-    (if (s-suffix? ".emacs.d/config.org" buffer-file-name)
-        (if (file-exists-p configel)
-            (delete-file "~/.emacs.d/config.el"))))
-
-  (add-hook 'after-save-hook #'my/delete-config-el)
-#+END_SRC
-
-*** Tangle =config.org= on Emacs shutdown
-
-But only when =config.el= is missing. Better to have a delayed shutdown than a
-delayed startup.
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/tangle-config ()
-    "Convert (AKA \"tangle\") config.org into config.el"
-    (if (not (file-exists-p "~/.emacs.d/config.el"))
-        (org-babel-tangle-file "~/.emacs.d/config.org"
-                               "~/.emacs.d/config.el"
-                               "emacs-lisp")))
-
-  (add-hook 'kill-emacs-hook #'my/tangle-config)
+  (set-locale-environment "pl_PL.UTF-8")
+  (set-language-environment 'utf-8)
+  (setq locale-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (unless (eq system-type 'windows-nt)
+    (progn
+      (set-selection-coding-system 'utf-8)
+      (set-keyboard-coding-system 'utf-8-mac)))
+  (prefer-coding-system 'utf-8)
 #+END_SRC
 
 * Key binding related
@@ -565,6 +546,18 @@ Useful because I edit my config frequently
       :mode ("\\.org\\'" . org-mode))
 #+END_SRC
 
+*** Archive files
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-archive-location "%s_archive::")
+#+END_SRC
+
+*** Agenda files
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-files '("~/org/"))
+#+END_SRC
+
 *** Prettier bullets
 
 Automatically hides preceding asterisks, and makes the leading one
@@ -596,21 +589,6 @@ The hierarchy of headers already does the job that indenting would do.
   (setq org-adapt-indentation nil)
 #+END_SRC
 
-*** utf-8 encoding plz
-
-#+BEGIN_SRC emacs-lisp
-  (set-locale-environment "pl_PL.UTF-8")
-  (set-language-environment 'utf-8)
-  (setq locale-coding-system 'utf-8)
-  (set-default-coding-systems 'utf-8)
-  (set-terminal-coding-system 'utf-8)
-  (unless (eq system-type 'windows-nt)
-    (progn
-      (set-selection-coding-system 'utf-8)
-      (set-keyboard-coding-system 'utf-8-mac)))
-  (prefer-coding-system 'utf-8)
-#+END_SRC
-
 *** More convenient bindings
 
 #+BEGIN_SRC emacs-lisp
@@ -638,6 +616,40 @@ only using it to take advantage of some of its nice functions.
 #+BEGIN_SRC emacs-lisp
   (use-package worf
     :after (org))
+#+END_SRC
+
+*** Optimize org-babel config for faster startup
+
+Running =org-babel-load-file= increases startup time, so only do it when there
+are changes to update. (see [[file:init.el::%3B%3B%20`org-babel-load-file`%20increases%20startup%20time,%20so%20only%20do%20it%20if%20necessary.][init.el]])
+
+**** Delete =config.el= when =config.org= is saved
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/delete-config-el ()
+    "Delete ~/.emacs.d/config.el when the current buffer is ~/.emacs.d/config.org"
+    (setq configel "~/.emacs.d/config.el")
+    (if (s-suffix? ".emacs.d/config.org" buffer-file-name)
+        (if (file-exists-p configel)
+            (delete-file "~/.emacs.d/config.el"))))
+
+  (add-hook 'after-save-hook #'my/delete-config-el)
+#+END_SRC
+
+**** Tangle =config.org= on Emacs shutdown
+
+But only when =config.el= is missing. Better to have a delayed shutdown than a
+delayed startup.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/tangle-config ()
+    "Convert (AKA \"tangle\") config.org into config.el"
+    (if (not (file-exists-p "~/.emacs.d/config.el"))
+        (org-babel-tangle-file "~/.emacs.d/config.org"
+                               "~/.emacs.d/config.el"
+                               "emacs-lisp")))
+
+  (add-hook 'kill-emacs-hook #'my/tangle-config)
 #+END_SRC
 
 *** [[*Evil Org][Evil-mode compatibility]]
@@ -668,6 +680,67 @@ is called.
         trash-directory "~/.emacs.d/trash")
 #+END_SRC
 
+*** Omit mode
+
+For hiding certain files and folders.
+
+**** Files to omit
+
+#+BEGIN_SRC emacs-lisp
+  ;; enable omit mode
+  (setq-default dired-omit-mode t
+
+                ;; autosave files
+                dired-omit-files "^\\.?#"
+
+                ;; dot files
+                dired-omit-files
+                (concat dired-omit-files "\\|^\\.[^\\.]"))
+#+END_SRC
+
+**** Toggle omit binding
+
+#+BEGIN_SRC emacs-lisp
+  (general-define-key :keymaps 'dired-mode-map
+                      ")" 'dired-omit-mode)
+#+END_SRC
+
+*** Open file with external application
+
+#+BEGIN_SRC emacs-lisp
+  (defun xah-open-in-external-app ()
+    "Open the current file or dired marked files in external app.
+  The app is chosen from your OS's preference.
+
+  URL `http://ergoemacs.org/emacs/emacs_dired_open_file_in_ext_apps.html'
+  Version 2015-01-26"
+    (interactive)
+    (let* (
+           (ξfile-list
+            (if (string-equal major-mode "dired-mode")
+                (dired-get-marked-files)
+                (list (buffer-file-name))))
+           (ξdo-it-p (if (<= (length ξfile-list) 5)
+                         t
+                         (y-or-n-p "Open more than 5 files? "))))
+
+      (when ξdo-it-p
+        (cond
+          ((string-equal system-type "windows-nt")
+           (mapc
+            (lambda (fPath)
+              (w32-shell-execute "open" (replace-regexp-in-string "/" "\\" fPath t t))) ξfile-list))
+          ((string-equal system-type "darwin")
+           (mapc
+            (lambda (fPath) (shell-command (format "open \"%s\"" fPath)))  ξfile-list))
+          ((string-equal system-type "gnu/linux")
+           (mapc
+            (lambda (fPath) (let ((process-connection-type nil)) (start-process "" nil "xdg-open" fPath))) ξfile-list))))))
+
+  (general-define-key :keymaps 'dired-mode-map
+                      "C-c C-o" 'xah-open-in-external-app)
+#+END_SRC
+
 *** Dired+
 
 Dired enhancements.
@@ -675,18 +748,6 @@ Dired enhancements.
 #+BEGIN_SRC emacs-lisp
   (use-package dired+
       :after (dired))
-#+END_SRC
-
-*** dired-details+
-
-Toggle visibility of details, as well as other small improvements.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package dired-details+
-      :after (dired)
-      :init
-    ;; show symlink targets
-    (setq dired-details-hide-link-targets nil))
 #+END_SRC
 
 *** [[*Evil%20Dired][Evil-mode compatibility]]
@@ -815,7 +876,7 @@ Adds enhanced ivy versions of many commands
   (use-package ivy-hydra))
 #+END_SRC
 
-*** [[*Evil%20Ivy][Evil-mode compatibility]]
+*** [[*Evil%20Ivy%2BSwiper][Evil-mode compatibility]]
 
 ** Yasnippet
 
@@ -1246,6 +1307,8 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
      "C-k" 'ivy-previous-line
      "C-n" 'ivy-next-history-element
      "C-p" 'ivy-previous-history-element
+     "<C-return>" 'ivy-immediate-done
+     "C-l" 'ivy-immediate-done
      "C-w" 'ivy-backward-kill-word)
     (general-define-key
      :keymaps 'swiper-map
@@ -1334,6 +1397,36 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
       "C-n" 'Info-history-forward
       "q" 'Info-exit))
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-info-mode)
+#+END_SRC
+
+** Basic options
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil
+    :init
+    ;; Pre-defined Evil options
+    (setq evil-ex-substitute-global t
+          evil-want-fine-undo "No"
+          evil-want-Y-yank-to-eol t
+          evil-overriding-maps nil
+          evil-search-module 'evil-search)
+
+    ;; Persistent undo history (save info to file)
+    (setq undo-tree-auto-save-history t
+          undo-tree-history-directory-alist `((".*" . "~/.emacs.d/tmp"))))
+#+END_SRC
+
+** Disable evil-make-overriding/intercept-map at start-up.
+
+Otherwise, Evil will mess with other mode's mappings.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil
+    :init
+    (advice-add 'evil-make-intercept-map
+                :override (defun my-kill-intercept-maps (&rest _)))
+    (advice-add 'evil-make-overriding-map
+                :override (defun my-kill-overriding-maps (&rest _))))
 #+END_SRC
 
 ** Post-activation setup function
@@ -1644,36 +1737,6 @@ other modes]].
 
 #+BEGIN_SRC emacs-lisp
   )
-#+END_SRC
-
-** Basic options
-
-#+BEGIN_SRC emacs-lisp
-  (use-package evil
-    :init
-    ;; Pre-defined Evil options
-    (setq evil-ex-substitute-global t
-          evil-want-fine-undo "No"
-          evil-want-Y-yank-to-eol t
-          evil-overriding-maps nil
-          evil-search-module 'evil-search)
-
-    ;; Persistent undo history (save info to file)
-    (setq undo-tree-auto-save-history t
-          undo-tree-history-directory-alist `((".*" . "~/.emacs.d/tmp"))))
-#+END_SRC
-
-** Disable evil-make-overriding/intercept-map at start-up.
-
-Otherwise, Evil will mess with other mode's mappings.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package evil
-    :init
-    (advice-add 'evil-make-intercept-map
-                :override (defun my-kill-intercept-maps (&rest _)))
-    (advice-add 'evil-make-overriding-map
-                :override (defun my-kill-overriding-maps (&rest _))))
 #+END_SRC
 
 ** Hook to configure Evil after activation
