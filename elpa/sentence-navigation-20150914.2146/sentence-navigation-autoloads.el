@@ -4,7 +4,7 @@
 (add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
 ;;;### (autoloads nil "sentence-navigation" "sentence-navigation.el"
-;;;;;;  (22364 46692 0 0))
+;;;;;;  (22373 45455 0 0))
 ;;; Generated autoloads from sentence-navigation.el
 
 (autoload 'sentence-nav-forward "sentence-navigation" "\

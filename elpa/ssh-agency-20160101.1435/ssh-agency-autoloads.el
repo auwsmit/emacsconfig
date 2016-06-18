@@ -3,7 +3,7 @@
 ;;; Code:
 (add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads nil "ssh-agency" "ssh-agency.el" (22364 46664 0
+;;;### (autoloads nil "ssh-agency" "ssh-agency.el" (22373 45422 0
 ;;;;;;  0))
 ;;; Generated autoloads from ssh-agency.el
 

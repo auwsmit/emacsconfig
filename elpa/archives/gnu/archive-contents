@@ -214,7 +214,7 @@
 		((:url . "http://elpa.gnu.org/packages/dbus-codegen.html")
 		 (:keywords "comm" "dbus" "convenience"))])
  (debbugs .
-	  [(0 9 5)
+	  [(0 9 6)
 	   ((soap-client
 	     (3 1 1))
 	    (cl-lib
@@ -312,7 +312,7 @@
 		  ((:keywords "convenience")
 		   (:url . "https://github.com/ergoemacs/ergoemacs-mode"))])
  (excorporate .
-	      [(0 7 3)
+	      [(0 7 5)
 	       ((emacs
 		 (24 1))
 		(fsm
@@ -605,7 +605,7 @@
 	     ((:url . "https://github.com/michael-heerdegen/on-screen.el")
 	      (:keywords "convenience"))])
  (org .
-      [(20160606)
+      [(20160613)
        nil "Outline-based notes management and organizer" tar nil])
  (osc .
       [(0 1)
@@ -635,7 +635,7 @@
 	 ((:url . "http://elpa.gnu.org/packages/poker.html")
 	  (:keywords "games"))])
  (python .
-	 [(0 25 1)
+	 [(0 25 2)
 	  ((emacs
 	    (24 1))
 	   (cl-lib
@@ -691,7 +691,7 @@
 	    ((:url . "http://elpa.gnu.org/packages/sed-mode.html")
 	     (:keywords))])
  (seq .
-      [(2 15)
+      [(2 16)
        nil "Sequence manipulation functions" tar
        ((:keywords "sequences")
 	(:url . "http://elpa.gnu.org/packages/seq.html"))])

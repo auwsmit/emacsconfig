@@ -3,7 +3,7 @@
 ;;; Code:
 (add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads nil "worf" "worf.el" (22364 46644 0 0))
+;;;### (autoloads nil "worf" "worf.el" (22373 45398 0 0))
 ;;; Generated autoloads from worf.el
 
 (autoload 'worf-mode "worf" "\
@@ -28,8 +28,8 @@ if the (looking-back \"^*+\") is true.
 
 ;;;***
 
-;;;### (autoloads nil nil ("worf-pkg.el" "zoutline.el") (22364 46644
-;;;;;;  679961 0))
+;;;### (autoloads nil nil ("worf-pkg.el" "zoutline.el") (22373 45399
+;;;;;;  126349 300000))
 
 ;;;***
 

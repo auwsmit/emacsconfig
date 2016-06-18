@@ -3,7 +3,7 @@
 ;;; Code:
 (add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
 
-;;;### (autoloads nil "ample-regexps" "ample-regexps.el" (22364 46691
+;;;### (autoloads nil "ample-regexps" "ample-regexps.el" (22373 45454
 ;;;;;;  0 0))
 ;;; Generated autoloads from ample-regexps.el
 
@@ -59,7 +59,7 @@ Run `re-builder' using arx form named ARX-NAME.
 ;;;***
 
 ;;;### (autoloads nil nil ("ample-regexps-pkg.el" "init-tryout.el")
-;;;;;;  (22364 46691 505890 0))
+;;;;;;  (22373 45454 355646 500000))
 
 ;;;***
 
