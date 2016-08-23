@@ -1037,6 +1037,8 @@ Otherwise they add unnecessary clutter.
 
 *** Evil Org
 
+I know org-mode is built-in, but it's so big that it's like a separate entity to me.
+
 #+BEGIN_SRC emacs-lisp
   (defun setup-evil-org-mode ()
     (with-eval-after-load "org"
@@ -1159,6 +1161,13 @@ Otherwise they add unnecessary clutter.
         "Make Evil mode's paragraph motions work correctly in Org mode."
         (setq paragraph-start "\\|[     ]*$"
               paragraph-separate "[       ]*$"))
+
+      ;; Swap j/k and n/p
+      (general-define-key :keymaps 'org-agenda-mode-map
+                          "j" 'org-agenda-next-line
+                          "k" 'org-agenda-previous-line
+                          "n" 'org-agenda-goto-date
+                          "p" 'org-agenda-capture)
 
       (add-hook 'org-mode-hook #'my/fix-org-evil-paragraphs)))
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-org-mode)
@@ -1768,7 +1777,32 @@ also focus on the new split window like Vim
         "C-n" 'evil-jump-forward)
 #+END_SRC
 
-**** select last pasted/changed text
+**** Move by wrapped lines, not by line numbers
+
+#+BEGIN_SRC emacs-lisp
+  (general-mmap "j" 'evil-next-visual-line
+                "k" 'evil-previous-visual-line
+                "gj" 'evil-next-line
+                "gk" 'evil-previous-line)
+#+END_SRC
+
+**** Go to the end of pasted text
+
+Useful for pasting multiple multi-lined blocks of text in a row.
+
+#+BEGIN_SRC emacs-lisp
+  ;; (general-vmap "p" (general-simulate-keys "p`]"))
+  ;; (general-nmap "p" (general-simulate-keys "p`]"))
+  (defun my/evil-paste (&optional count register yank-handler)
+    (interactive)
+    (evil-paste-after count register)
+    (evil-goto-mark ?\]))
+
+  (general-nmap "p" 'my/evil-paste)
+  (general-vmap "p" 'my/evil-paste)
+#+END_SRC
+
+**** Select last pasted/changed text
 
 #+BEGIN_SRC emacs-lisp
   (nmap "g=" "] SPC jp`[`]=")
@@ -1784,15 +1818,13 @@ Aside from being more comfortable, this keeps standard =C-u=
         "C-k" 'evil-scroll-up)
 #+END_SRC
 
-**** formatted paste
-
-#+BEGIN_SRC emacs-lisp
-  (nmap "g=" "] SPC jp`[`]=")
-#+END_SRC
-
 **** evil-unimpaired
 
-Inspired by [[https://github.com/tpope/vim-unimpaired][unimpaired]]:
+Inspired by [[https://github.com/tpope/vim-unimpaired][unimpaired]]
+
+***** Insert blank lines
+
+Like using =o= or =O=, but doesn't enter insert mode.
 
 #+BEGIN_SRC emacs-lisp
   (defun my/evil-blank-above (count)
@@ -1815,10 +1847,20 @@ Inspired by [[https://github.com/tpope/vim-unimpaired][unimpaired]]:
       (add-hook 'post-command-hook #'evil-maybe-remove-spaces)
       (setq count (- count 1)))
     (move-to-column col))
+
   (nmap "[ SPC" 'my/evil-blank-above
         "] SPC" 'my/evil-blank-below
         "[ b" 'previous-buffer
         "] b" 'next-buffer)
+#+END_SRC
+
+***** Formatted, line-wise paste
+
+Same as =\=p= unimpaired. Will always paste to a new line, and auto-format. I
+really need to make this less convoluted.
+
+#+BEGIN_SRC emacs-lisp
+  (nmap "gp" (general-simulate-keys "] SPC jp`[V`]=gvdP"))
 #+END_SRC
 
 **** C-g to see total line numbers like Vim
@@ -1863,13 +1905,13 @@ Leader bindings may be defined for other packages under [[*Compatibility%20with%
     (interactive)
     (find-file "~/.emacs.d/config.org"))
 
-  (defhydra hydra-toggle-option (:color blue
-                                 :columns 1)
+  (defhydra hydra-toggle-option (:color blue)
     "Toggle"
+    ("v" visual-line-mode "visual-line-mode")
     ("t" toggle-truncate-lines "truncate lines")
-    ("n" linum-mode "linum-mode")
     ("w" toggle-word-wrap "word wrap")
     ("W" whitespace-mode "whitespace-mode")
+    ("n" linum-mode "linum-mode")
     ("l" lispyville-mode "lispyville-mode")
     ;; TODO: look into cross-platform spell checker
     ("s" flyspell-mode "spell check"))
