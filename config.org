@@ -571,6 +571,15 @@ The long lost Emacs string manipulation library.
       :commands (s-suffix?))
 #+END_SRC
 
+** Multi-term
+
+Minor improvements over standard =:term= or =:ansi-term=. Also makes managing
+multiple terminals easier.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package multi-term)
+#+END_SRC
+
 ** Org-mode
 
 *** Autoload
