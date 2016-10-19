@@ -1,1 +1,0 @@
-(define-package "sentence-navigation" "20150914.2146" "Commands to navigate one-spaced sentences." '((ample-regexps "0.1") (emacs "24.4")) :url "https://github.com/noctuid/emacs-sentence-navigation" :keywords '("sentence" "evil"))

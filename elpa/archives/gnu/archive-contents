@@ -12,9 +12,9 @@
        ((:keywords "tools" "processes" "convenience")
 	(:url . "https://github.com/leoliu/ack-el"))])
  (ada-mode .
-	   [(5 1 9)
+	   [(5 2 0)
 	    ((wisi
-	      (1 1 2))
+	      (1 1 3))
 	     (cl-lib
 	      (0 4))
 	     (emacs
@@ -46,7 +46,7 @@
 		     ((:url . "https://github.com/Malabarba/aggressive-indent-mode")
 		      (:keywords "indent" "lisp" "maint" "tools"))])
  (ahungry-theme .
-		[(1 2 0)
+		[(1 3 0)
 		 ((emacs
 		   (24)))
 		 "Ahungry color theme for Emacs.  Make sure to (load-theme 'ahungry)." tar
@@ -80,7 +80,7 @@
 	 ((:keywords "async")
 	  (:url . "http://elpa.gnu.org/packages/async.html"))])
  (auctex .
-	 [(11 89 4)
+	 [(11 89 5)
 	  nil "Integrated environment for *TeX*" tar
 	  ((:url . "http://www.gnu.org/software/auctex/"))])
  (aumix-mode .
@@ -131,7 +131,7 @@
 	 ((:keywords "games")
 	  (:url . "http://elpa.gnu.org/packages/chess.html"))])
  (cl-generic .
-	     [(0 2)
+	     [(0 3)
 	      nil "Forward cl-generic compatibility for Emacs<25" single
 	      ((:url . "http://elpa.gnu.org/packages/cl-generic.html")
 	       (:keywords))])
@@ -219,7 +219,7 @@
 		((:url . "http://elpa.gnu.org/packages/dbus-codegen.html")
 		 (:keywords "comm" "dbus" "convenience"))])
  (debbugs .
-	  [(0 9 7)
+	  [(0 11)
 	   ((soap-client
 	     (3 1 1))
 	    (cl-lib
@@ -227,6 +227,11 @@
 	   "SOAP library to access debbugs servers" tar
 	   ((:keywords "comm" "hypermedia")
 	    (:url . "http://elpa.gnu.org/packages/debbugs.html"))])
+ (delight .
+	  [(1 5)
+	   nil "A dimmer switch for your lighter text." single
+	   ((:url . "https://savannah.nongnu.org/projects/delight")
+	    (:keywords "convenience"))])
  (dict-tree .
 	    [(0 12 8)
 	     ((trie
@@ -245,6 +250,11 @@
 	   "Highlight uncommitted changes using VC" tar
 	   ((:keywords "vc" "diff")
 	    (:url . "https://github.com/dgutov/diff-hl"))])
+ (diffview .
+	   [(1 0)
+	    nil "View diffs in side-by-side format" single
+	    ((:url . "https://github.com/mgalgs/diffview-mode")
+	     (:keywords "convenience" "diff"))])
  (dismal .
 	 [(1 5)
 	  ((cl-lib
@@ -281,12 +291,12 @@
 	     ((:url . "http://elpa.gnu.org/packages/ediprolog.html")
 	      (:keywords "languages" "processes"))])
  (el-search .
-	    [(0 2 1)
+	    [(0 2 3)
 	     ((emacs
 	       (25)))
-	     "Expression based incremental search for emacs-lisp-mode" single
-	     ((:url . "http://elpa.gnu.org/packages/el-search.html")
-	      (:keywords "lisp"))])
+	     "Expression based incremental search for emacs-lisp-mode" tar
+	     ((:keywords "lisp")
+	      (:url . "http://elpa.gnu.org/packages/el-search.html"))])
  (eldoc-eval .
 	     [(0 1)
 	      nil "Enable eldoc support when minibuffer is in use." single
@@ -317,7 +327,7 @@
 		  ((:keywords "convenience")
 		   (:url . "https://github.com/ergoemacs/ergoemacs-mode"))])
  (excorporate .
-	      [(0 7 5)
+	      [(0 7 6)
 	       ((emacs
 		 (24 1))
 		(fsm
@@ -325,14 +335,14 @@
 		(soap-client
 		 (3 1 1))
 		(url-http-ntlm
-		 (2 0 2)))
+		 (2 0 3)))
 	       "Exchange integration" tar
 	       ((:keywords "calendar")
 		(:url . "http://elpa.gnu.org/packages/excorporate.html"))])
  (exwm .
-       [(0 5)
+       [(0 11)
 	((xelb
-	  (0 8)))
+	  (0 11)))
 	"Emacs X Window Manager" tar
 	((:keywords "unix")
 	 (:url . "https://github.com/ch11ng/exwm"))])
@@ -360,7 +370,7 @@
        ((:url . "http://elpa.gnu.org/packages/fsm.html")
 	(:keywords "extensions"))])
  (ggtags .
-	 [(0 8 11)
+	 [(0 8 12)
 	  ((emacs
 	    (24))
 	   (cl-lib
@@ -408,6 +418,13 @@
 	 "Make bindings that stick around." tar
 	 ((:keywords "bindings")
 	  (:url . "https://github.com/abo-abo/hydra"))])
+ (hyperbole .
+	    [(6 0 2)
+	     ((emacs
+	       (24 4)))
+	     "GNU Hyperbole: The Everyday Hypertextual Information Manager" tar
+	     ((:keywords "comm" "convenience" "files" "frames" "hypermedia" "languages" "mail" "matching" "mouse" "multimedia" "outlines" "tools" "wp")
+	      (:url . "http://www.gnu.org/software/hyperbole"))])
  (ioccur .
 	 [(2 4)
 	  nil "Incremental occur" single
@@ -470,7 +487,7 @@
        nil "Lexical analyser construction" tar
        ((:url . "http://elpa.gnu.org/packages/lex.html"))])
  (lmc .
-      [(1 3)
+      [(1 4)
        nil "Little Man Computer in Elisp" single
        ((:url . "http://elpa.gnu.org/packages/lmc.html")
 	(:keywords))])
@@ -569,8 +586,12 @@
 	 ((:keywords "extensions" "lisp")
 	  (:url . "https://github.com/Malabarba/names"))])
  (nhexl-mode .
-	     [(0 1)
-	      nil "Minor mode to edit files via hex-dump format" single
+	     [(0 2)
+	      ((emacs
+		(24))
+	       (cl-lib
+		(0 5)))
+	      "Minor mode to edit files via hex-dump format" single
 	      ((:url . "http://elpa.gnu.org/packages/nhexl-mode.html")
 	       (:keywords "data"))])
  (nlinum .
@@ -583,7 +604,7 @@
 	      nil "Indexing system for on-line note-taking" tar
 	      ((:url . "http://elpa.gnu.org/packages/notes-mode.html"))])
  (ntlm .
-       [(2 0 0)
+       [(2 1 0)
 	nil "NTLM (NT LanManager) authentication support" single
 	((:url . "http://elpa.gnu.org/packages/ntlm.html")
 	 (:keywords "ntlm" "sasl" "comm"))])
@@ -610,7 +631,7 @@
 	     ((:url . "https://github.com/michael-heerdegen/on-screen.el")
 	      (:keywords "convenience"))])
  (org .
-      [(20160711)
+      [(20161010)
        nil "Outline-based notes management and organizer" tar nil])
  (osc .
       [(0 1)
@@ -635,7 +656,7 @@
 	    ((:url . "http://elpa.gnu.org/packages/pinentry.html")
 	     (:keywords "gnupg"))])
  (poker .
-	[(0 1)
+	[(0 2)
 	 nil "Texas hold 'em poker" single
 	 ((:url . "http://elpa.gnu.org/packages/poker.html")
 	  (:keywords "games"))])
@@ -663,6 +684,20 @@
 		nil "Colorize color names in buffers" single
 		((:url . "http://elpa.gnu.org/packages/rainbow-mode.html")
 		 (:keywords "faces"))])
+ (realgud .
+	  [(1 4 3)
+	   ((load-relative
+	     (1 2))
+	    (loc-changes
+	     (1 2))
+	    (test-simple
+	     (1 2 0))
+	    (cl-lib
+	     (0 5))
+	    (emacs
+	     (24)))
+	   "A modular front-end for interacting with external debuggers" tar
+	   ((:url . "http://github.com/realgud/realgud/"))])
  (register-list .
 		[(0 1)
 		 nil "Interactively list/edit registers" single
@@ -681,9 +716,13 @@
 	    ((:url . "http://elpa.gnu.org/packages/rnc-mode.html")
 	     (:keywords "xml" "relaxng"))])
  (rudel .
-	[(0 3)
-	 ((cl-lib
-	   (0 5)))
+	[(0 3 1)
+	 ((emacs
+	   (24))
+	  (cl-lib
+	   (0 5))
+	  (cl-generic
+	   (0 3)))
 	 "A collaborative editing framework for Emacs" tar
 	 ((:keywords "rudel" "collaboration")
 	  (:url . "http://rudel.sourceforge.net/"))])
@@ -721,7 +760,11 @@
 	       (:keywords "convenience"))])
  (sml-mode .
 	   [(6 7)
-	    nil "Major mode for editing (Standard) ML" single
+	    ((emacs
+	      (24))
+	     (cl-lib
+	      (0 5)))
+	    "Major mode for editing (Standard) ML" single
 	    ((:url . "http://elpa.gnu.org/packages/sml-mode.html")
 	     (:keywords "sml"))])
  (soap-client .
@@ -749,7 +792,7 @@
 	   ((:url . "https://github.com/Malabarba/spinner.el")
 	    (:keywords "processes" "mode-line"))])
  (stream .
-	 [(2 2 0)
+	 [(2 2 3)
 	  ((emacs
 	    (25)))
 	  "Implementation of streams" single
@@ -779,8 +822,10 @@
 	((:url . "http://www.dr-qubit.org/emacs.php")
 	 (:keywords "extensions" "matching" "data structures tnfa" "nfa" "dfa" "finite state automata" "automata" "regexp"))])
  (temp-buffer-browse .
-		     [(1 4)
-		      nil "temp buffer browse mode" single
+		     [(1 5)
+		      ((emacs
+			(24)))
+		      "temp buffer browse mode" single
 		      ((:url . "http://elpa.gnu.org/packages/temp-buffer-browse.html")
 		       (:keywords "convenience"))])
  (test-simple .
@@ -810,7 +855,7 @@
 	       ((:url . "http://elpa.gnu.org/packages/tramp-theme.html")
 		(:keywords "convenience" "faces"))])
  (transcribe .
-	     [(1 5 0)
+	     [(1 5 2)
 	      nil "Package for audio transcriptions" single
 	      ((:url . "http://elpa.gnu.org/packages/transcribe.html")
 	       (:keywords))])
@@ -833,11 +878,11 @@
 		   nil "Unicode confusables table" tar
 		   ((:url . "http://elpa.gnu.org/packages/uni-confusables.html"))])
  (url-http-ntlm .
-		[(2 0 2)
+		[(2 0 3)
 		 ((cl-lib
 		   (0 5))
 		  (ntlm
-		   (2 0 0)))
+		   (2 1 0)))
 		 "NTLM authentication for the url library" single
 		 ((:url . "http://elpa.gnu.org/packages/url-http-ntlm.html")
 		  (:keywords "comm" "data" "processes" "hypermedia"))])
@@ -890,7 +935,7 @@
 	      ((:url . "http://elpa.gnu.org/packages/windresize.html")
 	       (:keywords "window"))])
  (wisi .
-       [(1 1 2)
+       [(1 1 3)
 	((cl-lib
 	  (0 4))
 	 (emacs
@@ -909,7 +954,7 @@
 	 ((:url . "http://elpa.gnu.org/packages/xclip.html")
 	  (:keywords "convenience" "tools"))])
  (xelb .
-       [(0 8)
+       [(0 11)
 	((emacs
 	  (24 4))
 	 (cl-generic
@@ -930,7 +975,7 @@
 	     ((:keywords "convenience" "emulation")
 	      (:url . "http://github.com/capitaomorte/yasnippet"))])
  (ztree .
-	[(1 0 3)
+	[(1 0 4)
 	 ((cl-lib
 	   (0)))
 	 "Text mode directory tree" tar
