@@ -637,6 +637,12 @@ Done" system, named after his book.
           ("d" "Someday" todo "SOMEDAY" nil))))
 #+END_SRC
 
+**** Agenda follow-mode by default
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-start-with-follow-mode t)
+#+END_SRC
+
 *** Prettier bullets
 
 Automatically hides preceding asterisks, and makes the leading one
@@ -1830,12 +1836,6 @@ Useful for pasting multiple multi-lined blocks of text in a row.
   (general-vmap "p" 'my/evil-paste)
 #+END_SRC
 
-**** Select last pasted/changed text
-
-#+BEGIN_SRC emacs-lisp
-  (nmap "g=" "] SPC jp`[`]=")
-#+END_SRC
-
 **** Convenient scrolling
 
 Aside from being more comfortable, this keeps standard =C-u=
@@ -2049,7 +2049,10 @@ Relative line numbers
       :init
       (setq nlinum-relative-current-symbol "->")
       :config
-      (add-hook 'prog-mode-hook #'nlinum-relative-mode))
+      (add-hook 'prog-mode-hook #'nlinum-relative-mode)
+      ;; No bold!
+      (custom-set-faces
+       '(nlinum-relative-current-face ((t (:weight normal))))))
 #+END_SRC
 
 *** [[https://github.com/noctuid/emacs-sentence-navigation][emacs-sentence-navigation]]
