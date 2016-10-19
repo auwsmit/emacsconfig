@@ -109,29 +109,29 @@ Interesting trivia: Emacs originally opened to the scratch buffer by default.
 
 *** Eclipse theme
 
-A nice, light theme. Currently my default.
+A nice, light theme.
 
 #+BEGIN_SRC emacs-lisp
   (load-file "~/.emacs.d/elisp/eclipse-theme.el")
   (require 'eclipse-theme)
-  (load-theme 'eclipse t)
+  ;; (load-theme 'eclipse t)
 #+END_SRC
 
 *** Monokai
 
-A nice, dark theme. I use this when the light is too bright.
+A nice, dark theme.
 
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package monokai-theme
-  ;;      :init
-  ;;    (setq monokai-use-variable-pitch nil
-  ;;          monokai-height-minus-1 1.0
-  ;;          monokai-height-plus-1 1.0
-  ;;          monokai-height-plus-2 1.0
-  ;;          monokai-height-plus-3 1.0
-  ;;          monokai-height-plus-4 1.0)
-  ;;    :config
-  ;;    (load-theme 'monokai t))
+  (use-package monokai-theme
+       :init
+     (setq monokai-use-variable-pitch nil
+           monokai-height-minus-1 1.0
+           monokai-height-plus-1 1.0
+           monokai-height-plus-2 1.0
+           monokai-height-plus-3 1.0
+           monokai-height-plus-4 1.0)
+     :config
+     (load-theme 'monokai t))
 #+END_SRC
 
 ** RainbowDelimiters
@@ -214,7 +214,8 @@ Mostly makes the mode line easier to read.
   (use-package smart-mode-line
       :config
     (setq sml/no-confirm-load-theme t)
-    (setq sml/theme 'respectful)
+    ;; (setq sml/theme 'respectful)
+    (setq sml/theme 'dark)
     (sml/setup))
 #+END_SRC
 
