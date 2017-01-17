@@ -510,6 +510,16 @@ Resize text like every other program does.
    "C--" 'text-scale-decrease)
 #+END_SRC
 
+** Kill current buffer
+
+When using =C-x k=, I almost always want to kill the current buffer. So do that
+by default.
+
+#+BEGIN_SRC emacs-lisp
+  (general-define-key
+   "C-x k" 'kill-this-buffer)
+#+END_SRC
+
 * Language-specific
 
 ** C/C++
@@ -641,15 +651,12 @@ Done" system, named after his book.
                ((agenda "" nil)
                 (todo "NEXT"
                       ((org-agenda-overriding-header "Next Actions")))
-                (todo "TODO"
-                      ((org-agenda-overriding-header "Other Actions")))
                 (todo "PROJ"
                       ((org-agenda-overriding-header "Projects"))))
                nil)
           ("n" "Next Actions" todo "NEXT" nil)
-          ("o" "Other Actions" todo "TODO" nil)
           ("p" "Projects" todo "PROJ" nil)
-          ("d" "Someday" todo "SOMEDAY" nil))))
+          ("s" "Someday" todo "SOMEDAY" nil))))
 #+END_SRC
 
 **** Agenda follow-mode by default
@@ -1100,7 +1107,9 @@ I know org-mode is built-in, but it's so big that it's like a separate entity to
    ^ ^ _j_ ^ ^ | ^globally^ _C_ycle | ^ ^        |
   "
         ("j" worf-down)
+        ("J" worf-forward)
         ("k" worf-up)
+        ("K" worf-backward)
         ("h" worf-left)
         ("l" worf-right)
         ("a" my/show-header)
@@ -1112,17 +1121,17 @@ I know org-mode is built-in, but it's so big that it's like a separate entity to
         ("s" swiper)
         ("q" nil) ("b" nil) ("." nil))
 
-      (defhydra hydra-org-action (:color blue)
+      (defhydra hydra-org-action (:color blue :columns 5)
         "Org Actions:"
         ("c" org-ctrl-c-ctrl-c "C-c C-c")
         ("t" org-todo "todo")
         ("w" org-refile "move")
         ("d" org-deadline "deadline")
+        ("q" nil "quit")
         ("s" org-schedule "schedule")
         ("a" org-agenda "agenda")
         ("n" org-add-note "note")
-        ("x" org-archive-subtree "archive")
-        ("q" nil "quit"))
+        ("x" org-archive-subtree "archive"))
 
       (defun my/show-header ()
         (interactive)
@@ -1840,15 +1849,9 @@ also focus on the new split window like Vim
 Useful for pasting multiple multi-lined blocks of text in a row.
 
 #+BEGIN_SRC emacs-lisp
-  ;; (general-vmap "p" (general-simulate-keys "p`]"))
-  ;; (general-nmap "p" (general-simulate-keys "p`]"))
-  (defun my/evil-paste (&optional count register yank-handler)
-    (interactive)
-    (evil-paste-after count register)
-    (evil-goto-mark ?\]))
-
-  (general-nmap "p" 'my/evil-paste)
-  (general-vmap "p" 'my/evil-paste)
+    (defun my/cursor-to-end-of-paste (&rest _)
+      (evil-goto-mark ?\]))
+    (advice-add 'evil-paste-after :after #'my/cursor-to-end-of-paste)
 #+END_SRC
 
 **** Convenient scrolling
@@ -1899,11 +1902,12 @@ Like using =o= or =O=, but doesn't enter insert mode.
 
 ***** Formatted, line-wise paste
 
-Same as =\=p= unimpaired. Will always paste to a new line, and auto-format. I
-really need to make this less convoluted.
+Same as =\=p= unimpaired. This implementation is so bad that it's disabled until
+I make a better one. If anyone has any ideas, message me about it or make a pull
+request.
 
 #+BEGIN_SRC emacs-lisp
-  (nmap "gp" (general-simulate-keys "] SPC jp`[V`]=gvdP"))
+  ;;(nmap "gp" (general-simulate-keys "] SPC jp`[V`]=gvdP"))
 #+END_SRC
 
 **** C-g to see total line numbers like Vim
