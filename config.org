@@ -94,9 +94,13 @@ Interesting trivia: Emacs originally opened to the scratch buffer by default.
 
 #+BEGIN_SRC emacs-lisp
   ;; when "font" is available
-  (when (member "DejaVu Sans Mono" (font-family-list))
-    (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-9" ))
-    (set-face-attribute 'default t :font "DejaVu Sans Mono-9"))
+  (if (eq system-type 'windows-nt)
+      (when (member "Consolas" (font-family-list))
+        (add-to-list 'default-frame-alist '(font . "Consolas-10" ))
+        (set-face-attribute 'default t :font "Consolas-10"))
+      (when (member "DejaVu Sans Mono" (font-family-list))
+        (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-9" ))
+        (set-face-attribute 'default t :font "DejaVu Sans Mono-9")))
 #+END_SRC
 
 ** STOP THE BEEPING AND FLASHING
