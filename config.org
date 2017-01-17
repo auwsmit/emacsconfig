@@ -111,13 +111,23 @@ Interesting trivia: Emacs originally opened to the scratch buffer by default.
 
 ** Theme
 
+*** Tao theme
+
+Grayscale theme based on the golden ratio in white or black.
+
+#+BEGIN_SRC emacs-lisp
+    (use-package tao-theme
+        :config
+      (load-theme 'tao-yin t))
+#+END_SRC
+
 *** Eclipse theme
 
 A nice, light theme.
 
 #+BEGIN_SRC emacs-lisp
-  (load-file "~/.emacs.d/elisp/eclipse-theme.el")
-  (require 'eclipse-theme)
+  ;; (load-file "~/.emacs.d/elisp/eclipse-theme.el")
+  ;; (require 'eclipse-theme)
   ;; (load-theme 'eclipse t)
 #+END_SRC
 
@@ -126,16 +136,41 @@ A nice, light theme.
 A nice, dark theme.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package monokai-theme
-       :init
-     (setq monokai-use-variable-pitch nil
-           monokai-height-minus-1 1.0
-           monokai-height-plus-1 1.0
-           monokai-height-plus-2 1.0
-           monokai-height-plus-3 1.0
-           monokai-height-plus-4 1.0)
-     :config
-     (load-theme 'monokai t))
+  ;; (use-package monokai-theme
+  ;;      :init
+  ;;    (setq monokai-use-variable-pitch nil
+  ;;          monokai-height-minus-1 1.0
+  ;;          monokai-height-plus-1 1.0
+  ;;          monokai-height-plus-2 1.0
+  ;;          monokai-height-plus-3 1.0
+  ;;          monokai-height-plus-4 1.0)
+  ;;    :config
+  ;;    (load-theme 'monokai t)
+  ;;    )
+#+END_SRC
+
+** SmartModeLine
+
+Mostly makes the mode line easier to read.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package smart-mode-line
+      :config
+    (setq sml/no-confirm-load-theme t)
+    (setq sml/theme 'dark)
+    ;; (setq sml/theme 'dark)
+    (sml/setup))
+#+END_SRC
+
+** Spaceline
+
+I want to set this up some day because it looks vrry pretty.
+
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package spaceline
+  ;;     :config
+  ;;     (require 'spaceline-config)
+  ;;     (spaceline-spacemacs-theme))
 #+END_SRC
 
 ** RainbowDelimiters
@@ -197,30 +232,6 @@ Use tildes like Vim :>
 
 #+BEGIN_SRC emacs-lisp
   (column-number-mode t)
-#+END_SRC
-
-** Spaceline
-
-I want to set this up some day because it looks vrry pretty.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package spaceline
-  ;;     :config
-  ;;     (require 'spaceline-config)
-  ;;     (spaceline-spacemacs-theme))
-#+END_SRC
-
-** SmartModeLine
-
-Mostly makes the mode line easier to read.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package smart-mode-line
-      :config
-    (setq sml/no-confirm-load-theme t)
-    ;; (setq sml/theme 'respectful)
-    (setq sml/theme 'dark)
-    (sml/setup))
 #+END_SRC
 
 ** Diminish
