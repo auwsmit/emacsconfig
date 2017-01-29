@@ -1627,22 +1627,33 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-info-mode)
 #+END_SRC
 
+** Add to load-path
+
+Evil is currently transitioning from Bitbucket to Github, so the Melpa
+(package.el accessible) version is behind. Manually use the latest version
+for now.
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/elpa/evil")
+#+END_SRC
+
 ** Basic options
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil
+      :ensure nil
       :init
-    ;; Pre-defined Evil options
-    (setq evil-want-C-w-delete t
-          evil-want-fine-undo "No"
-          evil-want-Y-yank-to-eol t
-          evil-ex-substitute-global t
-          evil-overriding-maps nil
-          evil-search-module 'evil-search)
+      (setq evil-want-C-w-delete t
+            evil-want-fine-undo "No"
+            evil-want-Y-yank-to-eol t
+            evil-want-C-u-scroll t
+            evil-ex-substitute-global t
+            evil-overriding-maps nil
+            evil-search-module 'evil-search)
 
-    ;; Persistent undo history (save info to file)
-    (setq undo-tree-auto-save-history t
-          undo-tree-history-directory-alist `((".*" . "~/.emacs.d/tmp"))))
+      ;; Persistent undo history (save info to file)
+      (setq undo-tree-auto-save-history t
+            undo-tree-history-directory-alist `((".*" . "~/.emacs.d/tmp"))))
 #+END_SRC
 
 ** Disable evil-make-overriding/intercept-map at start-up.
@@ -1651,6 +1662,7 @@ Otherwise, Evil will mess with other mode's mappings.
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil
+      :ensure nil
       :init
     (advice-add 'evil-make-intercept-map
                 :override (defun my-kill-intercept-maps (&rest _)))
@@ -1837,11 +1849,36 @@ also focus on the new split window like Vim
 **** Go to the end of pasted text
 
 Useful for pasting multiple multi-lined blocks of text in a row.
+TODO: Remove goto-mark advice instead of copy-pasting the function
 
 #+BEGIN_SRC emacs-lisp
-    (defun my/cursor-to-end-of-paste (&rest _)
-      (evil-goto-mark ?\]))
-    (advice-add 'evil-paste-after :after #'my/cursor-to-end-of-paste)
+  (evil-define-command my/evil-goto-mark (char &optional noerror)
+    "Go to the marker specified by CHAR."
+    :keep-visual t
+    :repeat nil
+    :type exclusive
+    (interactive (list (read-char)))
+    (let ((marker (evil-get-marker char)))
+      (cond
+       ((markerp marker)
+        (switch-to-buffer (marker-buffer marker))
+        (goto-char (marker-position marker)))
+       ((numberp marker)
+        (goto-char marker))
+       ((consp marker)
+        (when (or (find-buffer-visiting (car marker))
+                  (and (y-or-n-p (format "Visit file %s again? "
+                                         (car marker)))
+                       (find-file (car marker))))
+          (goto-char (cdr marker))))
+       ((not noerror)
+        (user-error "Marker `%c' is not set%s" char
+                    (if (evil-global-marker-p char) ""
+                      " in this buffer"))))))
+
+  (defun my/cursor-to-end-of-paste (&rest _)
+    (my/evil-goto-mark ?\]))
+  (advice-add 'evil-paste-after :after #'my/cursor-to-end-of-paste)
 #+END_SRC
 
 **** Convenient scrolling
@@ -1994,9 +2031,7 @@ other modes]].
 ** Hook to configure Evil after activation
 
 #+BEGIN_SRC emacs-lisp
-  (use-package evil
-      :config
-    (add-hook 'evil-mode-hook #'setup-evil-settings))
+  (eval-after-load "evil" (add-hook 'evil-mode-hook #'setup-evil-settings))
 #+END_SRC
 
 ** Evil-specific packages
@@ -2007,7 +2042,7 @@ Manipulate surroundings
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-surround
-      :after (evil)
+      :after evil
       :config
       (global-evil-surround-mode))
 #+END_SRC
@@ -2018,7 +2053,7 @@ Exchange operator
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-exchange
-      :after (evil)
+      :after evil
       :config
       ;; "[g]o e[x]change"
       ;; gX is cancel
@@ -2031,7 +2066,7 @@ Comment operator
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-nerd-commenter
-      :after (evil)
+      :after evil
       :config
       (general-define-key :states '(normal visual) "gc"
                           'evilnc-comment-operator))
@@ -2043,9 +2078,18 @@ Make a visual selection, and search it. Convenient and intuitive.
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-visualstar
-      :after (evil)
+      :after evil
       :config
       (global-evil-visualstar-mode))
+#+END_SRC
+
+*** [[https://github.com/justbur/evil-magit][evil-magit]]
+
+Modifies some Magit bindings to be more Evil
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-magit
+      :after evil magit)
 #+END_SRC
 
 *** [[https://github.com/CodeFalling/nlinum-relative][nlinum-relative]]
@@ -2054,7 +2098,7 @@ Relative line numbers
 
 #+BEGIN_SRC emacs-lisp
   (use-package nlinum-relative
-      :after (evil)
+      :after evil
       :init
       (setq nlinum-relative-current-symbol "->")
       :config
@@ -2070,7 +2114,7 @@ Improved sentence logic and navigation.
 
 #+BEGIN_SRC emacs-lisp
   (use-package sentence-navigation
-      :after (evil)
+      :after evil
       :config
       (define-key evil-normal-state-map ")" 'sentence-nav-evil-forward)
       (define-key evil-normal-state-map "(" 'sentence-nav-evil-backward)
@@ -2090,7 +2134,7 @@ Better lisp editing for Evil. (With some help from [[https://github.com/abo-abo/
     (lispyville-mode)
     (diminish 'lispyville-mode))
   (use-package lispy
-      :after (evil)
+      :after evil
       :commands (lispyville-mode)
       :config
       (load-file "~/.emacs.d/elisp/lispyville.el")
