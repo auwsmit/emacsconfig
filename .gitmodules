@@ -1,0 +1,3 @@
+[submodule "elpa/evil"]
+	path = elpa/evil
+	url = https://github.com/emacs-evil/evil
