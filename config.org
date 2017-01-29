@@ -86,6 +86,8 @@ Interesting trivia: Emacs originally opened to the scratch buffer by default.
 
 ** Initial scratch buffer message
 
+NO DISTRACTIONS.
+
 #+BEGIN_SRC emacs-lisp
   (setq initial-scratch-message "")
 #+END_SRC
@@ -116,9 +118,9 @@ Interesting trivia: Emacs originally opened to the scratch buffer by default.
 Grayscale theme based on the golden ratio in white or black.
 
 #+BEGIN_SRC emacs-lisp
-    (use-package tao-theme
-        :config
-      (load-theme 'tao-yin t))
+  ;; (use-package tao-theme
+  ;;     :config
+  ;;   (load-theme 'tao-yin t))
 #+END_SRC
 
 *** Eclipse theme
@@ -126,9 +128,9 @@ Grayscale theme based on the golden ratio in white or black.
 A nice, light theme.
 
 #+BEGIN_SRC emacs-lisp
-  ;; (load-file "~/.emacs.d/elisp/eclipse-theme.el")
-  ;; (require 'eclipse-theme)
-  ;; (load-theme 'eclipse t)
+  (load-file "~/.emacs.d/elisp/eclipse-theme.el")
+  (require 'eclipse-theme)
+  (load-theme 'eclipse t)
 #+END_SRC
 
 *** Monokai
@@ -157,7 +159,7 @@ Mostly makes the mode line easier to read.
   (use-package smart-mode-line
       :config
     (setq sml/no-confirm-load-theme t)
-    (setq sml/theme 'dark)
+    (setq sml/theme 'respectful)
     ;; (setq sml/theme 'dark)
     (sml/setup))
 #+END_SRC
@@ -1524,18 +1526,6 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
 
 #+BEGIN_SRC emacs-lisp
   (defun setup-evil-magit-mode ()
-    ;; (with-eval-after-load "magit"
-    ;;   (evil-set-initial-state 'magit-status-mode 'normal)
-    ;;   (evil-set-initial-state 'magit-log-mode 'normal)
-    ;;   (evil-set-initial-state 'magit-diff-mode 'normal)
-    ;;   (evil-make-overriding-map magit-mode-map 'normal)
-    ;;   (general-evil-define-key 'normal 'magit-mode-map
-    ;;     "j" [down]
-    ;;     "k" [up]
-    ;;     "c" 'magit-commit-popup)
-    ;;   (general-evil-define-key 'normal 'magit-diff-mode-map
-    ;;     "C-j" 'evil-scroll-down))
-
     ;; Leader shortcuts
     (general-define-key
      :states '(normal motion emacs)
