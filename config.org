@@ -663,8 +663,10 @@ Done" system, named after his book.
 
 **** Agenda follow-mode by default
 
+Disabled for now
+
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-start-with-follow-mode t)
+  ;; (setq org-agenda-start-with-follow-mode t)
 #+END_SRC
 
 *** Prettier bullets
@@ -1978,6 +1980,9 @@ Leader bindings may be defined for other packages under [[*Compatibility%20with%
   (defun my/open-init-el ()
     (interactive)
     (find-file "~/.emacs.d/config.org"))
+  (defun my/open-gtd ()
+    (interactive)
+    (find-file "~/org/gtd/gtd.org"))
 
   (defhydra hydra-toggle-option (:color blue)
     "Toggle"
@@ -2004,13 +2009,15 @@ Leader bindings may be defined for other packages under [[*Compatibility%20with%
    "TAB" 'other-window
    "s"  'evil-write
    "e"  'eval-last-sexp
-   "E"  'pp-macroexpand-last-sexp
    "q"  'quit-window
    "f"  'ido-find-file
    "b"  'ido-switch-buffer
    "B"  'ibuffer
    "o"  'hydra-toggle-option/body
-   "i"  'my/open-init-el)
+   "i"  'my/open-init-el
+   "G"  'my/open-gtd
+   "I"  'emacs-init-time)
+
 #+END_SRC
 
 *** Run compatibility functions
