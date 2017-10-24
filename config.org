@@ -1629,16 +1629,6 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-info-mode)
 #+END_SRC
 
-** Add to load-path
-
-Evil is currently transitioning from Bitbucket to Github, so the Melpa
-(package.el accessible) version is behind. Manually use the latest version
-for now.
-
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/elpa/evil")
-#+END_SRC
-
 ** Basic options
 
 #+BEGIN_SRC emacs-lisp
