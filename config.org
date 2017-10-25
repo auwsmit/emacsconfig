@@ -1247,8 +1247,8 @@ I know org-mode is built-in, but it's so big that it's like a separate entity to
    ^Navigation^ | ^Mark^        | ^Actions^        | ^View^
   -^----------^-+-^----^--------+-^-------^--------+-^----^-------
     _k_:    ʌ   | _m_: mark     | _D_: delete      | _g_: refresh
-   _RET_: visit | _u_: unmark   | _S_: save        | _s_: sort
-    _j_:    v   | _*_: specific | _a_: all actions | _/_: filter
+   _RET_: visit | _u_: unmark   | _S_: save        | ^s^: sort
+    _j_:    v   | ^*^: specific | _a_: all actions | ^/^: filter
   -^----------^-+-^----^--------+-^-------^--------+-^----^-------
   "
         ("j" ibuffer-forward-line)
@@ -1257,34 +1257,19 @@ I know org-mode is built-in, but it's so big that it's like a separate entity to
 
         ("m" ibuffer-mark-forward)
         ("u" ibuffer-unmark-forward)
-        ("*" hydra-ibuffer-mark/body :color blue)
+        ;("*" hydra-ibuffer-mark/body :color blue)
 
         ("D" ibuffer-do-delete)
         ("S" ibuffer-do-save)
         ("a" hydra-ibuffer-action/body :color blue)
 
         ("g" ibuffer-update)
-        ("s" hydra-ibuffer-sort/body :color blue)
-        ("/" hydra-ibuffer-filter/body :color blue)
+        ;("s" hydra-ibuffer-sort/body :color blue)
+        ;("/" hydra-ibuffer-filter/body :color blue)
 
         ("o" ibuffer-visit-buffer-other-window "other window" :color blue)
         ("q" quit-window "quit ibuffer" :color blue)
         ("." nil "toggle hydra" :color blue))
-
-      (defhydra hydra-ibuffer-mark (:color teal :columns 5
-                                    :after-exit (hydra-ibuffer-main/body))
-        "Mark"
-        ("*" ibuffer-unmark-all "unmark all")
-        ("M" ibuffer-mark-by-mode "mode")
-        ("m" ibuffer-mark-modified-buffers "modified")
-        ("u" ibuffer-mark-unsaved-buffers "unsaved")
-        ("s" ibuffer-mark-special-buffers "special")
-        ("r" ibuffer-mark-read-only-buffers "read-only")
-        ("/" ibuffer-mark-dired-buffers "dired")
-        ("e" ibuffer-mark-dissociated-buffers "dissociated")
-        ("h" ibuffer-mark-help-buffers "help")
-        ("z" ibuffer-mark-compressed-file-buffers "compressed")
-        ("b" hydra-ibuffer-main/body "back" :color blue))
 
       (defhydra hydra-ibuffer-action (:color teal :columns 4
                                       :after-exit
@@ -1309,29 +1294,6 @@ I know org-mode is built-in, but it's so big that it's like a separate entity to
         ("X" ibuffer-do-shell-command-pipe "shell-command-pipe")
         ("b" nil "back"))
 
-      (defhydra hydra-ibuffer-sort (:color amaranth :columns 3)
-        "Sort"
-        ("i" ibuffer-invert-sorting "invert")
-        ("a" ibuffer-do-sort-by-alphabetic "alphabetic")
-        ("v" ibuffer-do-sort-by-recency "recently used")
-        ("s" ibuffer-do-sort-by-size "size")
-        ("f" ibuffer-do-sort-by-filename/process "filename")
-        ("m" ibuffer-do-sort-by-major-mode "mode")
-        ("b" hydra-ibuffer-main/body "back" :color blue))
-
-      (defhydra hydra-ibuffer-filter (:color amaranth :columns 4)
-        "Filter"
-        ("m" ibuffer-filter-by-used-mode "mode")
-        ("M" ibuffer-filter-by-derived-mode "derived mode")
-        ("n" ibuffer-filter-by-name "name")
-        ("c" ibuffer-filter-by-content "content")
-        ("e" ibuffer-filter-by-predicate "predicate")
-        ("f" ibuffer-filter-by-filename "filename")
-        (">" ibuffer-filter-by-size-gt "size")
-        ("<" ibuffer-filter-by-size-lt "size")
-        ("/" ibuffer-filter-disable "disable")
-        ("b" hydra-ibuffer-main/body "back" :color blue))
-
       (general-evil-define-key 'normal 'ibuffer-mode-map
         "." 'hydra-ibuffer-main/body)
       (add-hook 'ibuffer-hook #'hydra-ibuffer-main/body)))
@@ -1343,137 +1305,41 @@ I know org-mode is built-in, but it's so big that it's like a separate entity to
 Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's vinegar]].
 
 #+BEGIN_SRC emacs-lisp
-  ;; ;; Commands to mark or flag certain categories of files
-  ;; ("#" dired-flag-auto-save-files)
-  ;; ("." dired-clean-directory)
-  ;; ("~" dired-flag-backup-files)
-  ;; ;; Upper case keys (except !) for operating on the marked files
-  ;; ("A" dired-do-search)
-  ;; ("C" dired-do-copy)
-  ;; ("B" dired-do-byte-compile)
-  ;; ("D" dired-do-delete)
-  ;; ("G" dired-do-chgrp)
-  ;; ("H" dired-do-hardlink)
-  ;; ("L" dired-do-load)
-  ;; ("M" dired-do-chmod)
-  ;; ("O" dired-do-chown)
-  ;; ("P" dired-do-print)
-  ;; ("Q" dired-do-query-replace-regexp)
-  ;; ("R" dired-do-rename)
-  ;; ("S" dired-do-symlink)
-  ;; ("T" dired-do-touch)
-  ;; ("X" dired-do-shell-command)
-  ;; ("Z" dired-do-compress)
-  ;; ("!" dired-do-shell-command)
-  ;; ("&" dired-do-async-shell-command)
-  ;; ;; Comparison commands
-  ;; ("=" dired-diff)
-  ;; ;; Tree Dired commands
-  ;; ("\M-\C-?" dired-unmark-all-files)
-  ;; ("\M-\C-d" dired-tree-down)
-  ;; ("\M-\C-u" dired-tree-up)
-  ;; ("\M-\C-n" dired-next-subdir)
-  ;; ("\M-\C-p" dired-prev-subdir)
-  ;; ;; move to marked files
-  ;; ("\M-{" dired-prev-marked-file)
-  ;; ("\M-}" dired-next-marked-file)
-  ;; ;; Make all regexp commands share a `% prefix:
-  ;; ;; We used to get to the submap via a symbol dired-regexp-prefix,
-  ;; ;; but that seems to serve little purpose, and copy-keymap
-  ;; ;; does a better job without it.
-  ;; ("%" nil)
-  ;; ("%u" dired-upcase)
-  ;; ("%l" dired-downcase)
-  ;; ("%d" dired-flag-files-regexp)
-  ;; ("%g" dired-mark-files-containing-regexp)
-  ;; ("%m" dired-mark-files-regexp)
-  ;; ("%r" dired-do-rename-regexp)
-  ;; ("%C" dired-do-copy-regexp)
-  ;; ("%H" dired-do-hardlink-regexp)
-  ;; ("%R" dired-do-rename-regexp)
-  ;; ("%S" dired-do-symlink-regexp)
-  ;; ("%&" dired-flag-garbage-files)
-  ;; ;; Commands for marking and unmarking.
-  ;; ("*" nil)
-  ;; ("**" dired-mark-executables)
-  ;; ("*/" dired-mark-directories)
-  ;; ("*@" dired-mark-symlinks)
-  ;; ("*%" dired-mark-files-regexp)
-  ;; ("*c" dired-change-marks)
-  ;; ("*s" dired-mark-subdir-files)
-  ;; ("*m" dired-mark)
-  ;; ("*u" dired-unmark)
-  ;; ("*?" dired-unmark-all-files)
-  ;; ("*!" dired-unmark-all-marks)
-  ;; ("U" dired-unmark-all-marks)
-  ;; ("*\177" dired-unmark-backward)
-  ;; ("*\C-n" dired-next-marked-file)
-  ;; ("*\C-p" dired-prev-marked-file)
-  ;; ("*t" dired-toggle-marks)
-  ;; ;; Lower keys for commands not operating on all the marked files
-  ;; ("a" dired-find-alternate-file)
-  ;; ("d" dired-flag-file-deletion)
-  ;; ("e" dired-find-file)
-  ;; ("f" dired-find-file)
-  ;; ("\C-m" dired-find-file)
-  ;; ("g" revert-buffer)
-  ;; ("i" dired-maybe-insert-subdir)
-  ;; ("j" dired-goto-file)
-  ;; ("k" dired-do-kill-lines)
-  ;; ("l" dired-do-redisplay)
-  ;; ("o" dired-find-file-other-window)
-  ;; ("\C-o" dired-display-file)
-  ;; ("s" dired-sort-toggle-or-edit)
-  ;; ("t" dired-toggle-marks)
-  ;; ("u" dired-unmark)
-  ;; ("v" dired-view-file)
-  ;; ("w" dired-copy-filename-as-kill)
-  ;; ("x" dired-do-flagged-delete)
-  ;; ("y" dired-show-file-type)
-  ;; ("+" dired-create-directory)
-
   (defun setup-evil-dired-mode ()
     (with-eval-after-load "dired"
       (defun my/up-dir ()
         (interactive)
         (find-alternate-file ".."))
+
       (defhydra hydra-dired-main (:color pink :hint nil)
         "
    ^Navigation^ | ^Mark^        | ^Actions^        | ^View^
   -^----------^-+-^----^--------+-^-------^--------+-^----^-------
     _k_:    ʌ   | _m_: mark     | _D_: delete      | _g_: refresh
-   _RET_: visit | _u_: unmark   | _S_: save        | _s_: sort
-    _j_:    v   | _*_: specific | _a_: all actions | _/_: filter
+   _RET_: visit | _u_: unmark   | _S_: save        | ^s^: sort
+    _j_:    v   | ^*^: specific | ^a^: all actions | ^/^: filter
   -^----------^-+-^----^--------+-^-------^--------+-^----^-------
   "
         ("-" my/up-dir)
-        ("<" dired-prev-dirline)
         ("j" dired-next-line)
         ("RET" dired-find-alternate-file :color blue)
         ("k" dired-previous-line)
-        (">" dired-next-dirline)
 
         ("m" dired-mark)
         ("u" dired-unmark-forward)
-        ("*" hydra-dired-mark/body :color blue)
+        ;("*" hydra-dired-mark/body :color blue)
 
         ("D" dired-do-delete)
         ("S" dired-do-save)
-        ("a" hydra-dired-action/body :color blue)
+        ;("a" hydra-dired-action/body :color blue)
 
         ("g" dired-update)
-        ("s" hydra-dired-sort/body :color blue)
-        ("/" hydra-dired-filter/body :color blue)
+        ;("s" hydra-dired-sort/body :color blue)
+        ;("/" hydra-dired-filter/body :color blue)
 
-        ("o" dired-visit-buffer-other-window "other window" :color blue)
+        ("o" dired-find-file-other-window :color blue)
         ("q" quit-window "quit dired" :color blue)
         ("." nil "toggle hydra" :color blue))
-
-      (defhydra hydra-dired-mark (:color teal :columns 5
-                                  :after-exit (hydra-dired-main/body))
-        "Mark"
-        ("z" dired-mark-compressed-file-buffers "compressed")
-        ("b" hydra-dired-main/body "back" :color blue))
 
       (defhydra hydra-dired-action (:color teal :columns 4
                                     :after-exit
@@ -1483,10 +1349,8 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
         ("X" dired-do-shell-command-pipe "shell-command-pipe")
         ("b" nil "back"))
 
-      (add-hook 'dired-initial-position-hook #'hydra-dired-main/body)
-
       (evil-make-overriding-map dired-mode-map 'normal)
-      (general-define-key :states 'normal "-" (kbd "C-x d RET"))
+      (general-define-key :states 'normal "-" (kbd "C-x d RET ."))
       (general-evil-define-key 'normal 'dired-mode-map
         "-" 'my/up-dir
         "RET" 'dired-find-alternate-file
