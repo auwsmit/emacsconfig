@@ -1268,7 +1268,7 @@ I know org-mode is built-in, but it's so big that it's like a separate entity to
         ("/" hydra-ibuffer-filter/body :color blue)
 
         ("o" ibuffer-visit-buffer-other-window "other window" :color blue)
-        ("q" ibuffer-quit "quit ibuffer" :color blue)
+        ("q" quit-window "quit ibuffer" :color blue)
         ("." nil "toggle hydra" :color blue))
 
       (defhydra hydra-ibuffer-mark (:color teal :columns 5
@@ -1434,19 +1434,23 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
 
   (defun setup-evil-dired-mode ()
     (with-eval-after-load "dired"
+      (defun my/up-dir ()
+        (interactive)
+        (find-alternate-file ".."))
       (defhydra hydra-dired-main (:color pink :hint nil)
         "
    ^Navigation^ | ^Mark^        | ^Actions^        | ^View^
   -^----------^-+-^----^--------+-^-------^--------+-^----^-------
-    _n_:    ʌ   | _m_: mark     | _D_: delete      | _g_: refresh
+    _k_:    ʌ   | _m_: mark     | _D_: delete      | _g_: refresh
    _RET_: visit | _u_: unmark   | _S_: save        | _s_: sort
-    _p_:    v   | _*_: specific | _a_: all actions | _/_: filter
+    _j_:    v   | _*_: specific | _a_: all actions | _/_: filter
   -^----------^-+-^----^--------+-^-------^--------+-^----^-------
   "
+        ("-" my/up-dir)
         ("<" dired-prev-dirline)
-        ("n" dired-next-line)
-        ("RET" dired-do-view :color blue)
-        ("p" dired-previous-line)
+        ("j" dired-next-line)
+        ("RET" dired-find-alternate-file :color blue)
+        ("k" dired-previous-line)
         (">" dired-next-dirline)
 
         ("m" dired-mark)
@@ -1462,7 +1466,7 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
         ("/" hydra-dired-filter/body :color blue)
 
         ("o" dired-visit-buffer-other-window "other window" :color blue)
-        ("q" dired-quit "quit dired" :color blue)
+        ("q" quit-window "quit dired" :color blue)
         ("." nil "toggle hydra" :color blue))
 
       (defhydra hydra-dired-mark (:color teal :columns 5
@@ -1478,9 +1482,8 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
         "Action"
         ("X" dired-do-shell-command-pipe "shell-command-pipe")
         ("b" nil "back"))
-      (defun my/up-dir ()
-        (interactive)
-        (find-alternate-file ".."))
+
+      (add-hook 'dired-initial-position-hook #'hydra-dired-main/body)
 
       (evil-make-overriding-map dired-mode-map 'normal)
       (general-define-key :states 'normal "-" (kbd "C-x d RET"))
@@ -1491,7 +1494,9 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
         "j" 'dired-next-line
         "k" 'dired-previous-line
         "gg" 'evil-goto-first-line
-        "G" 'evil-goto-line)))
+        "G" 'evil-goto-line
+        "." 'hydra-dired-main/body)
+      ))
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-dired-mode)
 #+END_SRC
 
