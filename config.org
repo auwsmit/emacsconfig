@@ -627,47 +627,47 @@ multiple terminals easier.
 
 *** GTD related
 
-In an effort to be more productive, I'm trying David Allen's "Getting Things
-Done" system, named after his book.
-
-[[http://java.ociweb.com/mark/gtd.html][Here's a good summary of GTD]], if you're curious.
-
-**** Agenda files
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-files '("~/org/gtd/gtd.org"))
-#+END_SRC
-
-**** Stuck projects
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-stuck-projects '("/+PROJ" ("NEXT") nil nil))
-#+END_SRC
-
-**** Custom agenda views
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-custom-commands
-        (quote
-         ((" " "Agenda"
-               ((agenda "" nil)
-                (todo "NEXT"
-                      ((org-agenda-overriding-header "Next Actions")))
-                (todo "PROJ"
-                      ((org-agenda-overriding-header "Projects"))))
-               nil)
-          ("n" "Next Actions" todo "NEXT" nil)
-          ("p" "Projects" todo "PROJ" nil)
-          ("s" "Someday" todo "SOMEDAY" nil))))
-#+END_SRC
-
-**** Agenda follow-mode by default
-
-Disabled for now
-
-#+BEGIN_SRC emacs-lisp
-  ;; (setq org-agenda-start-with-follow-mode t)
-#+END_SRC
+# In an effort to be more productive, I'm trying David Allen's "Getting Things
+# Done" system, named after his book.
+# 
+[[http://java.ociweb.com/mark/gtd.html][# Here's a good summary of GTD]], if you're curious.
+# 
+# **** Agenda files
+# 
+# #+BEGIN_SRC emacs-lisp
+#   (setq org-agenda-files '("~/org/gtd/gtd.org"))
+# #+END_SRC
+# 
+# **** Stuck projects
+# 
+# #+BEGIN_SRC emacs-lisp
+#   (setq org-stuck-projects '("/+PROJ" ("NEXT") nil nil))
+# #+END_SRC
+# 
+# **** Custom agenda views
+# 
+# #+BEGIN_SRC emacs-lisp
+#   (setq org-agenda-custom-commands
+#         (quote
+#          ((" " "Agenda"
+#                ((agenda "" nil)
+#                 (todo "NEXT"
+#                       ((org-agenda-overriding-header "Next Actions")))
+#                 (todo "PROJ"
+#                       ((org-agenda-overriding-header "Projects"))))
+#                nil)
+#           ("n" "Next Actions" todo "NEXT" nil)
+#           ("p" "Projects" todo "PROJ" nil)
+#           ("s" "Someday" todo "SOMEDAY" nil))))
+# #+END_SRC
+# 
+# **** Agenda follow-mode by default
+# 
+# Disabled for now
+# 
+# #+BEGIN_SRC emacs-lisp
+#   ;; (setq org-agenda-start-with-follow-mode t)
+# #+END_SRC
 
 *** Prettier bullets
 
@@ -1053,7 +1053,6 @@ I would ever want to disable Evil-mode, but I can if I want, I guess.
 *** Built-in modes
 
 Configure various modes that have little to configure and are built-in to Emacs.
-Otherwise they add unnecessary clutter.
 
 #+BEGIN_SRC emacs-lisp
   (defun setup-evil-builtins ()
@@ -1406,8 +1405,8 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
      "gc" 'magit-commit
      "gl" 'magit-log
      "gp" 'magit-push
-     "gw" 'magit-stage-file   ;; "write"
-     "gr" 'magit-unstage-file ;; "remove"
+     ;; "gw" 'magit-stage-file   ;; "write"
+     ;; "gr" 'magit-unstage-file ;; "remove"
      "gg" 'vc-git-grep))
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-magit-mode)
 #+END_SRC
@@ -1525,10 +1524,8 @@ Otherwise, Evil will mess with other mode's mappings.
   (use-package evil
       :ensure nil
       :init
-    (advice-add 'evil-make-intercept-map
-                :override (defun my-kill-intercept-maps (&rest _)))
-    (advice-add 'evil-make-overriding-map
-                :override (defun my-kill-overriding-maps (&rest _))))
+    (advice-add 'evil-make-intercept-map :override #'ignore)
+    (advice-add 'evil-make-overriding-map :override #'ignore))
 #+END_SRC
 
 ** Post-activation setup function
@@ -1623,8 +1620,8 @@ They were disabled before so that I can have complete control over key bindings.
 They're being enabled again so that I can make use of them.
 
 #+BEGIN_SRC emacs-lisp
-  (advice-remove 'evil-make-overriding-map #'my-kill-overriding-maps)
-  (advice-remove 'evil-make-intercept-map #'my-kill-intercept-maps)
+  (advice-remove 'evil-make-overriding-map #'ignore)
+  (advice-remove 'evil-make-intercept-map #'ignore)
 #+END_SRC
 
 *** Global bindings
@@ -1709,36 +1706,10 @@ also focus on the new split window like Vim
 
 **** Go to the end of pasted text
 
-Useful for pasting multiple multi-lined blocks of text in a row.
-TODO: Remove goto-mark advice instead of copy-pasting the function
-
 #+BEGIN_SRC emacs-lisp
-  (evil-define-command my/evil-goto-mark (char &optional noerror)
-    "Go to the marker specified by CHAR."
-    :keep-visual t
-    :repeat nil
-    :type exclusive
-    (interactive (list (read-char)))
-    (let ((marker (evil-get-marker char)))
-      (cond
-       ((markerp marker)
-        (switch-to-buffer (marker-buffer marker))
-        (goto-char (marker-position marker)))
-       ((numberp marker)
-        (goto-char marker))
-       ((consp marker)
-        (when (or (find-buffer-visiting (car marker))
-                  (and (y-or-n-p (format "Visit file %s again? "
-                                         (car marker)))
-                       (find-file (car marker))))
-          (goto-char (cdr marker))))
-       ((not noerror)
-        (user-error "Marker `%c' is not set%s" char
-                    (if (evil-global-marker-p char) ""
-                      " in this buffer"))))))
-
   (defun my/cursor-to-end-of-paste (&rest _)
-    (my/evil-goto-mark ?\]))
+    (let ((marker (evil-get-marker ?\])))
+      (goto-char marker)))
   (advice-add 'evil-paste-after :after #'my/cursor-to-end-of-paste)
 #+END_SRC
 
