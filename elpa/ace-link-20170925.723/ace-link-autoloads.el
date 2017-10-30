@@ -1,9 +1,9 @@
 ;;; ace-link-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "ace-link" "ace-link.el" (23022 38248 0 0))
+;;;### (autoloads nil "ace-link" "ace-link.el" (23030 33998 0 0))
 ;;; Generated autoloads from ace-link.el
 
 (autoload 'ace-link "ace-link" "\

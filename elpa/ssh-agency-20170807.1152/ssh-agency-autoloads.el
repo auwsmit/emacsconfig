@@ -1,9 +1,9 @@
 ;;; ssh-agency-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "ssh-agency" "ssh-agency.el" (23022 38182 0
+;;;### (autoloads nil "ssh-agency" "ssh-agency.el" (23030 34023 0
 ;;;;;;  0))
 ;;; Generated autoloads from ssh-agency.el
 

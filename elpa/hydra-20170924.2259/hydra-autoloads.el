@@ -1,9 +1,9 @@
 ;;; hydra-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "hydra" "hydra.el" (23022 38214 0 0))
+;;;### (autoloads nil "hydra" "hydra.el" (23030 33988 0 0))
 ;;; Generated autoloads from hydra.el
 
 (autoload 'defhydra "hydra" "\
@@ -58,14 +58,14 @@ result of `defhydra'.
 
 \(fn NAME BODY &optional DOCSTRING &rest HEADS)" nil t)
 
-(put 'defhydra 'lisp-indent-function 'defun)
+(function-put 'defhydra 'lisp-indent-function 'defun)
 
-(put 'defhydra 'doc-string-elt '3)
+(function-put 'defhydra 'doc-string-elt '3)
 
 ;;;***
 
 ;;;### (autoloads nil nil ("hydra-examples.el" "hydra-ox.el" "hydra-pkg.el"
-;;;;;;  "lv.el") (23022 38215 224160 0))
+;;;;;;  "lv.el") (23030 33988 0 0))
 
 ;;;***
 

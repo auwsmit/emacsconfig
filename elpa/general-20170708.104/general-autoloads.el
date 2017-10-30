@@ -1,9 +1,9 @@
 ;;; general-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "general" "general.el" (22927 26008 0 0))
+;;;### (autoloads nil "general" "general.el" (23030 33987 0 0))
 ;;; Generated autoloads from general.el
 
 (autoload 'general-define-key "general" "\
@@ -48,7 +48,7 @@ list of keymaps).
 
 MAPS will be recorded for later use with `general-describe-keybindings'.
 
-\(fn &rest MAPS &key (prefix general-default-prefix) (non-normal-prefix general-default-non-normal-prefix) (global-prefix general-default-global-prefix) INFIX PREFIX-COMMAND PREFIX-MAP PREFIX-NAME (states general-default-states) (keymaps general-default-keymaps) PREDICATE PACKAGE MAJOR-MODE &allow-other-keys)" nil nil)
+\(fn &rest MAPS &key (PREFIX general-default-prefix) (NON-NORMAL-PREFIX general-default-non-normal-prefix) (GLOBAL-PREFIX general-default-global-prefix) INFIX PREFIX-COMMAND PREFIX-MAP PREFIX-NAME (STATES general-default-states) (KEYMAPS general-default-keymaps) PREDICATE PACKAGE MAJOR-MODE &allow-other-keys)" nil nil)
 
 (autoload 'general-create-definer "general" "\
 A helper macro to create key definitions functions.
@@ -69,7 +69,7 @@ not need to be quoted.
 
 \(fn KEYMAPS &rest ARGS)" nil t)
 
-(put 'general-emacs-define-key 'lisp-indent-function '1)
+(function-put 'general-emacs-define-key 'lisp-indent-function '1)
 
 (autoload 'general-evil-define-key "general" "\
 A wrapper for `general-define-key' that is similar to `evil-define-key'.
@@ -81,7 +81,7 @@ keymap, it does not need to be quoted.
 
 \(fn STATES KEYMAPS &rest ARGS)" nil t)
 
-(put 'general-evil-define-key 'lisp-indent-function '2)
+(function-put 'general-evil-define-key 'lisp-indent-function '2)
 
 (autoload 'general-describe-keybindings "general" "\
 Show all keys that have been bound with general in an org buffer.
@@ -126,7 +126,9 @@ WHICH-KEY can also be specified, in which case the description WHICH-KEY will
 replace the command name in the which-key popup. Note that this requires a
 version of which-key from after 2016-11-21.
 
-\(fn FALLBACK-COMMAND &rest MAPS &key TIMEOUT INHERIT-KEYMAP NAME DOCSTRING WHICH-KEY &allow-other-keys)" nil (quote macro))
+\(fn FALLBACK-COMMAND &rest MAPS &key TIMEOUT INHERIT-KEYMAP NAME DOCSTRING WHICH-KEY &allow-other-keys)" nil t)
+
+(function-put 'general-key-dispatch 'lisp-indent-function '1)
 
 (autoload 'general-create-vim-definer "general" "\
 A helper function to create vim-like wrappers over `general-define-key'.
@@ -155,8 +157,8 @@ aliases such as `nmap' for `general-nmap'.
 
 ;;;***
 
-;;;### (autoloads nil nil ("elpa.el" "general-pkg.el") (22927 26009
-;;;;;;  43597 600000))
+;;;### (autoloads nil nil ("elpa.el" "general-pkg.el") (23030 33987
+;;;;;;  0 0))
 
 ;;;***
 

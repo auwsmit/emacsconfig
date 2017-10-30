@@ -1,9 +1,9 @@
 ;;; worf-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "worf" "worf.el" (23022 38175 0 0))
+;;;### (autoloads nil "worf" "worf.el" (23030 34003 0 0))
 ;;; Generated autoloads from worf.el
 
 (autoload 'worf-mode "worf" "\
@@ -28,8 +28,8 @@ if the (looking-back \"^*+\") is true.
 
 ;;;***
 
-;;;### (autoloads nil nil ("elpa.el" "worf-pkg.el") (23022 38176
-;;;;;;  61450 0))
+;;;### (autoloads nil nil ("elpa.el" "worf-pkg.el") (23030 34003
+;;;;;;  0 0))
 
 ;;;***
 

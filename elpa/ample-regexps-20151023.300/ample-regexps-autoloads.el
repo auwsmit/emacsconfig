@@ -1,9 +1,9 @@
 ;;; ample-regexps-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "ample-regexps" "ample-regexps.el" (22373 45454
+;;;### (autoloads nil "ample-regexps" "ample-regexps.el" (23030 34050
 ;;;;;;  0 0))
 ;;; Generated autoloads from ample-regexps.el
 
@@ -59,7 +59,7 @@ Run `re-builder' using arx form named ARX-NAME.
 ;;;***
 
 ;;;### (autoloads nil nil ("ample-regexps-pkg.el" "init-tryout.el")
-;;;;;;  (22373 45454 355646 500000))
+;;;;;;  (23030 34050 0 0))
 
 ;;;***
 

@@ -1,9 +1,9 @@
 ;;; bind-key-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "bind-key" "bind-key.el" (22668 61768 0 0))
+;;;### (autoloads nil "bind-key" "bind-key.el" (23030 33979 0 0))
 ;;; Generated autoloads from bind-key.el
 
 (autoload 'bind-key "bind-key" "\

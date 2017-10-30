@@ -1,9 +1,9 @@
 ;;; evil-magit-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "evil-magit" "evil-magit.el" (23022 38220 0
+;;;### (autoloads nil "evil-magit" "evil-magit.el" (23030 34045 0
 ;;;;;;  0))
 ;;; Generated autoloads from evil-magit.el
 

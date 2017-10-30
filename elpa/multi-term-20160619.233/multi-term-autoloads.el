@@ -1,10 +1,10 @@
 ;;; multi-term-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "multi-term" "multi-term.el" (22524 58151 616453
-;;;;;;  200000))
+;;;### (autoloads nil "multi-term" "multi-term.el" (23030 33994 0
+;;;;;;  0))
 ;;; Generated autoloads from multi-term.el
 
 (autoload 'multi-term "multi-term" "\

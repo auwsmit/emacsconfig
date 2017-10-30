@@ -1,14 +1,15 @@
 ;;; which-key-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "which-key" "which-key.el" (23022 38179 0 0))
+;;;### (autoloads nil "which-key" "which-key.el" (23030 33990 0 0))
 ;;; Generated autoloads from which-key.el
 
 (defvar which-key-mode nil "\
 Non-nil if Which-Key mode is enabled.
-See the command `which-key-mode' for a description of this minor mode.
+See the `which-key-mode' command
+for a description of this minor mode.
 Setting this variable directly does not take effect;
 either customize it (see the info node `Easy Customization')
 or call the function `which-key-mode'.")

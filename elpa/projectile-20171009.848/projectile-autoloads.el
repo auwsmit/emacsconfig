@@ -1,9 +1,9 @@
 ;;; projectile-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "projectile" "projectile.el" (23022 38187 0
+;;;### (autoloads nil "projectile" "projectile.el" (23030 34027 0
 ;;;;;;  0))
 ;;; Generated autoloads from projectile.el
 
@@ -479,7 +479,8 @@ entirely.")
 
 (defvar projectile-mode nil "\
 Non-nil if Projectile mode is enabled.
-See the command `projectile-mode' for a description of this minor mode.
+See the `projectile-mode' command
+for a description of this minor mode.
 Setting this variable directly does not take effect;
 either customize it (see the info node `Easy Customization')
 or call the function `projectile-mode'.")

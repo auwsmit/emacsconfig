@@ -1,9 +1,9 @@
 ;;; swiper-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "swiper" "swiper.el" (23022 38181 0 0))
+;;;### (autoloads nil "swiper" "swiper.el" (23030 34001 0 0))
 ;;; Generated autoloads from swiper.el
 
 (autoload 'swiper-avy "swiper" "\

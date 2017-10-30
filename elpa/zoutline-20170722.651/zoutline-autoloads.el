@@ -1,9 +1,9 @@
 ;;; zoutline-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil nil ("zoutline.el") (22927 25612 203708 500000))
+;;;### (autoloads nil nil ("zoutline.el") (23030 33995 0 0))
 
 ;;;***
 

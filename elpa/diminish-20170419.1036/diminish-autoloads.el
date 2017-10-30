@@ -1,9 +1,9 @@
 ;;; diminish-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "diminish" "diminish.el" (22927 26029 0 0))
+;;;### (autoloads nil "diminish" "diminish.el" (23030 33978 0 0))
 ;;; Generated autoloads from diminish.el
 
 (autoload 'diminish "diminish" "\

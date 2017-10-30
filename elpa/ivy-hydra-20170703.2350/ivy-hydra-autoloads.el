@@ -1,9 +1,9 @@
 ;;; ivy-hydra-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (or (file-name-directory #$) (car load-path)))
+(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil nil ("ivy-hydra.el") (22927 25999 970502 700000))
+;;;### (autoloads nil nil ("ivy-hydra.el") (23030 34059 0 0))
 
 ;;;***
 
