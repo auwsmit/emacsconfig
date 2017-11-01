@@ -955,31 +955,7 @@ Improved window switching
                  magit-log
                  magit-push
                  magit-stage-file
-                 magit-unstage-file)
-#+END_SRC
-
-*** Magit is slow for Windows
-
-[[https://github.com/magit/magit/issues/2395][WORKAROUND SOURCE]]
-
-In summary: Magit isn't the problem. Git for Windows is just horribly slow with
-multiple calls, so these simplified functions make things less painful by
-calling less git commands.
-
-#+BEGIN_SRC emacs-lisp
-  :config
-  (when (eq system-type 'windows-nt)
-    (define-derived-mode magit-staging-mode magit-status-mode "Magit staging"
-      "Mode for showing staged and unstaged changes."
-      :group 'magit-status)
-    (defun magit-staging-refresh-buffer ()
-      (magit-insert-section (status)
-                            (magit-insert-untracked-files)
-                            (magit-insert-unstaged-changes)
-                            (magit-insert-staged-changes)))
-    (defun magit-staging ()
-      (interactive)
-      (magit-mode-setup #'magit-staging-mode))))
+                 magit-unstage-file))
 #+END_SRC
 
 *** Use =ssh-agency= for Windows login prompt
@@ -1055,43 +1031,49 @@ I would ever want to disable Evil-mode, but I can if I want, I guess.
 Configure various modes that have little to configure and are built-in to Emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (defun setup-evil-builtins ()
-    ;; Special
-    (evil-make-overriding-map special-mode-map 'normal)
+    (defun setup-evil-builtins ()
+      ;; Special
+      (evil-make-overriding-map special-mode-map 'normal)
 
-    ;; Compilation
-    (evil-set-initial-state 'compilation-mode 'normal)
+      ;; Compilation
+      (evil-set-initial-state 'compilation-mode 'normal)
 
-    ;; Occur
-    (evil-make-overriding-map occur-mode-map 'normal)
-    (evil-set-initial-state 'occur-mode 'normal)
+      ;; Occur
+      (evil-make-overriding-map occur-mode-map 'normal)
+      (evil-set-initial-state 'occur-mode 'normal)
 
-    ;; Help
-    (general-evil-define-key 'normal 'help-mode-map
-      "q" 'quit-window
-      "<" 'help-go-back
-      ">" 'help-go-forward)
+      ;; Package menu
+      (evil-set-initial-state 'package-menu-mode 'normal)
+      (evil-make-overriding-map package-menu-mode-map 'normal)
+      (general-evil-define-key 'normal 'package-menu-mode-map
+        "U" 'package-menu-mark-upgrades)
 
-    ;; Bookmark
-    (with-eval-after-load "bookmark"
-      (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
-      (evil-make-overriding-map bookmark-bmenu-mode-map 'normal)
-      (general-evil-define-key 'normal 'bookmark-bmenu-mode-map
-        "RET" 'bookmark-bmenu-this-window
-        "j" 'evil-next-line
-        "k" 'evil-previous-line))
+      ;; Help
+      (general-evil-define-key 'normal 'help-mode-map
+        "q" 'quit-window
+        "<" 'help-go-back
+        ">" 'help-go-forward)
 
-    ;; Shells (all three of them)
-    (defun my/evil-shell-insert ()
-      "Go to the very end of the buffer and enter insert state."
-      (interactive)
-      (evil-goto-line)
-      (evil-append-line 0))
-    (general-evil-define-key 'normal
-        '(shell-mode-map eshell-mode-map term-mode-map)
-      "I" 'my/evil-shell-insert
-      "A" 'my/evil-shell-insert))
-  (add-to-list 'my/evil-other-mode-funs 'setup-evil-builtins)
+      ;; Bookmark
+      (with-eval-after-load "bookmark"
+        (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+        (evil-make-overriding-map bookmark-bmenu-mode-map 'normal)
+        (general-evil-define-key 'normal 'bookmark-bmenu-mode-map
+          "RET" 'bookmark-bmenu-this-window
+          "j" 'evil-next-line
+          "k" 'evil-previous-line))
+
+      ;; Shells (all three of them)
+      (defun my/evil-shell-insert ()
+        "Go to the very end of the buffer and enter insert state."
+        (interactive)
+        (evil-goto-line)
+        (evil-append-line 0))
+      (general-evil-define-key 'normal
+          '(shell-mode-map eshell-mode-map term-mode-map)
+        "I" 'my/evil-shell-insert
+        "A" 'my/evil-shell-insert))
+    (add-to-list 'my/evil-other-mode-funs 'setup-evil-builtins)
 #+END_SRC
 
 *** Evil Org
@@ -1109,10 +1091,10 @@ I know org-mode is built-in, but it's so big that it's like a separate entity to
    _h_ ^+^ _l_ | hi_d_e,  _c_ycle,  | _s_wiper   | _q_uit_._
    ^ ^ _j_ ^ ^ | ^globally^ _C_ycle | ^ ^        |
   "
-        ("j" worf-down)
-        ("J" worf-forward)
-        ("k" worf-up)
-        ("K" worf-backward)
+        ("j" outline-next-visible-heading)
+        ("J" worf-down)
+        ("k" outline-previous-visible-heading)
+        ("K" worf-up)
         ("h" worf-left)
         ("l" worf-right)
         ("a" my/show-header)
@@ -1191,8 +1173,8 @@ I know org-mode is built-in, but it's so big that it's like a separate entity to
         "s" 'hydra-org-action/body
         "z g" 'org-goto
         "z x" 'hydra-org-nav/body
-        "z j" 'hydra-org-nav/worf-down
-        "z k" 'hydra-org-nav/worf-up
+        "z j" 'hydra-org-nav/outline-next-visible-heading
+        "z k" 'hydra-org-nav/outline-previous-visible-heading
         "z h" 'hydra-org-nav/worf-left
         "z l" 'hydra-org-nav/worf-right)
       (general-evil-define-key 'insert 'org-mode-map
@@ -1256,15 +1238,12 @@ I know org-mode is built-in, but it's so big that it's like a separate entity to
 
         ("m" ibuffer-mark-forward)
         ("u" ibuffer-unmark-forward)
-        ;("*" hydra-ibuffer-mark/body :color blue)
 
         ("D" ibuffer-do-delete)
         ("S" ibuffer-do-save)
         ("a" hydra-ibuffer-action/body :color blue)
 
         ("g" ibuffer-update)
-        ;("s" hydra-ibuffer-sort/body :color blue)
-        ;("/" hydra-ibuffer-filter/body :color blue)
 
         ("o" ibuffer-visit-buffer-other-window "other window" :color blue)
         ("q" quit-window "quit ibuffer" :color blue)
@@ -1394,8 +1373,11 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
 
 *** Evil Magit
 
+(not to be confused with the package, evil-magit)
+
 #+BEGIN_SRC emacs-lisp
   (defun setup-evil-magit-mode ()
+    (evil-set-initial-state 'magit-mode 'emacs)
     ;; Leader shortcuts
     (general-define-key
      :states '(normal motion emacs)
@@ -1509,7 +1491,8 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
             evil-want-C-u-scroll t
             evil-ex-substitute-global t
             evil-overriding-maps nil
-            evil-search-module 'evil-search)
+            evil-search-module 'evil-search
+            )
 
       ;; Persistent undo history (save info to file)
       (setq undo-tree-auto-save-history t
@@ -1723,6 +1706,34 @@ Aside from being more comfortable, this keeps standard =C-u=
         "C-k" 'evil-scroll-up)
 #+END_SRC
 
+**** evil-Sayonara
+
+A rip-off of [[https://github.com/mhinz/vim-sayonara][vim-sayonara]], and a WIP
+
+TODO: 
+- fix destroy bugs
+- make preserve not kill if the current buffer is visible elsewhere
+  - (window-buffer WINDOW) finds buffer of window
+  - somehow check buffers of all other windows
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/sayonara-destroy ()
+    "Kill buffer and window, if it's not the last split."
+    (interactive "p")
+    (dolist (buf (buffer-list (selected-frame)))
+      (let ((win (get-buffer-window buf)))
+        (kill-buffer (current-buffer))
+        (window--delete))))
+
+  (defun my/sayonara-preserve ()
+    "Kill buffer, but always keep window"
+    (interactive "p")
+    (kill-this-buffer))
+
+  (nmap "gs" 'my/sayonara-destroy
+        "gS" 'my/sayonara-preserve)
+#+END_SRC
+
 **** evil-unimpaired
 
 Inspired by [[https://github.com/tpope/vim-unimpaired][unimpaired]]
@@ -1843,6 +1854,7 @@ Leader bindings may be defined for other packages under [[*Compatibility%20with%
    "f"  'ido-find-file
    "b"  'ido-switch-buffer
    "B"  'ibuffer
+   "P"  'list-packages
    "o"  'hydra-toggle-option/body
    "i"  'my/open-init-el
    "G"  'my/open-gtd
@@ -1926,6 +1938,7 @@ Modifies some Magit bindings to be more Evil
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-magit
+      :init (setq evil-magit-state 'emacs)
       :after evil magit)
 #+END_SRC
 
@@ -1963,22 +1976,22 @@ Improved sentence logic and navigation.
 
 *** [[https://github.com/noctuid/lispyville][lispyville]]
 
-Better lisp editing for Evil. (With some help from [[https://github.com/abo-abo/lispy][lispy]])
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/load-lispy ()
-    (interactive)
-    (lispyville-mode)
-    (diminish 'lispyville-mode))
-  (use-package lispy
-      :after evil
-      :commands (lispyville-mode)
-      :config
-      (load-file "~/.emacs.d/elisp/lispyville.el")
-      (lispyville-set-key-theme '(slurp/barf-cp)))
-  (add-hook 'lisp-mode-hook #'my/load-lispy)
-  (add-hook 'emacs-lisp-mode-hook #'my/load-lispy)
-#+END_SRC
+# Better lisp editing for Evil. (With some help from [[https://github.com/abo-abo/lispy][lispy]])
+# 
+# #+BEGIN_SRC emacs-lisp
+#   (defun my/load-lispy ()
+#     (interactive)
+#     (lispyville-mode)
+#     (diminish 'lispyville-mode))
+#   (use-package lispy
+#       :after evil
+#       :commands (lispyville-mode)
+#       :config
+#       (load-file "~/.emacs.d/elisp/lispyville.el")
+#       (lispyville-set-key-theme '(slurp/barf-cp)))
+#   (add-hook 'lisp-mode-hook #'my/load-lispy)
+#   (add-hook 'emacs-lisp-mode-hook #'my/load-lispy)
+# #+END_SRC
 
 ** Activate Evil
 
