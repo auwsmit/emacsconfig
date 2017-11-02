@@ -164,17 +164,6 @@ Mostly makes the mode line easier to read.
     (sml/setup))
 #+END_SRC
 
-** Spaceline
-
-I want to set this up some day because it looks vrry pretty.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package spaceline
-  ;;     :config
-  ;;     (require 'spaceline-config)
-  ;;     (spaceline-spacemacs-theme))
-#+END_SRC
-
 ** RainbowDelimiters
 
 Highlight matching delimiters with unique colors. It's pretty indispensable for
@@ -630,7 +619,7 @@ multiple terminals easier.
 # In an effort to be more productive, I'm trying David Allen's "Getting Things
 # Done" system, named after his book.
 # 
-[[http://java.ociweb.com/mark/gtd.html][# Here's a good summary of GTD]], if you're curious.
+# [[http://java.ociweb.com/mark/gtd.html][Here's a good summary of GTD]], if you're curious.
 # 
 # **** Agenda files
 # 
@@ -924,24 +913,6 @@ Adds enhanced ivy versions of many commands
 #+END_SRC
 
 *** [[*Evil%20Ivy%2BSwiper][Evil-mode compatibility]]
-
-** ace-window
-
-Improved window switching
-
-#+BEGIN_SRC emacs-lisp
-  (use-package ace-window
-      ;; Autoload
-      :commands (ace-window)
-      :bind ("M-p" . ace-window)
-
-      :config
-      ;; Evil mode "leader" style mapping
-      (general-define-key
-       :states '(normal motion emacs)
-       :prefix "SPC"
-       "TAB" 'ace-window))
-#+END_SRC
 
 ** Magit
 
