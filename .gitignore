@@ -4,8 +4,9 @@
 # unignore everything within elisp
 !elisp/
 !elisp/*
+!elisp/**/*
 
-# unignore everything recursively within elisp
+# unignore everything within elpa
 !elpa/
 !elpa/*
 !elpa/**/*

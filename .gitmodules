@@ -1,3 +1,6 @@
 [submodule "elpa/evil"]
 	path = elpa/evil
 	url = https://github.com/emacs-evil/evil
+[submodule "elisp\\evil-special-modes"]
+	path = elisp\\evil-special-modes
+	url = https://github.com/Ambrevar/evil-special-modes
