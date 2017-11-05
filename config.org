@@ -416,7 +416,9 @@ These are global bindings, and packages that affect key binding in general.
 bind keys. Particularly useful for Evil mode and its various states.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package general)
+      (use-package general
+          :load-path "~/.emacs.d/elisp/general.el"
+          :ensure nil)
 #+END_SRC
 
 ** The Mighty Hydra
@@ -1815,15 +1817,17 @@ Leader bindings may be defined for other packages under [[*Compatibility%20with%
     ;; TODO: look into cross-platform spell checker
     ("s" flyspell-mode "spell check"))
 
+  (general-override-mode)
   (general-define-key
     :states '(normal motion emacs)
+    :keymaps 'override
     :prefix "SPC"
 
    ;;  Avoiding CTRL
-   "w" (general-simulate-keys "C-w")
-   "x" (general-simulate-keys "C-x")
-   "c" (general-simulate-keys "C-c")
-   "h" (general-simulate-keys "C-h")
+   "w" (general-simulate-keys "C-w" nil nil t)
+   "x" (general-simulate-keys "C-x" nil nil t)
+   "c" (general-simulate-keys "C-c" nil nil t)
+   "h" (general-simulate-keys "C-h" nil nil t)
 
    ;; The Rest
    "TAB" 'other-window
