@@ -7,9 +7,12 @@
 This is my Emacs config, which is (pretty much) in a single file thanks to
 [[http://orgmode.org/worg/org-contrib/babel/intro.html][org-babel]].
 
-Although GitHub does render =.org= files nicely, I recommend viewing it in
-Emacs, as GitHub isn't fully compatible. Using org-mode gives a nice overview
-and makes it quick and easy to navigate and make changes.
+Although GitHub does render =.org= files nicely, I recommend viewing it within
+Emacs org-mode, where everything is collapsible and all the links work.
+
+GitHub doesn't translate links to headings correctly, so [[*Preamble][this link to the
+Preamble]], for example, will only work in org-mode. Regular web-url links will
+work either way.
 
 * Package related
 
@@ -113,24 +116,15 @@ NO DISTRACTIONS.
 
 ** Theme
 
-*** Tao theme
-
-Grayscale theme based on the golden ratio in white or black.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package tao-theme
-  ;;     :config
-  ;;   (load-theme 'tao-yin t))
-#+END_SRC
-
 *** Eclipse theme
 
 A nice, light theme.
 
 #+BEGIN_SRC emacs-lisp
-  (load-file "~/.emacs.d/elisp/eclipse-theme.el")
-  (require 'eclipse-theme)
-  (load-theme 'eclipse t)
+  (use-package eclipse-theme
+      :load-path "~/.emacs.d/elisp"
+      :config
+      (load-theme 'eclipse t))
 #+END_SRC
 
 *** Monokai
@@ -735,6 +729,7 @@ are changes to update. (see [[file:init.el::%3B%3B%20`org-babel-load-file`%20inc
             (delete-file "~/.emacs.d/config.el"))))
 
   (add-hook 'after-save-hook #'my/delete-config-el)
+  (add-hook 'delayed-warnings-hook #'my/delete-config-el)
 #+END_SRC
 
 **** Tangle =config.org= on Emacs shutdown
@@ -781,31 +776,6 @@ is called.
         trash-directory "~/.emacs.d/trash")
 #+END_SRC
 
-*** Omit mode
-
-For hiding certain files and folders.
-
-**** Files to omit
-
-#+BEGIN_SRC emacs-lisp
-  ;; enable omit mode
-  (setq-default dired-omit-mode t
-
-                ;; autosave files
-                dired-omit-files "^\\.?#"
-
-                ;; dot files
-                dired-omit-files
-                (concat dired-omit-files "\\|^\\.[^\\.]"))
-#+END_SRC
-
-**** Toggle omit binding
-
-#+BEGIN_SRC emacs-lisp
-  (general-define-key :keymaps 'dired-mode-map
-                      ")" 'dired-omit-mode)
-#+END_SRC
-
 *** Open file with external application
 
 #+BEGIN_SRC emacs-lisp
@@ -847,8 +817,43 @@ For hiding certain files and folders.
 Dired enhancements.
 
 #+BEGIN_SRC emacs-lisp
+  (use-package dired+)
+#+END_SRC
+
+**** Omit mode
+
+For hiding certain files and folders.
+
+***** Files to omit
+
+#+BEGIN_SRC emacs-lisp
   (use-package dired+
-      :after (dired))
+      :init
+    ;; enable omit mode
+    (setq-default dired-omit-mode t
+
+                  ;; autosave files
+                  dired-omit-files "^\\.?#"
+
+                  ;; dot files
+                  dired-omit-files
+                  (concat dired-omit-files "\\|^\\.[^\\.]")))
+#+END_SRC
+
+***** Toggle omit binding
+
+#+BEGIN_SRC emacs-lisp
+  (use-package dired+
+      :config
+    (defun my/dired-omit-toggle ()
+      (interactive)
+      (if (bound-and-true-p dired-omit-mode)
+          (progn (setq-default dired-omit-mode nil)
+                 (dired-omit-mode -1))
+        (progn (setq-default dired-omit-mode t)
+               (dired-omit-mode 1))))
+    (general-define-key :keymaps 'dired-mode-map
+                        ")" 'my/dired-omit-toggle))
 #+END_SRC
 
 *** [[*Evil%20Dired][Evil-mode compatibility]]
@@ -912,7 +917,7 @@ Adds enhanced ivy versions of many commands
   (use-package ivy-hydra))
 #+END_SRC
 
-*** [[*Evil%20Ivy%2BSwiper][Evil-mode compatibility]]
+*** [[*Evil%20Ivy%2BSwiper][Evil-mode compatibility]] 
 
 ** Magit
 
@@ -941,7 +946,9 @@ example), so this package deals with that and fixes it somehow.
       (setenv "SSH_ASKPASS" "git-gui--askpass"))
 #+END_SRC
 
-*** [[*Evil%20Magit][Evil-mode compatibility]]
+*** [[*Evil%20Magit][Vim-like leader bindings]]
+
+*** See also: evil-magit under [[*Evil-specific%20packages][Evil-specific packages]]
 
 ** Projectile
 
@@ -960,7 +967,7 @@ example), so this package deals with that and fixes it somehow.
   (projectile-mode t))
 #+END_SRC
 
-*** [[*Evil%20Projectile][Evil-mode compatibility]]
+*** [[*Evil%20Projectile][Vim-like leader bindings]]
 
 ** Yasnippet
 
@@ -999,52 +1006,55 @@ I would ever want to disable Evil-mode, but I can if I want, I guess.
 
 *** Built-in modes
 
+See also: evil-special-modes under [[*Evil-specific%20packages][Evil-specific packages]]
+
 Configure various modes that have little to configure and are built-in to Emacs.
 
 #+BEGIN_SRC emacs-lisp
-    (defun setup-evil-builtins ()
-      ;; Special
-      (evil-make-overriding-map special-mode-map 'normal)
+  (defun setup-evil-builtins ()
+    ;; Special
+    (evil-make-overriding-map special-mode-map 'normal)
 
-      ;; Compilation
-      (evil-set-initial-state 'compilation-mode 'normal)
+    ;; Compilation
+    (evil-set-initial-state 'compilation-mode 'normal)
 
-      ;; Occur
-      (evil-make-overriding-map occur-mode-map 'normal)
-      (evil-set-initial-state 'occur-mode 'normal)
+    ;; Occur
+    (evil-make-overriding-map occur-mode-map 'normal)
+    (evil-set-initial-state 'occur-mode 'normal)
 
-      ;; Package menu
-      (evil-set-initial-state 'package-menu-mode 'normal)
-      (evil-make-overriding-map package-menu-mode-map 'normal)
-      (general-evil-define-key 'normal 'package-menu-mode-map
-        "U" 'package-menu-mark-upgrades)
+    ;; Bookmark
+    (with-eval-after-load "bookmark"
+      (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+      (evil-make-overriding-map bookmark-bmenu-mode-map 'normal)
+      (general-evil-define-key 'normal 'bookmark-bmenu-mode-map
+        "RET" 'bookmark-bmenu-this-window
+        "j" 'evil-next-line
+        "k" 'evil-previous-line))
 
-      ;; Help
-      (general-evil-define-key 'normal 'help-mode-map
-        "q" 'quit-window
-        "<" 'help-go-back
-        ">" 'help-go-forward)
+    ;;;; Package menu
+    ;;(evil-set-initial-state 'package-menu-mode 'normal)
+    ;;(evil-make-overriding-map package-menu-mode-map 'normal)
+    ;;(general-evil-define-key 'normal 'package-menu-mode-map
+    ;;  "U" 'package-menu-mark-upgrades)
 
-      ;; Bookmark
-      (with-eval-after-load "bookmark"
-        (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
-        (evil-make-overriding-map bookmark-bmenu-mode-map 'normal)
-        (general-evil-define-key 'normal 'bookmark-bmenu-mode-map
-          "RET" 'bookmark-bmenu-this-window
-          "j" 'evil-next-line
-          "k" 'evil-previous-line))
+    ;;;; Help
+    ;;(general-evil-define-key 'normal 'help-mode-map
+    ;;  "q" 'quit-window
+    ;;  "<" 'help-go-back
+    ;;  ">" 'help-go-forward)
 
-      ;; Shells (all three of them)
-      (defun my/evil-shell-insert ()
-        "Go to the very end of the buffer and enter insert state."
-        (interactive)
-        (evil-goto-line)
-        (evil-append-line 0))
-      (general-evil-define-key 'normal
-          '(shell-mode-map eshell-mode-map term-mode-map)
-        "I" 'my/evil-shell-insert
-        "A" 'my/evil-shell-insert))
-    (add-to-list 'my/evil-other-mode-funs 'setup-evil-builtins)
+    ;;;; Shells (all three of them)
+    ;;(defun my/evil-shell-insert ()
+    ;;  "Go to the very end of the buffer and enter insert state."
+    ;;  (interactive)
+    ;;  (evil-goto-line)
+    ;;  (evil-append-line 0))
+    ;;(general-evil-define-key 'normal
+    ;;    '(shell-mode-map eshell-mode-map term-mode-map)
+    ;;  "I" 'my/evil-shell-insert
+    ;;  "A" 'my/evil-shell-insert)
+    )
+  (add-to-list 'my/evil-other-mode-funs 'setup-evil-builtins)
 #+END_SRC
 
 *** Evil Org
@@ -1299,7 +1309,7 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
         ("b" nil "back"))
 
       (evil-make-overriding-map dired-mode-map 'normal)
-      (general-define-key :states 'normal "-" (kbd "C-x d RET ."))
+      (general-define-key :states 'normal "-" (kbd "C-x d RET"))
       (general-evil-define-key 'normal 'dired-mode-map
         "-" 'my/up-dir
         "RET" 'dired-find-alternate-file
@@ -1379,82 +1389,81 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
 *** Evil Info
 
 #+BEGIN_SRC emacs-lisp
-  (defun setup-evil-info-mode ()
-    (defhydra hydra-info (:color red
-                          :hint nil)
-      "
-  Info-mode:
+  ;;  (defun setup-evil-info-mode ()
+  ;;    (defhydra hydra-info (:color red
+  ;;                          :hint nil)
+  ;;      "
+  ;;  Info-mode:
 
-    ^^_]_ forward  (next logical node)       ^^_l_ast (←)        _u_p (↑)                             _f_ollow reference       _T_OC
-    ^^_[_ backward (prev logical node)       ^^_r_eturn (→)      _m_enu (↓) (C-u for new window)      _i_ndex                  _d_irectory
-    ^^_n_ext (same level only)               ^^_H_istory         _g_oto (C-u for new window)          _,_ next index item      _c_opy node name
-    ^^_p_rev (same level only)               _<_/_t_op           _b_eginning of buffer                virtual _I_ndex          _C_lone buffer
-    regex _s_earch (_S_ case sensitive)      ^^_>_ final         _e_nd of buffer                      ^^                       _a_propos
+  ;;    ^^_]_ forward  (next logical node)       ^^_l_ast (←)        _u_p (↑)                             _f_ollow reference       _T_OC
+  ;;    ^^_[_ backward (prev logical node)       ^^_r_eturn (→)      _m_enu (↓) (C-u for new window)      _i_ndex                  _d_irectory
+  ;;    ^^_n_ext (same level only)               ^^_H_istory         _g_oto (C-u for new window)          _,_ next index item      _c_opy node name
+  ;;    ^^_p_rev (same level only)               _<_/_t_op           _b_eginning of buffer                virtual _I_ndex          _C_lone buffer
+  ;;    regex _s_earch (_S_ case sensitive)      ^^_>_ final         _e_nd of buffer                      ^^                       _a_propos
 
-    _1_ .. _9_ Pick first .. ninth item in the node's menu.
-  "
-      ("]"   Info-forward-node)
-      ("["   Info-backward-node)
-      ("n"   Info-next)
-      ("p"   Info-prev)
-      ("s"   Info-search)
-      ("S"   Info-search-case-sensitively)
+  ;;    _1_ .. _9_ Pick first .. ninth item in the node's menu.
+  ;;  "
+  ;;      ("]"   Info-forward-node)
+  ;;      ("["   Info-backward-node)
+  ;;      ("n"   Info-next)
+  ;;      ("p"   Info-prev)
+  ;;      ("s"   Info-search)
+  ;;      ("S"   Info-search-case-sensitively)
 
-      ("l"   Info-history-back)
-      ("r"   Info-history-forward)
-      ("H"   Info-history)
-      ("t"   Info-top-node)
-      ("<"   Info-top-node)
-      (">"   Info-final-node)
+  ;;      ("l"   Info-history-back)
+  ;;      ("r"   Info-history-forward)
+  ;;      ("H"   Info-history)
+  ;;      ("t"   Info-top-node)
+  ;;      ("<"   Info-top-node)
+  ;;      (">"   Info-final-node)
 
-      ("u"   Info-up)
-      ("^"   Info-up)
-      ("m"   Info-menu)
-      ("g"   Info-goto-node)
-      ("b"   beginning-of-buffer)
-      ("e"   end-of-buffer)
+  ;;      ("u"   Info-up)
+  ;;      ("^"   Info-up)
+  ;;      ("m"   Info-menu)
+  ;;      ("g"   Info-goto-node)
+  ;;      ("b"   beginning-of-buffer)
+  ;;      ("e"   end-of-buffer)
 
-      ("f"   Info-follow-reference)
-      ("i"   Info-index)
-      (","   Info-index-next)
-      ("I"   Info-virtual-index)
+  ;;      ("f"   Info-follow-reference)
+  ;;      ("i"   Info-index)
+  ;;      (","   Info-index-next)
+  ;;      ("I"   Info-virtual-index)
 
-      ("T"   Info-toc)
-      ("d"   Info-directory)
-      ("c"   Info-copy-current-node-name)
-      ("C"   clone-buffer)
-      ("a"   info-apropos)
+  ;;      ("T"   Info-toc)
+  ;;      ("d"   Info-directory)
+  ;;      ("c"   Info-copy-current-node-name)
+  ;;      ("C"   clone-buffer)
+  ;;      ("a"   info-apropos)
 
-      ("1"   Info-nth-menu-item)
-      ("2"   Info-nth-menu-item)
-      ("3"   Info-nth-menu-item)
-      ("4"   Info-nth-menu-item)
-      ("5"   Info-nth-menu-item)
-      ("6"   Info-nth-menu-item)
-      ("7"   Info-nth-menu-item)
-      ("8"   Info-nth-menu-item)
-      ("9"   Info-nth-menu-item)
+  ;;      ("1"   Info-nth-menu-item)
+  ;;      ("2"   Info-nth-menu-item)
+  ;;      ("3"   Info-nth-menu-item)
+  ;;      ("4"   Info-nth-menu-item)
+  ;;      ("5"   Info-nth-menu-item)
+  ;;      ("6"   Info-nth-menu-item)
+  ;;      ("7"   Info-nth-menu-item)
+  ;;      ("8"   Info-nth-menu-item)
+  ;;      ("9"   Info-nth-menu-item)
 
-      ("?"   Info-summary "Info summary")
-      ("h"   Info-help "Info help")
-      ("q"   Info-exit "Info exit" :color blue)
-      ("." nil "toggle hydra" :color blue))
-    (general-evil-define-key 'normal 'Info-mode-map
-      "." 'hydra-info/body
-      "TAB" 'Info-next-reference
-      "S-TAB" 'Info-prev-reference
-      "RET" 'Info-follow-nearest-node
-      "C-p" 'Info-history-back
-      "C-n" 'Info-history-forward
-      "q" 'Info-exit))
-  (add-to-list 'my/evil-other-mode-funs 'setup-evil-info-mode)
+  ;;      ("?"   Info-summary "Info summary")
+  ;;      ("h"   Info-help "Info help")
+  ;;      ("q"   Info-exit "Info exit" :color blue)
+  ;;      ("." nil "toggle hydra" :color blue))
+  ;;    (general-evil-define-key 'normal 'Info-mode-map
+  ;;      "." 'hydra-info/body
+  ;;      "TAB" 'Info-next-reference
+  ;;      "S-TAB" 'Info-prev-reference
+  ;;      "RET" 'Info-follow-nearest-node
+  ;;      "C-p" 'Info-history-back
+  ;;      "C-n" 'Info-history-forward
+  ;;      "q" 'Info-exit))
+  ;;(add-to-list 'my/evil-other-mode-funs 'setup-evil-info-mode)
 #+END_SRC
 
 ** Basic options
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil
-      :ensure nil
       :init
       (setq evil-want-C-w-delete t
             evil-want-fine-undo "No"
@@ -1462,12 +1471,12 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
             evil-want-C-u-scroll t
             evil-ex-substitute-global t
             evil-overriding-maps nil
-            evil-search-module 'evil-search
-            )
+            evil-search-module 'evil-search)
 
-      ;; Persistent undo history (save info to file)
-      (setq undo-tree-auto-save-history t
-            undo-tree-history-directory-alist `((".*" . "~/.emacs.d/tmp"))))
+      ;;;; Persistent undo history (save info to file)
+      ;;(setq undo-tree-auto-save-history t
+      ;;      undo-tree-history-directory-alist `((".*" . "~/.emacs.d/tmp")))
+      )
 #+END_SRC
 
 ** Disable evil-make-overriding/intercept-map at start-up.
@@ -1476,7 +1485,6 @@ Otherwise, Evil will mess with other mode's mappings.
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil
-      :ensure nil
       :init
     (advice-add 'evil-make-intercept-map :override #'ignore)
     (advice-add 'evil-make-overriding-map :override #'ignore))
@@ -1494,16 +1502,6 @@ for Evil.
 #+END_SRC
 
 *** General settings
-
-**** Normal state == Motion state
-
-Basically avoid Motion state and use Normal state instead. I don't need Motion
-state, so it adds unnecessary complexity.
-
-#+BEGIN_SRC emacs-lisp
-  (setq evil-normal-state-modes (append evil-motion-state-modes evil-normal-state-modes))
-  (setq evil-motion-state-modes nil)
-#+END_SRC
 
 **** Cursor color/shape to indicate modes/states
 
@@ -1658,6 +1656,12 @@ also focus on the new split window like Vim
                 "gk" 'evil-previous-line)
 #+END_SRC
 
+**** gb for simple buffer management
+
+#+BEGIN_SRC emacs-lisp
+  (nmap "gb" 'buffer-menu)
+#+END_SRC
+
 **** Go to the end of pasted text
 
 #+BEGIN_SRC emacs-lisp
@@ -1776,8 +1780,12 @@ request.
 
 For operating on the entire file.
 
+(require 'evil-textobj-entire)
+
 #+BEGIN_SRC emacs-lisp
-  (load-file "~/.emacs.d/elisp/evil-textobj-entire.el")
+  (use-package evil-textobj-entire
+      :load-path "~/.emacs.d/elisp/"
+      :ensure nil)
 #+END_SRC
 
 *** Leader bindings
@@ -1808,8 +1816,8 @@ Leader bindings may be defined for other packages under [[*Compatibility%20with%
     ("s" flyspell-mode "spell check"))
 
   (general-define-key
-   :states '(normal motion emacs)
-   :prefix "SPC"
+    :states '(normal motion emacs)
+    :prefix "SPC"
 
    ;;  Avoiding CTRL
    "w" (general-simulate-keys "C-w")
@@ -1821,12 +1829,14 @@ Leader bindings may be defined for other packages under [[*Compatibility%20with%
    "TAB" 'other-window
    "s"  'evil-write
    "e"  'eval-last-sexp
+   "E"  'pp-macroexpand-last-sexp
    "q"  'quit-window
    "f"  'ido-find-file
    "b"  'ido-switch-buffer
    "B"  'ibuffer
    "P"  'list-packages
    "o"  'hydra-toggle-option/body
+   "m"  'evil-motion-state
    "i"  'my/open-init-el
    "G"  'my/open-gtd
    "I"  'emacs-init-time)
@@ -1855,6 +1865,42 @@ other modes]].
 #+END_SRC
 
 ** Evil-specific packages
+
+*** [[https://github.com/Ambrevar/evil-special-modes][evil-special-modes]]
+
+Creates consistent evil bindings for many built-in modes.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-special-modes
+      :load-path "~/.emacs.d/elisp/evil-special-modes"
+      :config
+      (with-eval-after-load 'calendar   (require 'evil-calendar) (evil-calendar-set-keys))
+      (with-eval-after-load 'cus-edit   (require 'evil-custom) (evil-custom-set-keys))
+      (with-eval-after-load 'debug      (require 'evil-debugger) (evil-debugger-set-keys))
+      (with-eval-after-load 'diff-mode  (require 'evil-diff-mode) (evil-diff-mode-set-keys))
+      (with-eval-after-load 'eshell     (require 'evil-eshell) (evil-eshell-set-keys))
+      (with-eval-after-load 'help       (require 'evil-help) (evil-help-set-keys))
+      (with-eval-after-load 'image-mode (require 'evil-image) (evil-image-set-keys))
+      (with-eval-after-load 'info       (require 'evil-info) (evil-info-set-keys))
+      (with-eval-after-load 'man        (require 'evil-man) (evil-man-set-keys))
+    ;;(with-eval-after-load 'outline    (require 'evil-outline) (evil-outline-set-keys))
+      (with-eval-after-load 'package    (require 'evil-package) (evil-package-set-keys))
+      (with-eval-after-load 'proced     (require 'evil-proced) (evil-proced-set-keys))
+      (with-eval-after-load 'profiler   (require 'evil-profiler) (evil-profiler-set-keys))
+      (with-eval-after-load 'term       (require 'evil-term) (evil-term-set-keys))
+      (with-eval-after-load 'woman (require 'evil-woman) (evil-woman-set-keys))
+      :ensure nil)
+#+END_SRC
+
+*** [[https://github.com/justbur/evil-magit][evil-magit]]
+
+Modifies some Magit bindings to be more Evil
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-magit
+      :init (setq evil-magit-state 'emacs)
+      :after evil magit)
+#+END_SRC
 
 *** [[https://github.com/timcharper/evil-surround][evil-surround]]
 
@@ -1901,16 +1947,6 @@ Make a visual selection, and search it. Convenient and intuitive.
       :after evil
       :config
       (global-evil-visualstar-mode))
-#+END_SRC
-
-*** [[https://github.com/justbur/evil-magit][evil-magit]]
-
-Modifies some Magit bindings to be more Evil
-
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-magit
-      :init (setq evil-magit-state 'emacs)
-      :after evil magit)
 #+END_SRC
 
 *** [[https://github.com/CodeFalling/nlinum-relative][nlinum-relative]]
