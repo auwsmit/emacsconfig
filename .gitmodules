@@ -4,9 +4,6 @@
 [submodule "elisp/general.el"]
 	path = elisp/general.el
 	url = https://github.com/noctuid/general.el
-[submodule "elisp/evil-special-modes"]
-	path = elisp/evil-special-modes
-	url = https://github.com/Ambrevar/evil-special-modes
 [submodule "elisp/evil-collection"]
 	path = elisp/evil-collection
 	url = https://github.com/jojojames/evil-collection

@@ -1261,7 +1261,7 @@ I know org-mode is built-in, but it's so big that it's like a separate entity to
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-ibuffer-mode)
 #+END_SRC
 
-*** Evil Dired
+*** COMMENT Evil Dired
 
 Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's vinegar]].
 
@@ -1310,16 +1310,16 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
         ("X" dired-do-shell-command-pipe "shell-command-pipe")
         ("b" nil "back"))
 
-      (evil-make-overriding-map dired-mode-map 'normal)
+      ;; (evil-make-overriding-map dired-mode-map 'normal)
       (general-define-key :states 'normal "-" (kbd "C-x d RET"))
       (general-evil-define-key 'normal 'dired-mode-map
         "-" 'my/up-dir
-        "RET" 'dired-find-alternate-file
-        "i" 'ido-find-file
-        "j" 'dired-next-line
-        "k" 'dired-previous-line
-        "gg" 'evil-goto-first-line
-        "G" 'evil-goto-line
+        ;; "RET" 'dired-find-alternate-file
+        ;; "i" 'ido-find-file
+        ;; "j" 'dired-next-line
+        ;; "k" 'dired-previous-line
+        ;; "gg" 'evil-goto-first-line
+        ;; "G" 'evil-goto-line
         "." 'hydra-dired-main/body)
       ))
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-dired-mode)
@@ -1879,32 +1879,8 @@ Currently an early WIP
   (use-package evil-collection
       :load-path "~/.emacs.d/elisp/evil-collection"
       :config
-      :ensure nil)
-#+END_SRC
-
-*** [[https://github.com/Ambrevar/evil-special-modes][evil-special-modes]]
-
-Creates consistent evil bindings for many built-in modes.
-Currently an early WIP
-
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-special-modes
-      :load-path "~/.emacs.d/elisp/evil-special-modes"
-      :config
-      ;;(with-eval-after-load 'calendar   (require 'evil-calendar) (evil-calendar-set-keys))
-      ;;(with-eval-after-load 'cus-edit   (require 'evil-custom) (evil-custom-set-keys))
-      ;;(with-eval-after-load 'debug      (require 'evil-debugger) (evil-debugger-set-keys))
-      ;;(with-eval-after-load 'diff-mode  (require 'evil-diff-mode) (evil-diff-mode-set-keys))
-      ;;(with-eval-after-load 'eshell     (require 'evil-eshell) (evil-eshell-set-keys))
-      ;;(with-eval-after-load 'help       (require 'evil-help) (evil-help-set-keys))
-      ;;(with-eval-after-load 'image-mode (require 'evil-image) (evil-image-set-keys))
-      ;;(with-eval-after-load 'info       (require 'evil-info) (evil-info-set-keys))
-      ;;(with-eval-after-load 'man        (require 'evil-man) (evil-man-set-keys))
-      ;;(with-eval-after-load 'package    (require 'evil-package) (evil-package-set-keys))
-      ;;(with-eval-after-load 'proced     (require 'evil-proced) (evil-proced-set-keys))
-      ;;(with-eval-after-load 'profiler   (require 'evil-profiler) (evil-profiler-set-keys))
-      ;;(with-eval-after-load 'term       (require 'evil-term) (evil-term-set-keys))
-      ;;(with-eval-after-load 'woman (require 'evil-woman) (evil-woman-set-keys))
+      (with-eval-after-load 'help (require 'evil-help) (evil-help-setup))
+      (with-eval-after-load 'dired (require 'evil-dired) (evil-dired-setup))
       :ensure nil)
 #+END_SRC
 
