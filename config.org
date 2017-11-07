@@ -1015,31 +1015,31 @@ Configure various modes that have little to configure and are built-in to Emacs.
 #+BEGIN_SRC emacs-lisp
   (defun setup-evil-builtins ()
     ;; Special
-    (evil-make-overriding-map special-mode-map 'normal)
+    ;; (evil-make-overriding-map special-mode-map 'normal)
 
     ;; Compilation
-    (evil-set-initial-state 'compilation-mode 'normal)
+    ;; (evil-set-initial-state 'compilation-mode 'normal)
 
     ;; Occur
-    (evil-make-overriding-map occur-mode-map 'normal)
-    (evil-set-initial-state 'occur-mode 'normal)
+    ;; (evil-make-overriding-map occur-mode-map 'normal)
+    ;; (evil-set-initial-state 'occur-mode 'normal)
 
     ;; Bookmark
-    (with-eval-after-load "bookmark"
-      (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
-      (evil-make-overriding-map bookmark-bmenu-mode-map 'normal)
-      (general-evil-define-key 'normal 'bookmark-bmenu-mode-map
-        "RET" 'bookmark-bmenu-this-window
-        "j" 'evil-next-line
-        "k" 'evil-previous-line))
+    ;;(with-eval-after-load "bookmark"
+    ;;  (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+    ;;  (evil-make-overriding-map bookmark-bmenu-mode-map 'normal)
+    ;;  (general-evil-define-key 'normal 'bookmark-bmenu-mode-map
+    ;;    "RET" 'bookmark-bmenu-this-window
+    ;;    "j" 'evil-next-line
+    ;;    "k" 'evil-previous-line))
 
-    ;;;; Package menu
+    ;; Package menu
     ;;(evil-set-initial-state 'package-menu-mode 'normal)
     ;;(evil-make-overriding-map package-menu-mode-map 'normal)
     ;;(general-evil-define-key 'normal 'package-menu-mode-map
     ;;  "U" 'package-menu-mark-upgrades)
 
-    ;;;; Help
+    ;; Help
     ;;(general-evil-define-key 'normal 'help-mode-map
     ;;  "q" 'quit-window
     ;;  "<" 'help-go-back
@@ -1346,10 +1346,12 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
     ;; Leader shortcuts
     (general-define-key
      :states '(normal motion emacs)
+     :keymaps 'override
      :prefix "SPC"
      "SPC"  'counsel-M-x
      "b" 'ivy-switch-buffer
      "f" 'counsel-find-file
+     "r" 'counsel-recentf
      ))
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-ivyswiper-mode)
 #+END_SRC
@@ -1364,6 +1366,7 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
     ;; Leader shortcuts
     (general-define-key
      :states '(normal motion emacs)
+     :keymaps 'override
      :prefix "SPC"
      "gs" 'magit-status
      "gd" 'magit-diff
@@ -1383,8 +1386,9 @@ Directory climbing inspired by [[https://github.com/tpope/vim-vinegar][tpope's v
     ;; Leader shortcuts
     (general-define-key
      :states '(normal motion emacs)
+     :keymaps 'override
      :prefix "SPC"
-     "p"  (general-simulate-keys "C-c p")))
+     "p"  (general-simulate-keys "C-c p" nil nil t)))
   (add-to-list 'my/evil-other-mode-funs 'setup-evil-projectile-mode)
 #+END_SRC
 
