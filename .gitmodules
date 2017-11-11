@@ -1,9 +1,6 @@
 [submodule "elpa/evil"]
 	path = elpa/evil
 	url = https://github.com/emacs-evil/evil
-[submodule "elisp/general.el"]
-	path = elisp/general.el
-	url = https://github.com/noctuid/general.el
 [submodule "elisp/evil-collection"]
 	path = elisp/evil-collection
 	url = https://github.com/jojojames/evil-collection
