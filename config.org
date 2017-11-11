@@ -1940,7 +1940,7 @@ Improved sentence logic and navigation.
 #+END_SRC
 
 # *** [[https://github.com/noctuid/lispyville][lispyville]]
-#
+
 # Better lisp editing for Evil. (With some help from [[https://github.com/abo-abo/lispy][lispy]])
 # 
 # #+BEGIN_SRC emacs-lisp
