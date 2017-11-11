@@ -416,8 +416,7 @@ These are global bindings, and packages that affect key binding in general.
 bind keys. Particularly useful for Evil mode and its various states.
 
 #+BEGIN_SRC emacs-lisp
-      (use-package general
-          :ensure nil)
+      (use-package general)
 #+END_SRC
 
 ** The Mighty Hydra
@@ -1705,7 +1704,7 @@ Inspired by [[https://github.com/tpope/vim-unimpaired][unimpaired]]
     ("w" toggle-word-wrap "word wrap")
     ("W" whitespace-mode "whitespace-mode")
     ("n" linum-mode "linum-mode")
-    ("l" lispyville-mode "lispyville-mode")
+    ;; ("l" lispyville-mode "lispyville-mode")
     ;; TODO: look into cross-platform spell checker
     ("s" flyspell-mode "spell check"))
 
@@ -1771,8 +1770,6 @@ Like using =o= or =O=, but doesn't enter insert mode.
 **** "entire" text object (ae and ie)
 
 For operating on the entire file.
-
-(require 'evil-textobj-entire)
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-textobj-entire
@@ -1942,8 +1939,8 @@ Improved sentence logic and navigation.
       (define-key evil-inner-text-objects-map "s" 'sentence-nav-evil-inner-sentence))
 #+END_SRC
 
-*** [[https://github.com/noctuid/lispyville][lispyville]]
-
+# *** [[https://github.com/noctuid/lispyville][lispyville]]
+#
 # Better lisp editing for Evil. (With some help from [[https://github.com/abo-abo/lispy][lispy]])
 # 
 # #+BEGIN_SRC emacs-lisp
